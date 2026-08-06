@@ -1,0 +1,60 @@
+/* 星屿乐园 Stellar Park — 沉浸式电影感设计合约
+   单一品牌色：琥珀金 (#E3A63B)，夜空蓝黑背景，电影级光效与深度 */
+
+:root {
+  /* 基础表面 — 中灰 */
+  --stellar-background: #303540;
+  --stellar-background-elevated: #363B48;
+  --stellar-foreground: #ECEFF4;
+
+  --stellar-card: #383E4B;
+  --stellar-card-elevated: #3E4554;
+  --stellar-card-foreground: #ECEFF4;
+
+  --stellar-popover: #343A46;
+  --stellar-popover-foreground: #ECEFF4;
+
+  /* 品牌主色：琥珀金 + 辉光层 */
+  --stellar-primary: #E3A63B;
+  --stellar-primary-bright: #F0BC5A;
+  --stellar-primary-foreground: #14100A;
+  --stellar-primary-strong: #C98F26;
+  --stellar-primary-soft: rgba(227, 166, 59, 0.12);
+  --stellar-primary-glow: rgba(227, 166, 59, 0.35);
+  --stellar-primary-glow-soft: rgba(227, 166, 59, 0.15);
+
+  /* 中性层级 */
+  --stellar-muted: #424857;
+  --stellar-muted-foreground: #A0A5B4;
+  --stellar-ink-3: #74798A;
+
+  /* 线条与输入 */
+  --stellar-border: #454C5C;
+  --stellar-border-glow: rgba(227, 166, 59, 0.2);
+  --stellar-input: #454C5C;
+  --stellar-ring: #E3A63B;
+
+  /* 圆角 */
+  --stellar-radius-sm: 4px;
+  --stellar-radius-md: 10px;
+  --stellar-radius-lg: 18px;
+
+  /* 状态色（仅真实状态使用） */
+  --stellar-state-success: #34D899;
+  --stellar-state-warning: #F0B84A;
+  --stellar-state-error: #FF7B6B;
+  --stellar-state-info: #6BA8E8;
+
+  /* 字体 */
+  --stellar-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+
+  /* 电影感深度阴影 — 漂浮层专用 */
+  --stellar-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --stellar-shadow-2: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
+  --stellar-shadow-glow: 0 0 40px -8px rgba(227, 166, 59, 0.25);
+  --stellar-shadow-card: 0 8px 32px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(227, 166, 59, 0.04);
+
+  /* 玻璃拟态 */
+  --stellar-glass-bg: rgba(15, 20, 32, 0.65);
+  --stellar-glass-border: rgba(227, 166, 59, 0.12);
+}

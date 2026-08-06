@@ -1,0 +1,1669 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>后台 · 用户管理</title>
+    <style id="theme-vars">
+/* 星屿乐园 Stellar Park — 后台浅色主题
+   单一品牌色：琥珀金 (#E3A63B)，浅灰白背景，清爽数据工作台 */
+
+:root {
+  --stellar-background: #F4F5F8;
+  --stellar-background-elevated: #FFFFFF;
+  --stellar-foreground: #1A1F2E;
+  --stellar-card: #FFFFFF;
+  --stellar-card-elevated: #FFFFFF;
+  --stellar-card-foreground: #1A1F2E;
+  --stellar-popover: #FFFFFF;
+  --stellar-popover-foreground: #1A1F2E;
+  --stellar-primary: #E3A63B;
+  --stellar-primary-bright: #F0BC5A;
+  --stellar-primary-foreground: #14100A;
+  --stellar-primary-strong: #C98F26;
+  --stellar-primary-soft: rgba(227, 166, 59, 0.10);
+  --stellar-primary-glow: rgba(227, 166, 59, 0.20);
+  --stellar-primary-glow-soft: rgba(227, 166, 59, 0.08);
+  --stellar-muted: #EEF0F4;
+  --stellar-muted-foreground: #6B7280;
+  --stellar-ink-3: #9CA3AF;
+  --stellar-border: #E2E5EB;
+  --stellar-border-glow: rgba(227, 166, 59, 0.25);
+  --stellar-input: #E2E5EB;
+  --stellar-ring: #E3A63B;
+  --stellar-radius-sm: 4px;
+  --stellar-radius-md: 10px;
+  --stellar-radius-lg: 18px;
+  --stellar-state-success: #16A34A;
+  --stellar-state-warning: #D97706;
+  --stellar-state-error: #DC2626;
+  --stellar-state-info: #2563EB;
+  --stellar-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --stellar-shadow-1: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --stellar-shadow-2: 0 8px 30px -8px rgba(0, 0, 0, 0.12);
+  --stellar-shadow-glow: 0 0 24px -6px rgba(227, 166, 59, 0.15);
+  --stellar-shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --stellar-glass-bg: rgba(255, 255, 255, 0.90);
+  --stellar-glass-border: rgba(227, 166, 59, 0.15);
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--stellar-background);
+    --color-foreground: var(--stellar-foreground);
+    --color-card: var(--stellar-card);
+    --color-card-foreground: var(--stellar-card-foreground);
+    --color-popover: var(--stellar-popover);
+    --color-popover-foreground: var(--stellar-popover-foreground);
+    --color-primary: var(--stellar-primary);
+    --color-primary-foreground: var(--stellar-primary-foreground);
+    --color-muted: var(--stellar-muted);
+    --color-muted-foreground: var(--stellar-muted-foreground);
+    --color-border: var(--stellar-border);
+    --color-input: var(--stellar-input);
+    --color-ring: var(--stellar-ring);
+    --radius-sm: var(--stellar-radius-sm);
+    --radius-md: var(--stellar-radius-md);
+    --radius-lg: var(--stellar-radius-lg);
+  }
+  @layer base {
+    body { background: var(--stellar-background); color: var(--stellar-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--stellar-background); }
+      .text-background { color: var(--stellar-background); }
+      .bg-foreground { background-color: var(--stellar-foreground); }
+      .text-foreground { color: var(--stellar-foreground); }
+      .bg-card { background-color: var(--stellar-card); }
+      .text-card { color: var(--stellar-card); }
+      .bg-card-foreground { background-color: var(--stellar-card-foreground); }
+      .text-card-foreground { color: var(--stellar-card-foreground); }
+      .bg-popover { background-color: var(--stellar-popover); }
+      .text-popover { color: var(--stellar-popover); }
+      .bg-popover-foreground { background-color: var(--stellar-popover-foreground); }
+      .text-popover-foreground { color: var(--stellar-popover-foreground); }
+      .bg-primary { background-color: var(--stellar-primary); }
+      .text-primary { color: var(--stellar-primary); }
+      .bg-primary-foreground { background-color: var(--stellar-primary-foreground); }
+      .text-primary-foreground { color: var(--stellar-primary-foreground); }
+      .bg-muted { background-color: var(--stellar-muted); }
+      .text-muted { color: var(--stellar-muted); }
+      .bg-muted-foreground { background-color: var(--stellar-muted-foreground); }
+      .text-muted-foreground { color: var(--stellar-muted-foreground); }
+      .bg-border { background-color: var(--stellar-border); }
+      .text-border { color: var(--stellar-border); }
+      .bg-input { background-color: var(--stellar-input); }
+      .text-input { color: var(--stellar-input); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] { display: inline-flex; align-items: center; justify-content: center; }
+      .panel-enter { animation: panelFade 0.3s ease; }
+      @keyframes panelFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+      .pulse-dot { animation: pulseDot 2.5s ease-in-out infinite; }
+      @keyframes pulseDot { 0%, 100% { opacity: 1; box-shadow: 0 0 8px currentColor; } 50% { opacity: 0.5; box-shadow: 0 0 4px currentColor; } }
+      .new-row { animation: highlightRow 1.5s ease; }
+      @keyframes highlightRow { 0% { background-color: rgba(227,166,59,0.15); } 100% { background-color: transparent; } }
+      .sidebar-item-active { background: var(--stellar-primary-soft); color: var(--stellar-primary); box-shadow: inset 0 0 20px -8px var(--stellar-primary-glow-soft); border-left: 2px solid var(--stellar-primary); }
+
+      /* 玻璃拟态卡片 */
+      .glass-card {
+        background: var(--stellar-glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--stellar-glass-border);
+        box-shadow: var(--stellar-shadow-card);
+      }
+
+      /* 金色辉光边框 */
+      .glow-border {
+        border: 1px solid var(--stellar-border-glow);
+        box-shadow: 0 0 24px -8px var(--stellar-primary-glow), inset 0 1px 0 rgba(227,166,59,0.06);
+      }
+
+      /* 金色文字辉光 */
+      .text-glow {
+        text-shadow: 0 0 20px var(--stellar-primary-glow-soft), 0 0 40px var(--stellar-primary-glow-soft);
+      }
+
+      /* 金色按钮辉光 */
+      .btn-glow {
+        box-shadow: 0 4px 24px -4px var(--stellar-primary-glow), 0 0 0 1px rgba(227,166,59,0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .btn-glow:hover { box-shadow: 0 6px 32px -4px var(--stellar-primary-glow), 0 0 0 1px rgba(227,166,59,0.5); }
+      .btn-glow:active { transform: scale(0.97); box-shadow: 0 2px 12px -2px var(--stellar-primary-glow); }
+
+      /* 金色金属质感文字 */
+      .gold-text {
+        color: #C98F26;
+        font-weight: 600;
+      }
+
+      /* 氛围光晕 */
+      .ambient-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+        animation: glowFloat 10s ease-in-out infinite;
+      }
+      @keyframes glowFloat { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; } 33% { transform: translate(20px, -15px) scale(1.1); opacity: 0.6; } 66% { transform: translate(-15px, 10px) scale(0.9); opacity: 0.3; } }
+
+      /* 暗角（浅色主题下禁用） */
+      .cinematic-vignette::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        display: none;
+      }
+
+      /* 卡片悬浮 */
+      .lift-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .lift-card:hover { transform: translateY(-2px); box-shadow: var(--stellar-shadow-2), 0 0 24px -8px var(--stellar-primary-glow-soft); }
+
+      /* 按钮 hover 辉光 */
+      .hover-glow { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .hover-glow:hover { box-shadow: 0 0 16px -4px var(--stellar-primary-glow); }
+
+      /* 项目专属 SVG 图标辉光 */
+      .ride-icon-svg { filter: drop-shadow(0 0 3px var(--stellar-primary-glow-soft)) drop-shadow(0 0 6px var(--stellar-primary-glow-soft)); }
+      .ride-icon-svg.dimmed { filter: none !important; opacity: 0.4; }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased cinematic-vignette">
+<main>
+<div class="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+  <div class="ambient-glow" style="width:400px;height:400px;background:var(--stellar-primary-glow-soft);top:-100px;right:10%;"></div>
+  <div class="ambient-glow" style="width:300px;height:300px;background:rgba(91,141,201,0.06);bottom:10%;left:5%;animation-delay:-4s;"></div>
+  <div class="ambient-glow" style="width:250px;height:250px;background:rgba(227,166,59,0.05);top:40%;right:40%;animation-delay:-7s;"></div>
+</div>
+
+<!-- 项目运营状态确认弹窗 -->
+<div id="ride-toggle-confirm" class="fixed inset-0 z-[80] hidden items-center justify-center px-8" style="background: rgba(0,0,0,0.4); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
+  <div class="w-full max-w-[300px] rounded-2xl p-6 text-center" style="background: var(--stellar-card); box-shadow: var(--stellar-shadow-2); border: 1px solid var(--stellar-border);">
+    <p class="text-base font-semibold mb-1" id="ride-toggle-title" style="color: var(--stellar-foreground);">确认操作？</p>
+    <p class="text-xs mb-5" id="ride-toggle-desc" style="color: var(--stellar-muted-foreground);"></p>
+    <div class="flex gap-3">
+      <button onclick="cancelRideToggle()" class="flex-1 py-2.5 rounded-xl text-sm font-medium" style="background: var(--stellar-muted); color: var(--stellar-foreground);">否</button>
+      <button onclick="confirmRideToggle()" class="flex-1 py-2.5 rounded-xl text-sm font-medium" style="background: var(--stellar-primary); color: var(--stellar-primary-foreground);">是</button>
+    </div>
+  </div>
+</div>
+
+<div class="flex min-h-screen relative z-10">
+
+  <!-- ==================== 侧边栏 ==================== -->
+  <aside class="w-[232px] shrink-0 border-r-[1px] border-[var(--stellar-glass-border)] flex flex-col" style="background: var(--stellar-glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
+    <!-- Logo -->
+    <div class="px-5 py-5 border-b border-[var(--stellar-glass-border)]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">
+          <i data-lucide="sparkles" class="w-4 h-4 text-[var(--stellar-primary)]"></i>
+        </div>
+        <div>
+          <div class="text-sm font-bold">星屿乐园</div>
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)]">运营管理后台</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 导航 -->
+    <nav class="flex-1 px-3 py-4 space-y-1">
+      <button onclick="switchAdminPanel('dashboard')" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm sidebar-item-active" data-panel="dashboard">
+        <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+        <span>数据仪表盘</span>
+      </button>
+      <button onclick="switchAdminPanel('rides')" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors" data-panel="rides">
+        <i data-lucide="ferris-wheel" class="w-4 h-4"></i>
+        <span>项目运营</span>
+      </button>
+      <button onclick="switchAdminPanel('orders')" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors relative" data-panel="orders">
+        <i data-lucide="receipt-text" class="w-4 h-4"></i>
+        <span>订单管理</span>
+        <span id="new-order-badge" class="hidden ml-auto text-[10px] px-1.5 py-0.5 rounded-full pulse-dot" style="background: var(--stellar-state-error); color: white;">新</span>
+      </button>
+      <button onclick="switchAdminPanel('users')" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors relative" data-panel="users">
+        <i data-lucide="users" class="w-4 h-4"></i>
+        <span>用户管理</span>
+        <span id="new-user-badge" class="hidden ml-auto text-[10px] px-1.5 py-0.5 rounded-full pulse-dot" style="background: var(--stellar-state-info); color: white;">新</span>
+      </button>
+      <button onclick="switchAdminPanel('products')" class="admin-nav-item w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors" data-panel="products">
+        <i data-lucide="package" class="w-4 h-4"></i>
+        <span>商品管理</span>
+      </button>
+    </nav>
+
+    <!-- 底部信息 -->
+    <div class="px-4 py-4 border-t border-[var(--stellar-glass-border)]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">
+          <i data-lucide="user-cog" class="w-4 h-4 text-[var(--stellar-primary)]"></i>
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="text-xs font-medium truncate">管理员</div>
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)]">admin@stellar.com</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ==================== 主内容区 ==================== -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- 顶栏 -->
+    <header class="h-14 border-b border-[var(--stellar-glass-border)] flex items-center justify-between px-6 shrink-0" style="background: var(--stellar-glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
+      <div class="flex items-center gap-3">
+        <h1 class="text-sm font-semibold" id="page-title">数据仪表盘</h1>
+        <span class="text-[10px] px-2 py-0.5 rounded-full flex items-center gap-1" style="background: rgba(52,216,153,0.15); color: var(--stellar-state-success); box-shadow: 0 0 12px -4px var(--stellar-state-success);">
+          <span class="w-1.5 h-1.5 rounded-full pulse-dot" style="background: var(--stellar-state-success);"></span> 实时
+        </span>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="text-xs text-[var(--stellar-muted-foreground)]" id="current-time">—</div>
+      </div>
+    </header>
+
+    <!-- 面板容器 -->
+    <div class="flex-1 overflow-auto p-6">
+
+      <!-- ==================== 数据仪表盘 ==================== -->
+      <div id="panel-dashboard" class="panel-enter">
+        <!-- 核心指标 -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">今日营收</span>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 12px -4px var(--stellar-primary-glow);">
+                <i data-lucide="trending-up" class="w-4 h-4 text-[var(--stellar-state-success)]"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-bold gold-text">¥<span id="dash-revenue">0</span></div>
+            <div class="text-[10px] text-[var(--stellar-state-success)] mt-1">↑ 实时统计</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">今日订单</span>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 12px -4px var(--stellar-primary-glow);">
+                <i data-lucide="receipt" class="w-4 h-4 text-[var(--stellar-primary)]"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-bold" id="dash-orders">0</div>
+            <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-1">笔订单</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">在园人数</span>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 12px -4px var(--stellar-primary-glow);">
+                <i data-lucide="users" class="w-4 h-4 text-[var(--stellar-primary)]"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-bold" id="dash-visitors">8,426</div>
+            <div class="text-[10px] text-[var(--stellar-state-success)] mt-1">↑ 较昨日 +12%</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">运营项目</span>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 12px -4px var(--stellar-primary-glow);">
+                <i data-lucide="ferris-wheel" class="w-4 h-4 text-[var(--stellar-primary)]"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-bold"><span id="dash-rides-open">7</span>/<span class="text-[var(--stellar-muted-foreground)] text-base">8</span></div>
+            <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-1">个正常运营</div>
+          </div>
+        </div>
+
+        <!-- 两列布局 -->
+        <div class="grid grid-cols-3 gap-4">
+          <!-- 最近订单 -->
+          <div class="col-span-2 glass-card rounded-xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-[var(--stellar-glass-border)] flex items-center justify-between">
+              <h3 class="text-sm font-semibold">最近订单</h3>
+              <button onclick="switchAdminPanel('orders')" class="text-xs text-[var(--stellar-primary)] flex items-center gap-1">全部订单 <i data-lucide="chevron-right" class="w-3 h-3"></i></button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-xs text-[var(--stellar-muted-foreground)] border-b border-[var(--stellar-glass-border)]">
+                    <th class="text-left px-4 py-2.5 font-normal">订单号</th>
+                    <th class="text-left px-4 py-2.5 font-normal">票种</th>
+                    <th class="text-left px-4 py-2.5 font-normal">买家</th>
+                    <th class="text-left px-4 py-2.5 font-normal">金额</th>
+                    <th class="text-left px-4 py-2.5 font-normal">状态</th>
+                    <th class="text-left px-4 py-2.5 font-normal">时间</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-recent-orders">
+                  <tr><td colspan="6" class="text-center py-8 text-[var(--stellar-muted-foreground)] text-xs">暂无订单数据</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- 项目排队概览 -->
+          <div class="glass-card rounded-xl overflow-hidden">
+            <div class="px-4 py-3 border-b border-[var(--stellar-glass-border)]">
+              <h3 class="text-sm font-semibold">项目排队概览</h3>
+            </div>
+            <div class="p-4 space-y-3" id="dash-rides-status"></div>
+          </div>
+        </div>
+
+        <!-- 票种销售占比 -->
+        <div class="mt-4 glass-card rounded-xl p-4">
+          <h3 class="text-sm font-semibold mb-4">票种销售分布</h3>
+          <div class="grid grid-cols-4 gap-4" id="dash-ticket-stats">
+            <div class="text-center">
+              <div class="text-2xl font-bold gold-text" id="stat-single">0</div>
+              <div class="text-xs text-[var(--stellar-muted-foreground)] mt-1">成人单次入园票</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold gold-text" id="stat-annual">0</div>
+              <div class="text-xs text-[var(--stellar-muted-foreground)] mt-1">年卡会员</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold gold-text" id="stat-express">0</div>
+              <div class="text-xs text-[var(--stellar-muted-foreground)] mt-1">快速通行证</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold gold-text" id="stat-child">0</div>
+              <div class="text-xs text-[var(--stellar-muted-foreground)] mt-1">儿童单次入园票</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 项目运营 ==================== -->
+      <div id="panel-rides" class="panel-enter hidden">
+        <div class="glass-card rounded-xl overflow-hidden">
+          <div class="px-4 py-3 border-b border-[var(--stellar-glass-border)] flex items-center justify-between">
+            <h3 class="text-sm font-semibold">项目运营管理</h3>
+            <div class="flex items-center gap-2 text-xs text-[var(--stellar-muted-foreground)]">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full" style="background: var(--stellar-state-success);"></span>运营中</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-[var(--stellar-ink-3)]"></span>维护中</span>
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-xs text-[var(--stellar-muted-foreground)] border-b border-[var(--stellar-glass-border)]">
+                  <th class="text-left px-4 py-2.5 font-normal">项目名称</th>
+                  <th class="text-left px-4 py-2.5 font-normal">所属区域</th>
+                  <th class="text-left px-4 py-2.5 font-normal">刺激等级</th>
+                  <th class="text-left px-4 py-2.5 font-normal">排队时间</th>
+                  <th class="text-left px-4 py-2.5 font-normal">载客量</th>
+                  <th class="text-left px-4 py-2.5 font-normal">运营状态</th>
+                  <th class="text-left px-4 py-2.5 font-normal">操作</th>
+                </tr>
+              </thead>
+              <tbody id="rides-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 区域概览 -->
+        <div class="grid grid-cols-4 gap-4 mt-4">
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-2 h-2 rounded-full text-[var(--stellar-primary)] pulse-dot" style="background: var(--stellar-primary);"></div>
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">星际港</span>
+            </div>
+            <div class="text-lg font-bold">2 个项目</div>
+            <div class="text-[10px] text-[var(--stellar-state-warning)] mt-1">平均排队 22min</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-2 h-2 rounded-full text-[var(--stellar-state-error)]" style="background: var(--stellar-state-error);"></div>
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">暗影域</span>
+            </div>
+            <div class="text-lg font-bold">2 个项目</div>
+            <div class="text-[10px] text-[var(--stellar-state-warning)] mt-1">平均排队 36min</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-2 h-2 rounded-full text-[var(--stellar-state-info)]" style="background: var(--stellar-state-info);"></div>
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">霓虹城</span>
+            </div>
+            <div class="text-lg font-bold">2 个项目</div>
+            <div class="text-[10px] text-[var(--stellar-state-error)] mt-1">平均排队 45min</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-2 h-2 rounded-full text-[var(--stellar-state-success)]" style="background: var(--stellar-state-success);"></div>
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">幻梦湾</span>
+            </div>
+            <div class="text-lg font-bold">2 个项目</div>
+            <div class="text-[10px] text-[var(--stellar-state-success)] mt-1">平均排队 16min</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 订单管理 ==================== -->
+      <div id="panel-orders" class="panel-enter hidden">
+        <!-- 筛选栏 -->
+        <div class="glass-card rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">状态筛选:</span>
+              <button onclick="filterOrders('all')" class="order-status-filter text-xs px-3 py-1.5 rounded-lg sidebar-item-active" data-status="all">全部</button>
+              <button onclick="filterOrders('paid')" class="order-status-filter text-xs px-3 py-1.5 rounded-lg text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors" data-status="paid">待使用</button>
+              <button onclick="filterOrders('pending')" class="order-status-filter text-xs px-3 py-1.5 rounded-lg text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors" data-status="pending">待支付</button>
+              <button onclick="filterOrders('used')" class="order-status-filter text-xs px-3 py-1.5 rounded-lg text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors" data-status="used">已使用</button>
+              <button onclick="filterOrders('refunded')" class="order-status-filter text-xs px-3 py-1.5 rounded-lg text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors" data-status="refunded">已退款</button>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--stellar-muted-foreground)] absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="order-search" placeholder="搜索订单号/买家..." class="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-[var(--stellar-input)] w-48 focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);">
+              </div>
+              <button onclick="refreshOrders()" class="hover-glow text-xs px-3 py-1.5 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-all flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 刷新
+              </button>
+              <button onclick="adminClearAllOrders()" class="text-xs px-3 py-1.5 rounded-lg border border-[var(--stellar-state-error)]/30 text-[var(--stellar-state-error)] hover:bg-[var(--stellar-state-error)]/10 transition-all flex items-center gap-1">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> 清空订单
+              </button>
+            </div>
+          </div>
+          <!-- 统计条 -->
+          <div class="flex items-center gap-4 mt-3 pt-3 border-t border-[var(--stellar-glass-border)] text-xs text-[var(--stellar-muted-foreground)]">
+            <span>共 <span class="text-[var(--stellar-foreground)] font-medium" id="order-total-count">0</span> 笔订单</span>
+            <span>待使用 <span style="color: var(--stellar-state-success);" id="order-paid-count">0</span></span>
+            <span>待支付 <span style="color: var(--stellar-state-warning);" id="order-pending-count">0</span></span>
+            <span>已使用 <span style="color: var(--stellar-muted-foreground);" id="order-used-count">0</span></span>
+            <span>已退款 <span style="color: var(--stellar-state-error);" id="order-refunded-count">0</span></span>
+            <span class="ml-auto">总金额 <span class="gold-text font-medium">¥<span id="order-total-revenue">0</span></span></span>
+          </div>
+        </div>
+
+        <!-- 订单表格 -->
+        <div class="glass-card rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-xs text-[var(--stellar-muted-foreground)] border-b border-[var(--stellar-glass-border)]">
+                  <th class="text-left px-4 py-2.5 font-normal">订单号</th>
+                  <th class="text-left px-4 py-2.5 font-normal">票种</th>
+                  <th class="text-left px-4 py-2.5 font-normal">游玩日期</th>
+                  <th class="text-left px-4 py-2.5 font-normal">单价</th>
+                  <th class="text-left px-4 py-2.5 font-normal">数量</th>
+                  <th class="text-left px-4 py-2.5 font-normal">买家</th>
+                  <th class="text-left px-4 py-2.5 font-normal">金额</th>
+                  <th class="text-left px-4 py-2.5 font-normal">状态</th>
+                  <th class="text-left px-4 py-2.5 font-normal">下单时间</th>
+                  <th class="text-left px-4 py-2.5 font-normal">操作</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <tr><td colspan="10" class="text-center py-12 text-[var(--stellar-muted-foreground)] text-xs">
+                  <i data-lucide="receipt" class="w-10 h-10 mx-auto mb-3 text-[var(--stellar-ink-3)]"></i>
+                  <div>暂无订单数据</div>
+                  <div class="mt-1">在 App 端购票后，订单将实时显示在此处</div>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 用户管理 ==================== -->
+      <div id="panel-users" class="panel-enter hidden">
+        <!-- Stats row -->
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">总用户数</span>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 12px -4px var(--stellar-primary-glow);">
+                <i data-lucide="users" class="w-4 h-4 text-[var(--stellar-primary)]"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-bold gold-text" id="users-stat-total">0</div>
+            <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-1">位注册用户</div>
+          </div>
+          <div class="glass-card lift-card rounded-xl p-4">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">今日新增</span>
+              <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--stellar-primary-soft); box-shadow: 0 0 12px -4px var(--stellar-primary-glow);">
+                <i data-lucide="user-plus" class="w-4 h-4 text-[var(--stellar-state-success)]"></i>
+              </div>
+            </div>
+            <div class="text-2xl font-bold" style="color: var(--stellar-state-success);" id="users-stat-today">0</div>
+            <div class="text-[10px] text-[var(--stellar-state-success)] mt-1">今日注册</div>
+          </div>
+        </div>
+
+        <!-- 搜索 + 刷新栏 -->
+        <div class="glass-card rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-[var(--stellar-muted-foreground)]">用户管理</span>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--stellar-muted-foreground)] absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="user-search" placeholder="搜索手机号/昵称..." class="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-[var(--stellar-input)] w-56 focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);">
+              </div>
+              <button onclick="renderUsersTable()" class="hover-glow text-xs px-3 py-1.5 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-all flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 刷新
+              </button>
+            </div>
+          </div>
+          <!-- 统计条 -->
+          <div class="flex items-center gap-4 mt-3 pt-3 border-t border-[var(--stellar-glass-border)] text-xs text-[var(--stellar-muted-foreground)]">
+            <span>共 <span class="text-[var(--stellar-foreground)] font-medium" id="users-summary-total">0</span> 位注册用户</span>
+            <span>有订单用户 <span style="color: var(--stellar-state-success);" id="users-summary-active">0</span> 位</span>
+            <span class="ml-auto">总消费金额 <span class="gold-text font-medium">¥<span id="users-summary-spending">0</span></span></span>
+          </div>
+        </div>
+
+        <!-- 用户表格 -->
+        <div class="glass-card rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-xs text-[var(--stellar-muted-foreground)] border-b border-[var(--stellar-glass-border)]">
+                  <th class="text-left px-4 py-2.5 font-normal">手机号</th>
+                  <th class="text-left px-4 py-2.5 font-normal">昵称</th>
+                  <th class="text-left px-4 py-2.5 font-normal">注册时间</th>
+                  <th class="text-left px-4 py-2.5 font-normal">订单数</th>
+                  <th class="text-left px-4 py-2.5 font-normal">总消费</th>
+                  <th class="text-left px-4 py-2.5 font-normal">操作</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body">
+                <tr><td colspan="6" class="text-center py-12 text-[var(--stellar-muted-foreground)] text-xs">
+                  <i data-lucide="users" class="w-10 h-10 mx-auto mb-3 text-[var(--stellar-ink-3)]"></i>
+                  <div>暂无用户数据</div>
+                  <div class="mt-1">在 App 端注册后，用户将实时显示在此处</div>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== 商品管理 ==================== -->
+      <div id="panel-products" class="panel-enter hidden">
+        <!-- 筛选 + 操作栏 -->
+        <div class="glass-card rounded-xl p-4 mb-4">
+          <div class="flex items-center gap-3 flex-wrap">
+            <div class="flex items-center gap-2">
+              <div class="relative">
+                <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--stellar-muted-foreground)] absolute left-2.5 top-1/2 -translate-y-1/2"></i>
+                <input type="text" id="product-search" oninput="renderProducts()" placeholder="搜索商品名称..." class="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-[var(--stellar-input)] w-48 focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);">
+              </div>
+              <select id="product-status-filter" onchange="renderProducts()" class="text-xs px-3 py-1.5 rounded-lg border border-[var(--stellar-input)] focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);">
+                <option value="all">全部状态</option>
+                <option value="active">在售</option>
+                <option value="inactive">已下架</option>
+              </select>
+            </div>
+            <div class="ml-auto flex items-center gap-2">
+              <button onclick="renderProducts()" class="hover-glow text-xs px-3 py-1.5 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-all flex items-center gap-1">
+                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 刷新
+              </button>
+              <button onclick="showProductDetail(null)" class="text-xs px-3 py-1.5 rounded-lg flex items-center gap-1 text-white transition-all" style="background: var(--stellar-primary); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i> 添加商品
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 商品表格 -->
+        <div class="glass-card rounded-xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-xs text-[var(--stellar-muted-foreground)] border-b border-[var(--stellar-glass-border)]">
+                  <th class="text-left px-4 py-2.5 font-normal">商品名称</th>
+                  <th class="text-left px-4 py-2.5 font-normal">商品描述</th>
+                  <th class="text-left px-4 py-2.5 font-normal">售价</th>
+                  <th class="text-left px-4 py-2.5 font-normal">原价</th>
+                  <th class="text-left px-4 py-2.5 font-normal">库存</th>
+                  <th class="text-left px-4 py-2.5 font-normal">上架状态</th>
+                  <th class="text-left px-4 py-2.5 font-normal">操作</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <tr><td colspan="7" class="text-center py-12 text-[var(--stellar-muted-foreground)] text-xs">
+                  <i data-lucide="package" class="w-10 h-10 mx-auto mb-3 text-[var(--stellar-ink-3)]"></i>
+                  <div>暂无商品数据</div>
+                </td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /面板容器 -->
+  </div><!-- /主内容区 -->
+</div>
+
+<!-- ==================== 订单详情 Modal ==================== -->
+<div id="order-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+  <div class="w-[480px] max-h-[80vh] overflow-y-auto rounded-2xl panel-enter glow-border" style="background: var(--stellar-glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);" id="order-detail-content">
+  </div>
+</div>
+
+<!-- ==================== 用户详情 Modal ==================== -->
+<div id="user-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+  <div class="w-[480px] max-h-[80vh] overflow-y-auto rounded-2xl panel-enter glow-border" style="background: var(--stellar-glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);" id="user-detail-content">
+  </div>
+</div>
+
+<!-- ==================== 商品详情/编辑 Modal ==================== -->
+<div id="product-detail-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+  <div class="w-[480px] max-h-[85vh] overflow-y-auto rounded-2xl panel-enter glow-border" style="background: var(--stellar-glass-bg); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);">
+    <div class="px-6 py-4 border-b border-[var(--stellar-glass-border)] flex items-center justify-between sticky top-0 z-10" style="background: var(--stellar-glass-bg);">
+      <h3 class="text-sm font-semibold" id="product-modal-title">商品详情</h3>
+      <button onclick="closeProductDetail()" class="text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)]">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="text-xs text-[var(--stellar-muted-foreground)] mb-1.5 block">商品名称</label>
+        <input type="text" id="product-edit-name" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);" placeholder="请输入商品名称">
+      </div>
+      <div>
+        <label class="text-xs text-[var(--stellar-muted-foreground)] mb-1.5 block">商品描述</label>
+        <textarea id="product-edit-desc" rows="2" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] resize-none" style="background: var(--stellar-background);" placeholder="请输入商品描述"></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-xs text-[var(--stellar-muted-foreground)] mb-1.5 block">售价（¥）</label>
+          <input type="number" id="product-edit-price" min="0" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);" placeholder="0">
+        </div>
+        <div>
+          <label class="text-xs text-[var(--stellar-muted-foreground)] mb-1.5 block">原价（¥）</label>
+          <input type="number" id="product-edit-original-price" min="0" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);" placeholder="0">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-[var(--stellar-muted-foreground)] mb-1.5 block">库存</label>
+        <input type="number" id="product-edit-stock" min="0" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);" placeholder="0">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button onclick="closeProductDetail()" class="text-xs px-4 py-2 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)] transition-colors">取消</button>
+        <button onclick="saveProductDetail()" class="text-xs px-4 py-2 rounded-lg text-white transition-all" style="background: var(--stellar-primary); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/stellar-sync.js"></script>
+<script>
+// ==================== 数据定义（与 App 端一致） ====================
+const TICKET_TYPES = {
+  single: { id: 'single', name: '成人单次入园票', price: 399, icon: 'ticket' },
+  annual: { id: 'annual', name: '年卡会员', price: 1299, icon: 'crown' },
+  express: { id: 'express', name: '快速通行证', price: 199, icon: 'zap' },
+  child: { id: 'child', name: '儿童单次入园票', price: 279, icon: 'baby' }
+};
+
+const RIDES = [
+  { id: 'galaxy', name: '银河穿梭', zone: '星际港', wait: 45, status: 'open', thrill: '刺激', capacity: '24人/批' },
+  { id: 'abyss', name: '深渊坠落', zone: '暗影域', wait: 32, status: 'open', thrill: '极度刺激', capacity: '16人/批' },
+  { id: 'neon', name: '霓虹竞速', zone: '霓虹城', wait: 65, status: 'open', thrill: '刺激', capacity: '12人/批' },
+  { id: 'dream', name: '幻梦漂流', zone: '幻梦湾', wait: 18, status: 'open', thrill: '温和', capacity: '20人/批' },
+  { id: 'matrix', name: '矩阵迷宫', zone: '霓虹城', wait: 25, status: 'open', thrill: '探索', capacity: '6人/批' },
+  { id: 'thunder', name: '雷霆风暴', zone: '星际港', wait: 0, status: 'maintenance', thrill: '极度刺激', capacity: '32人/批' },
+  { id: 'shadow', name: '暗影鬼屋', zone: '暗影域', wait: 40, status: 'open', thrill: '恐怖', capacity: '8人/批' },
+  { id: 'aurora', name: '极光摩天轮', zone: '幻梦湾', wait: 15, status: 'open', thrill: '温和', capacity: '8人/舱' }
+];
+
+// ==================== 项目专属 SVG 图标 ====================
+function getRideIconSvg(rideId, sizeClass, colorVar, dimmed) {
+  const dimClass = dimmed ? ' dimmed' : '';
+  const colorStyle = dimmed ? 'color: var(--stellar-ink-3)' : `color: ${colorVar}`;
+  if (rideId === 'galaxy') {
+    return `<svg viewBox="0 0 24 24" fill="none" class="${sizeClass} ride-icon-svg${dimClass}" style="${colorStyle}"><path d="M12 12 C 9 11, 6 12, 5 9 C 4 6.5, 7 4.5, 10 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.85"/><path d="M12 12 C 15 13, 18 12, 19 15 C 20 17.5, 17 19.5, 14 18.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.85"/><path d="M12 12 C 11 14.5, 8.5 16, 6 15.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/><path d="M12 12 C 13 9.5, 15.5 8, 18 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/><circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.9"/><circle cx="12" cy="12" r="0.8" fill="#fff" opacity="0.7"/><circle cx="6" cy="5" r="0.7" fill="currentColor" opacity="0.5"/><circle cx="18.5" cy="19" r="0.6" fill="currentColor" opacity="0.4"/><circle cx="17" cy="5.5" r="0.5" fill="currentColor" opacity="0.35"/></svg>`;
+  }
+  if (rideId === 'abyss') {
+    return `<svg viewBox="0 0 24 24" fill="none" class="${sizeClass} ride-icon-svg${dimClass}" style="${colorStyle}"><path d="M5 3 L 10 11 L 11.5 17 L 12 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/><path d="M19 3 L 14 11 L 12.5 17 L 12 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/><path d="M12 5 L 12 18" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 2.5" opacity="0.55"/><circle cx="12" cy="4" r="1.5" fill="currentColor" opacity="0.9"/><circle cx="12" cy="21" r="2" fill="currentColor" opacity="0.7"/><circle cx="12" cy="21" r="0.7" fill="var(--stellar-background)" opacity="0.9"/></svg>`;
+  }
+  return null;
+}
+
+const STORAGE_KEY = 'stellar_park_orders';
+const USERS_KEY = 'stellar_park_users';
+let currentOrderFilter = 'all';
+let lastOrderCount = 0;
+
+const ORDER_STATUS = {
+  pending: { label: '待支付', color: 'var(--stellar-state-warning)', bg: 'rgba(240,184,74,0.15)' },
+  paid: { label: '待使用', color: 'var(--stellar-state-success)', bg: 'rgba(52,216,153,0.15)' },
+  used: { label: '已使用', color: 'var(--stellar-muted-foreground)', bg: 'var(--stellar-muted)' },
+  refunded: { label: '已退款', color: 'var(--stellar-state-error)', bg: 'rgba(255,123,107,0.15)' }
+};
+
+function getOrderStatusMeta(status) {
+  return ORDER_STATUS[status] || ORDER_STATUS.paid;
+}
+
+// ==================== localStorage 读取 ====================
+function getOrders() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveOrders(orders) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.orders);
+}
+
+// 用户数据来自 localStorage（与 App 端共享）
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.users);
+}
+
+// 手机号脱敏：前 3 + **** + 后 4（例如 138****8888）
+function maskPhone(phone) {
+  if (!phone) return '—';
+  const p = String(phone);
+  if (p.includes('****')) return p;
+  if (p.length < 7) return p;
+  return p.slice(0, 3) + '****' + p.slice(-4);
+}
+
+// 生成随机完整手机号（11 位）
+function randomPhone() {
+  const prefixes = ['138', '139', '136', '135', '158', '159', '186', '188', '133', '177'];
+  const prefix = prefixes[Math.floor(Math.random() * prefixes.length)];
+  const middle = Math.floor(1000 + Math.random() * 9000);
+  const last4 = Math.floor(1000 + Math.random() * 9000);
+  return prefix + middle + last4;
+}
+
+// ==================== Panel 切换 ====================
+function switchAdminPanel(panelName) {
+  document.querySelectorAll('.admin-nav-item').forEach(item => {
+    item.classList.remove('sidebar-item-active');
+    item.classList.add('text-[var(--stellar-muted-foreground)]', 'hover:bg-[var(--stellar-muted)]', 'transition-colors');
+  });
+  const activeNav = document.querySelector(`[data-panel="${panelName}"]`);
+  if (activeNav) {
+    activeNav.classList.add('sidebar-item-active');
+    activeNav.classList.remove('text-[var(--stellar-muted-foreground)]', 'hover:bg-[var(--stellar-muted)]');
+  }
+
+  document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'));
+  document.getElementById('panel-' + panelName).classList.remove('hidden');
+  document.getElementById('panel-' + panelName).classList.add('panel-enter');
+
+  const titles = { dashboard: '数据仪表盘', rides: '项目运营', orders: '订单管理', users: '用户管理', products: '商品管理' };
+  document.getElementById('page-title').textContent = titles[panelName];
+
+  if (panelName === 'dashboard') renderDashboard();
+  if (panelName === 'rides') renderRidesTable();
+  if (panelName === 'orders') renderOrdersTable();
+  if (panelName === 'users') renderUsersTable();
+  if (panelName === 'products') renderProducts();
+
+  // 隐藏新订单徽章
+  if (panelName === 'orders') {
+    document.getElementById('new-order-badge').classList.add('hidden');
+  }
+  // 隐藏新用户徽章
+  if (panelName === 'users') {
+    const badge = document.getElementById('new-user-badge');
+    if (badge) badge.classList.add('hidden');
+  }
+}
+
+// ==================== 数据仪表盘 ====================
+function renderDashboard() {
+  const orders = getOrders();
+  const todayOrders = orders; // 全部视为今日订单（演示）
+  const revenue = todayOrders.filter(o => o.status !== 'refunded').reduce((sum, o) => sum + o.total, 0);
+
+  document.getElementById('dash-revenue').textContent = revenue.toLocaleString();
+  document.getElementById('dash-orders').textContent = todayOrders.length;
+  document.getElementById('dash-rides-open').textContent = RIDES.filter(r => r.status === 'open').length;
+
+  // 票种统计
+  const ticketCounts = { single: 0, annual: 0, express: 0, child: 0 };
+  todayOrders.forEach(o => {
+    if (ticketCounts[o.ticketId] !== undefined) ticketCounts[o.ticketId]++;
+  });
+  document.getElementById('stat-single').textContent = ticketCounts.single;
+  document.getElementById('stat-annual').textContent = ticketCounts.annual;
+  document.getElementById('stat-express').textContent = ticketCounts.express;
+  document.getElementById('stat-child').textContent = ticketCounts.child;
+
+  // 最近订单
+  const recentOrders = todayOrders.slice(0, 5);
+  const statusMap = ORDER_STATUS;
+
+  if (recentOrders.length === 0) {
+    document.getElementById('dash-recent-orders').innerHTML = `<tr><td colspan="6" class="text-center py-8 text-[var(--stellar-muted-foreground)] text-xs">暂无订单数据，在 App 端购票后将实时显示</td></tr>`;
+  } else {
+    document.getElementById('dash-recent-orders').innerHTML = recentOrders.map(o => {
+      const s = getOrderStatusMeta(o.status);
+      const d = new Date(o.createdAt);
+      const timeStr = `${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+      return `
+        <tr class="border-b border-[var(--stellar-border)]/50 hover:bg-[var(--stellar-primary-soft)]/30 transition-colors">
+          <td class="px-4 py-2.5 font-mono text-xs">${o.id}</td>
+          <td class="px-4 py-2.5 text-xs">${o.ticketName}</td>
+          <td class="px-4 py-2.5 text-xs">${o.buyer || '游客'}</td>
+          <td class="px-4 py-2.5 text-xs gold-text font-medium">¥${o.total}</td>
+          <td class="px-4 py-2.5"><span class="text-[10px] px-2 py-0.5 rounded font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span></td>
+          <td class="px-4 py-2.5 text-xs text-[var(--stellar-muted-foreground)]">${timeStr}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  // 项目排队概览
+  const topRides = RIDES.filter(r => r.status === 'open').sort((a,b) => b.wait - a.wait).slice(0, 5);
+  document.getElementById('dash-rides-status').innerHTML = topRides.map(ride => {
+    const color = ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
+    const pct = Math.min(100, (ride.wait / 90) * 100);
+    return `
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <span class="text-xs font-medium">${ride.name}</span>
+          <span class="text-xs font-bold" style="color: ${color};">${ride.wait}min</span>
+        </div>
+        <div class="h-1.5 rounded-full overflow-hidden" style="background: var(--stellar-muted);">
+          <div class="h-full rounded-full transition-all" style="width: ${pct}%; background: ${color}; box-shadow: 0 0 8px -2px ${color};"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  lucide.createIcons();
+}
+
+// ==================== 项目运营 ====================
+function renderRidesTable() {
+  const html = RIDES.map(ride => {
+    const waitColor = ride.status === 'maintenance' ? 'var(--stellar-ink-3)' : ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
+    const statusBadge = ride.status === 'open'
+      ? `<span class="text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1 w-fit" style="background: rgba(52,216,153,0.15); color: var(--stellar-state-success);"><span class="w-1.5 h-1.5 rounded-full pulse-dot" style="background: var(--stellar-state-success);"></span>运营中</span>`
+      : `<span class="text-[10px] px-2 py-0.5 rounded font-medium flex items-center gap-1 w-fit" style="background: var(--stellar-muted); color: var(--stellar-muted-foreground);"><span class="w-1.5 h-1.5 rounded-full" style="background: var(--stellar-ink-3);"></span>维护中</span>`;
+    const rideIcon = getRideIconSvg(ride.id, 'w-4 h-4', 'var(--stellar-primary)', ride.status === 'maintenance')
+      || `<i data-lucide="ferris-wheel" class="w-4 h-4 ${ride.status === 'maintenance' ? 'text-[var(--stellar-ink-3)]' : 'text-[var(--stellar-primary)]'}"></i>`;
+    return `
+      <tr class="border-b border-[var(--stellar-border)]/50 hover:bg-[var(--stellar-primary-soft)]/30 transition-colors">
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: ${ride.status === 'maintenance' ? 'var(--stellar-muted)' : 'var(--stellar-primary-soft)'}; ${ride.status === 'maintenance' ? '' : 'box-shadow: 0 0 12px -4px var(--stellar-primary-glow);'}">
+              ${rideIcon}
+            </div>
+            <span class="text-xs font-medium">${ride.name}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)]">${ride.zone}</td>
+        <td class="px-4 py-3 text-xs">${ride.thrill}</td>
+        <td class="px-4 py-3 text-xs font-bold" style="color: ${waitColor};">${ride.status === 'maintenance' ? '—' : ride.wait + 'min'}</td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)]">${ride.capacity}</td>
+        <td class="px-4 py-3">${statusBadge}</td>
+        <td class="px-4 py-3">
+          <button onclick="toggleRideStatus('${ride.id}')" class="text-[11px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-colors">
+            ${ride.status === 'open' ? '暂停运营' : '恢复运营'}
+          </button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  document.getElementById('rides-table-body').innerHTML = html;
+  lucide.createIcons();
+}
+
+const RIDES_STORAGE_KEY = 'stellar_park_rides_status';
+let pendingRideToggleId = null;
+
+// 从 localStorage 加载 ride 状态覆盖
+function loadRidesStatus() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(RIDES_STORAGE_KEY) || '{}');
+    RIDES.forEach(r => {
+      if (saved[r.id]) r.status = saved[r.id];
+    });
+  } catch(e) {}
+}
+
+// 保存 ride 状态到 localStorage 并通知 App 端
+function saveRidesStatus() {
+  const statusMap = {};
+  RIDES.forEach(r => { statusMap[r.id] = r.status; });
+  localStorage.setItem(RIDES_STORAGE_KEY, JSON.stringify(statusMap));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.ridesStatus);
+}
+
+function toggleRideStatus(rideId) {
+  const ride = RIDES.find(r => r.id === rideId);
+  if (!ride) return;
+  pendingRideToggleId = rideId;
+  const isPausing = ride.status === 'open';
+  const modal = document.getElementById('ride-toggle-confirm');
+  document.getElementById('ride-toggle-title').textContent = isPausing
+    ? '确认将「' + ride.name + '」暂停运营？'
+    : '确认将「' + ride.name + '」恢复运营？';
+  document.getElementById('ride-toggle-desc').textContent = isPausing
+    ? '暂停后 App 端将同步显示为维护状态'
+    : '恢复后 App 端将同步显示为开放状态';
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function confirmRideToggle() {
+  if (!pendingRideToggleId) return;
+  const ride = RIDES.find(r => r.id === pendingRideToggleId);
+  if (ride) {
+    ride.status = ride.status === 'open' ? 'maintenance' : 'open';
+    saveRidesStatus();
+    renderRidesTable();
+    // 刷新仪表盘
+    const activePanel = document.querySelector('.admin-nav-item.sidebar-item-active')?.dataset.panel || 'dashboard';
+    if (activePanel === 'dashboard') renderDashboard();
+  }
+  cancelRideToggle();
+}
+
+function cancelRideToggle() {
+  pendingRideToggleId = null;
+  const modal = document.getElementById('ride-toggle-confirm');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+// ==================== 订单管理 ====================
+function getOrderUnitPrice(order) {
+  if (order.unitPrice != null) return Number(order.unitPrice);
+  if (order.qty && order.total != null) return Number(order.total) / Number(order.qty);
+  const ticket = TICKET_TYPES[order.ticketId];
+  return ticket ? Number(ticket.price) : 0;
+}
+
+function getOrderAmount(order) {
+  const unitPrice = getOrderUnitPrice(order);
+  const qty = Number(order.qty) || 1;
+  return unitPrice * qty;
+}
+
+function renderOrdersTable() {
+  const orders = getOrders();
+  const searchQuery = (document.getElementById('order-search')?.value || '').toLowerCase();
+  let filtered = currentOrderFilter === 'all' ? orders : orders.filter(o => o.status === currentOrderFilter);
+  if (searchQuery) {
+    filtered = filtered.filter(o =>
+      o.id.toLowerCase().includes(searchQuery) ||
+      (o.buyer || '').toLowerCase().includes(searchQuery) ||
+      o.ticketName.toLowerCase().includes(searchQuery)
+    );
+  }
+
+  // 更新统计
+  document.getElementById('order-total-count').textContent = orders.length;
+  document.getElementById('order-paid-count').textContent = orders.filter(o => o.status === 'paid').length;
+  document.getElementById('order-pending-count').textContent = orders.filter(o => o.status === 'pending').length;
+  document.getElementById('order-used-count').textContent = orders.filter(o => o.status === 'used').length;
+  document.getElementById('order-refunded-count').textContent = orders.filter(o => o.status === 'refunded').length;
+  document.getElementById('order-total-revenue').textContent = orders.filter(o => o.status !== 'refunded').reduce((sum, o) => sum + o.total, 0).toLocaleString();
+
+  if (filtered.length === 0) {
+    document.getElementById('orders-table-body').innerHTML = `
+      <tr><td colspan="10" class="text-center py-12 text-[var(--stellar-muted-foreground)] text-xs">
+        <i data-lucide="receipt" class="w-10 h-10 mx-auto mb-3 text-[var(--stellar-ink-3)]"></i>
+        <div>暂无订单数据</div>
+        <div class="mt-1">${orders.length === 0 ? '在 App 端购票后，订单将实时显示在此处' : '没有符合筛选条件的订单'}</div>
+      </td></tr>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const html = filtered.map((order, idx) => {
+    const s = getOrderStatusMeta(order.status);
+    const unitPrice = getOrderUnitPrice(order);
+    const amount = getOrderAmount(order);
+    const d = new Date(order.createdAt);
+    const timeStr = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    const isNew = idx === 0 && orders.length > lastOrderCount;
+    return `
+      <tr class="border-b border-[var(--stellar-border)]/50 hover:bg-[var(--stellar-primary-soft)]/30 transition-colors ${isNew ? 'new-row' : ''}" onclick="showOrderDetail('${order.id}')">
+        <td class="px-4 py-3 font-mono text-xs cursor-pointer">${order.id}</td>
+        <td class="px-4 py-3 text-xs">
+          <div class="flex items-center gap-2">
+            <i data-lucide="${TICKET_TYPES[order.ticketId]?.icon || 'ticket'}" class="w-3.5 h-3.5 text-[var(--stellar-primary)]"></i>
+            ${order.ticketName}
+          </div>
+        </td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)]">${order.date || '—'}</td>
+        <td class="px-4 py-3 text-xs">¥${unitPrice}</td>
+        <td class="px-4 py-3 text-xs">${order.qty} 张</td>
+        <td class="px-4 py-3 text-xs">${order.buyer || '游客'}</td>
+        <td class="px-4 py-3 text-xs gold-text font-medium">¥${amount}</td>
+        <td class="px-4 py-3"><span class="text-[10px] px-2 py-0.5 rounded font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span></td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)]">${timeStr}</td>
+        <td class="px-4 py-3">
+          <div class="flex gap-1.5">
+            ${(order.status === 'paid' || order.status === 'pending') ? `<button onclick="event.stopPropagation(); adminRefund('${order.id}')" class="text-[10px] px-2 py-1 rounded border border-[var(--stellar-border)] text-[var(--stellar-state-error)] hover:bg-[var(--stellar-state-error)]/10 transition-colors">退款</button>` : ''}
+            ${order.status === 'paid' ? `<button onclick="event.stopPropagation(); adminUpdateStatus('${order.id}', 'used')" class="text-[10px] px-2 py-1 rounded border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors">核销</button>` : ''}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  document.getElementById('orders-table-body').innerHTML = html;
+  lastOrderCount = orders.length;
+  lucide.createIcons();
+}
+
+function filterOrders(status) {
+  currentOrderFilter = status;
+  document.querySelectorAll('.order-status-filter').forEach(b => {
+    b.classList.remove('sidebar-item-active');
+    b.classList.add('text-[var(--stellar-muted-foreground)]', 'hover:bg-[var(--stellar-muted)]', 'transition-colors');
+  });
+  const activeBtn = document.querySelector(`.order-status-filter[data-status="${status}"]`);
+  if (activeBtn) {
+    activeBtn.classList.add('sidebar-item-active');
+    activeBtn.classList.remove('text-[var(--stellar-muted-foreground)]', 'hover:bg-[var(--stellar-muted)]', 'transition-colors');
+  }
+  renderOrdersTable();
+}
+
+function refreshOrders() {
+  renderOrdersTable();
+  renderDashboard();
+}
+
+function adminClearAllOrders() {
+  if (!confirm('确认清空全部历史订单？此操作不可恢复。')) return;
+  if (window.StellarSync) {
+    StellarSync.clearOrdersData();
+    localStorage.setItem(StellarSync.KEYS.ordersResetVersion, StellarSync.ORDERS_RESET_VERSION);
+  } else {
+    localStorage.removeItem(STORAGE_KEY);
+  }
+  lastOrderCount = 0;
+  const badge = document.getElementById('new-order-badge');
+  if (badge) badge.classList.add('hidden');
+  renderOrdersTable();
+  renderDashboard();
+  lucide.createIcons();
+}
+
+function adminUpdateStatus(orderId, status) {
+  const orders = getOrders();
+  const order = orders.find(o => o.id === orderId);
+  if (order) {
+    order.status = status;
+    if (status === 'paid') order.paidAt = new Date().toISOString();
+    if (status === 'used') order.usedAt = new Date().toISOString();
+    saveOrders(orders);
+    renderOrdersTable();
+    renderDashboard();
+  }
+}
+
+function adminRefund(orderId) {
+  if (confirm('确认对该订单执行退款？退款后状态将变为「已退款」。')) {
+    adminUpdateStatus(orderId, 'refunded');
+  }
+}
+
+function showOrderDetail(orderId) {
+  const orders = getOrders();
+  const order = orders.find(o => o.id === orderId);
+  if (!order) return;
+
+  const s = getOrderStatusMeta(order.status);
+  const unitPrice = getOrderUnitPrice(order);
+  const amount = getOrderAmount(order);
+  const d = new Date(order.createdAt);
+  const timeStr = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+
+  document.getElementById('order-detail-content').innerHTML = `
+    <div class="px-6 py-4 border-b border-[var(--stellar-glass-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold">订单详情</h3>
+      <button onclick="closeOrderDetail()" class="text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)]">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="p-6">
+      <!-- 状态 -->
+      <div class="flex items-center justify-between mb-5">
+        <div>
+          <div class="text-xs text-[var(--stellar-muted-foreground)] mb-1">订单号</div>
+          <div class="font-mono text-sm">${order.id}</div>
+        </div>
+        <span class="text-xs px-3 py-1 rounded-lg font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+      </div>
+      <!-- 订单信息 -->
+      <div class="space-y-3 mb-5">
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">票种</span>
+          <span class="font-medium">${order.ticketName}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">游玩日期</span>
+          <span>${order.date || '—'}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">购买数量</span>
+          <span>${order.qty} 张</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">单价</span>
+          <span>¥${unitPrice}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">买家姓名</span>
+          <span>${order.buyer || '游客'}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">联系电话</span>
+          <span>${order.phone || '—'}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">支付方式</span>
+          <span>${order.paymentMethod === 'wechat' ? '微信支付' : (order.paymentMethod || '—')}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">下单时间</span>
+          <span>${timeStr}</span>
+        </div>
+      </div>
+      <!-- 金额 -->
+      <div class="rounded-lg p-4 glow-border mb-5">
+        <div class="flex justify-between items-center">
+          <span class="text-sm">订单总额</span>
+          <span class="text-xl font-bold gold-text">¥${amount}</span>
+        </div>
+      </div>
+      <!-- 操作按钮 -->
+      <div class="flex gap-3">
+        ${(order.status === 'paid' || order.status === 'pending') ? `<button onclick="closeOrderDetail(); adminRefund('${order.id}')" class="flex-1 py-2.5 rounded-lg border border-[var(--stellar-border)] text-sm text-[var(--stellar-state-error)] hover:bg-[var(--stellar-state-error)]/10 transition-colors">执行退款</button>` : ''}
+        ${order.status === 'paid' ? `<button onclick="closeOrderDetail(); adminUpdateStatus('${order.id}', 'used')" class="flex-1 py-2.5 rounded-lg border border-[var(--stellar-border)] text-sm text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors">核销使用</button>` : ''}
+        ${(order.status === 'used' || order.status === 'refunded') ? `<button onclick="closeOrderDetail()" class="flex-1 py-2.5 rounded-lg border border-[var(--stellar-border)] text-sm text-[var(--stellar-muted-foreground)]">关闭</button>` : ''}
+      </div>
+    </div>
+  `;
+  document.getElementById('order-detail-modal').classList.remove('hidden');
+  document.getElementById('order-detail-modal').classList.add('flex');
+  lucide.createIcons();
+}
+
+function closeOrderDetail() {
+  document.getElementById('order-detail-modal').classList.add('hidden');
+  document.getElementById('order-detail-modal').classList.remove('flex');
+}
+
+// ==================== 用户管理 ====================
+// 根据用户手机号匹配其订单（App 端订单存储 phone 字段，匹配完整号或脱敏号）
+function getOrdersForUser(userPhone) {
+  const orders = getOrders();
+  if (!userPhone) return [];
+  const masked = maskPhone(userPhone);
+  return orders.filter(o => {
+    if (!o.phone) return false;
+    return o.phone === userPhone || o.phone === masked || maskPhone(o.phone) === masked;
+  });
+}
+
+function renderUsersTable() {
+  const users = getUsers();
+  const orders = getOrders();
+  const searchQuery = (document.getElementById('user-search')?.value || '').toLowerCase().trim();
+
+  // 为每位用户计算订单数与总消费
+  const usersWithStats = users.map(u => {
+    const userOrders = getOrdersForUser(u.phone);
+    const orderCount = userOrders.length;
+    const totalSpending = userOrders.filter(o => o.status !== 'refunded').reduce((sum, o) => sum + (o.total || 0), 0);
+    return { ...u, orderCount, totalSpending };
+  });
+
+  // 搜索过滤（手机号或昵称）
+  let filtered = usersWithStats;
+  if (searchQuery) {
+    filtered = usersWithStats.filter(u => {
+      const masked = maskPhone(u.phone).toLowerCase();
+      const full = (u.phone || '').toLowerCase();
+      const nick = (u.nickname || '').toLowerCase();
+      return masked.includes(searchQuery) || full.includes(searchQuery) || nick.includes(searchQuery);
+    });
+  }
+
+  // 按注册时间倒序（最新优先）
+  filtered.sort((a, b) => new Date(b.registeredAt || 0) - new Date(a.registeredAt || 0));
+
+  // 统计指标
+  const totalUsers = users.length;
+  const todayStart = new Date(); todayStart.setHours(0, 0, 0, 0);
+  const newToday = users.filter(u => new Date(u.registeredAt || 0) >= todayStart).length;
+  const activeUsers = usersWithStats.filter(u => u.orderCount > 0).length;
+  const totalSpendingAll = usersWithStats.filter(u => u.orderCount > 0).reduce((sum, u) => sum + u.totalSpending, 0);
+
+  document.getElementById('users-stat-total').textContent = totalUsers;
+  document.getElementById('users-stat-today').textContent = newToday;
+
+  document.getElementById('users-summary-total').textContent = totalUsers;
+  document.getElementById('users-summary-active').textContent = activeUsers;
+  document.getElementById('users-summary-spending').textContent = totalSpendingAll.toLocaleString();
+
+  if (filtered.length === 0) {
+    document.getElementById('users-table-body').innerHTML = `
+      <tr><td colspan="6" class="text-center py-12 text-[var(--stellar-muted-foreground)] text-xs">
+        <i data-lucide="users" class="w-10 h-10 mx-auto mb-3 text-[var(--stellar-ink-3)]"></i>
+        <div>暂无用户数据</div>
+        <div class="mt-1">${users.length === 0 ? '在 App 端注册后，用户将实时显示在此处' : '没有符合搜索条件的用户'}</div>
+      </td></tr>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const html = filtered.map((u, idx) => {
+    const regDate = new Date(u.registeredAt || Date.now());
+    const regStr = `${regDate.getFullYear()}-${(regDate.getMonth()+1).toString().padStart(2,'0')}-${regDate.getDate().toString().padStart(2,'0')} ${regDate.getHours().toString().padStart(2,'0')}:${regDate.getMinutes().toString().padStart(2,'0')}`;
+    const isNew = idx === 0;
+    const initial = (u.nickname || '游').charAt(0);
+    return `
+      <tr class="border-b border-[var(--stellar-border)]/50 hover:bg-[var(--stellar-primary-soft)]/30 transition-colors ${isNew ? 'new-row' : ''}">
+        <td class="px-4 py-3 font-mono text-xs">${maskPhone(u.phone)}</td>
+        <td class="px-4 py-3 text-xs">
+          <div class="flex items-center gap-2">
+            <div class="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-medium" style="background: var(--stellar-primary-soft); color: var(--stellar-primary);">${initial}</div>
+            ${u.nickname || '游客'}
+          </div>
+        </td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)]">${regStr}</td>
+        <td class="px-4 py-3 text-xs">${u.orderCount}</td>
+        <td class="px-4 py-3 text-xs gold-text font-medium">¥${u.totalSpending.toLocaleString()}</td>
+        <td class="px-4 py-3">
+          <button onclick="showUserDetail('${u.phone}')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-colors">查看详情</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  document.getElementById('users-table-body').innerHTML = html;
+  lucide.createIcons();
+}
+
+function filterUsers() {
+  renderUsersTable();
+}
+
+// ==================== 商品管理 ====================
+const PRODUCTS = [
+  { id: 'single', name: '成人单次入园票', desc: '当日有效，畅玩全园所有项目', price: 399, originalPrice: 499, stock: 9999, icon: 'ticket', active: true },
+  { id: 'child', name: '儿童单次入园票', desc: '身高 1.0m-1.4m 儿童，需成人陪同', price: 279, originalPrice: 349, stock: 9999, icon: 'baby', active: true },
+  { id: 'express', name: '快速通行证', desc: '指定热门项目免排队，最多省 2 小时', price: 199, originalPrice: 249, stock: 500, icon: 'zap', active: true }
+];
+const PRODUCTS_KEY = 'stellar_park_products';
+let editingProductId = null;
+
+function getProducts() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || 'null');
+    if (saved && Array.isArray(saved)) return saved;
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(PRODUCTS));
+}
+function saveProducts(products) {
+  localStorage.setItem(PRODUCTS_KEY, JSON.stringify(products));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.products);
+}
+
+function ensureProductsSeed() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || 'null');
+    if (!saved || !Array.isArray(saved) || saved.length === 0) {
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(PRODUCTS));
+    }
+  } catch (e) {
+    localStorage.setItem(PRODUCTS_KEY, JSON.stringify(PRODUCTS));
+  }
+}
+
+function renderProducts() {
+  const products = getProducts();
+  const searchQuery = (document.getElementById('product-search')?.value || '').toLowerCase().trim();
+  const statusFilter = document.getElementById('product-status-filter')?.value || 'all';
+
+  let filtered = products;
+  if (searchQuery) {
+    filtered = filtered.filter(p => p.name.toLowerCase().includes(searchQuery));
+  }
+  if (statusFilter === 'active') {
+    filtered = filtered.filter(p => p.active);
+  } else if (statusFilter === 'inactive') {
+    filtered = filtered.filter(p => !p.active);
+  }
+
+  if (filtered.length === 0) {
+    document.getElementById('products-table-body').innerHTML = `
+      <tr><td colspan="7" class="text-center py-12 text-[var(--stellar-muted-foreground)] text-xs">
+        <i data-lucide="package" class="w-10 h-10 mx-auto mb-3 text-[var(--stellar-ink-3)]"></i>
+        <div>${products.length === 0 ? '暂无商品数据' : '没有符合筛选条件的商品'}</div>
+      </td></tr>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const html = filtered.map(p => {
+    const statusBadge = p.active
+      ? `<span class="text-[10px] px-2 py-0.5 rounded font-medium" style="background: rgba(52,216,153,0.15); color: var(--stellar-state-success);">在售</span>`
+      : `<span class="text-[10px] px-2 py-0.5 rounded font-medium" style="background: var(--stellar-muted); color: var(--stellar-muted-foreground);">已下架</span>`;
+    const toggleLabel = p.active ? '下架' : '上架';
+    const toggleColor = p.active ? 'var(--stellar-state-error)' : 'var(--stellar-state-success)';
+    const stockDisplay = p.stock >= 9999 ? '不限' : p.stock;
+    const stockColor = p.stock === 0 ? 'var(--stellar-state-error)' : p.stock < 50 ? 'var(--stellar-state-warning)' : 'var(--stellar-foreground)';
+    return `
+      <tr class="border-b border-[var(--stellar-border)]/50 hover:bg-[var(--stellar-primary-soft)]/30 transition-colors">
+        <td class="px-4 py-3 text-xs">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg flex items-center justify-center shrink-0" style="background: var(--stellar-primary-soft);">
+              <i data-lucide="${p.icon || 'package'}" class="w-3.5 h-3.5 text-[var(--stellar-primary)]"></i>
+            </div>
+            <span class="font-medium">${p.name}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)]">${p.desc || '—'}</td>
+        <td class="px-4 py-3 text-xs gold-text font-medium">¥${p.price}</td>
+        <td class="px-4 py-3 text-xs text-[var(--stellar-muted-foreground)] line-through">¥${p.originalPrice}</td>
+        <td class="px-4 py-3 text-xs font-medium" style="color: ${stockColor};">${stockDisplay}</td>
+        <td class="px-4 py-3">${statusBadge}</td>
+        <td class="px-4 py-3">
+          <div class="flex items-center gap-1.5">
+            <button onclick="showProductDetail('${p.id}')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-colors">查看详情</button>
+            <button onclick="toggleProduct('${p.id}')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] transition-colors" style="color: ${toggleColor};" onmouseover="this.style.borderColor='${toggleColor}'" onmouseout="this.style.borderColor='var(--stellar-border)'">${toggleLabel}</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  document.getElementById('products-table-body').innerHTML = html;
+  lucide.createIcons();
+}
+
+function toggleProduct(productId) {
+  const products = getProducts();
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  product.active = !product.active;
+  saveProducts(products);
+  renderProducts();
+}
+
+function showProductDetail(productId) {
+  editingProductId = productId;
+  const modal = document.getElementById('product-detail-modal');
+  if (productId) {
+    const products = getProducts();
+    const product = products.find(p => p.id === productId);
+    if (!product) return;
+    document.getElementById('product-modal-title').textContent = '编辑商品';
+    document.getElementById('product-edit-name').value = product.name || '';
+    document.getElementById('product-edit-desc').value = product.desc || '';
+    document.getElementById('product-edit-price').value = product.price || 0;
+    document.getElementById('product-edit-original-price').value = product.originalPrice || 0;
+    document.getElementById('product-edit-stock').value = product.stock !== undefined ? product.stock : 0;
+  } else {
+    document.getElementById('product-modal-title').textContent = '添加商品';
+    document.getElementById('product-edit-name').value = '';
+    document.getElementById('product-edit-desc').value = '';
+    document.getElementById('product-edit-price').value = '';
+    document.getElementById('product-edit-original-price').value = '';
+    document.getElementById('product-edit-stock').value = '';
+  }
+  modal.classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function closeProductDetail() {
+  document.getElementById('product-detail-modal').classList.add('hidden');
+  editingProductId = null;
+}
+
+function saveProductDetail() {
+  const name = document.getElementById('product-edit-name').value.trim();
+  const desc = document.getElementById('product-edit-desc').value.trim();
+  const price = parseInt(document.getElementById('product-edit-price').value) || 0;
+  const originalPrice = parseInt(document.getElementById('product-edit-original-price').value) || 0;
+  const stock = parseInt(document.getElementById('product-edit-stock').value) || 0;
+
+  if (!name) {
+    alert('请输入商品名称');
+    return;
+  }
+
+  const products = getProducts();
+  if (editingProductId) {
+    const product = products.find(p => p.id === editingProductId);
+    if (product) {
+      product.name = name;
+      product.desc = desc;
+      product.price = price;
+      product.originalPrice = originalPrice;
+      product.stock = stock;
+    }
+  } else {
+    const newId = 'p_' + Date.now();
+    products.push({
+      id: newId,
+      name: name,
+      desc: desc,
+      price: price,
+      originalPrice: originalPrice,
+      stock: stock,
+      icon: 'package',
+      active: true
+    });
+  }
+  saveProducts(products);
+  closeProductDetail();
+  renderProducts();
+}
+
+function showUserDetail(phone) {
+  const users = getUsers();
+  const user = users.find(u => u.phone === phone);
+  if (!user) return;
+
+  const userOrders = getOrdersForUser(phone);
+  const orderCount = userOrders.length;
+  const totalSpending = userOrders.filter(o => o.status !== 'refunded').reduce((sum, o) => sum + (o.total || 0), 0);
+  const regDate = new Date(user.registeredAt || Date.now());
+  const regStr = `${regDate.getFullYear()}-${(regDate.getMonth()+1).toString().padStart(2,'0')}-${regDate.getDate().toString().padStart(2,'0')} ${regDate.getHours().toString().padStart(2,'0')}:${regDate.getMinutes().toString().padStart(2,'0')}`;
+  const isActive = orderCount > 0;
+  const initial = (user.nickname || '游').charAt(0);
+
+  const ordersHtml = userOrders.length === 0
+    ? `<div class="text-center py-6 text-xs text-[var(--stellar-muted-foreground)]">暂无订单记录</div>`
+    : userOrders.map(o => {
+        const s = getOrderStatusMeta(o.status);
+        const d = new Date(o.createdAt);
+        const timeStr = `${(d.getMonth()+1).toString().padStart(2,'0')}/${d.getDate().toString().padStart(2,'0')} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+        return `
+          <div class="flex items-center justify-between py-2.5 border-b border-[var(--stellar-border)]/40 last:border-0">
+            <div class="flex items-center gap-2">
+              <i data-lucide="${TICKET_TYPES[o.ticketId]?.icon || 'ticket'}" class="w-3.5 h-3.5 text-[var(--stellar-primary)]"></i>
+              <div>
+                <div class="text-xs font-medium">${o.ticketName} × ${o.qty}</div>
+                <div class="text-[10px] text-[var(--stellar-muted-foreground)] font-mono">${o.id} · ${timeStr}</div>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs gold-text font-medium">¥${o.total}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+  document.getElementById('user-detail-content').innerHTML = `
+    <div class="px-6 py-4 border-b border-[var(--stellar-glass-border)] flex items-center justify-between">
+      <h3 class="text-sm font-semibold">用户详情</h3>
+      <button onclick="closeUserDetail()" class="text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)]">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+    <div class="p-6">
+      <!-- 用户信息 -->
+      <div class="flex items-center gap-3 mb-5">
+        <div class="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold" style="background: var(--stellar-primary-soft); color: var(--stellar-primary); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">${initial}</div>
+        <div class="flex-1">
+          <div class="flex items-center gap-2">
+            <span class="text-sm font-semibold">${user.nickname || '游客'}</span>
+            <span class="text-[10px] px-2 py-0.5 rounded font-medium" style="background: ${isActive ? 'rgba(52,216,153,0.15)' : 'rgba(240,184,74,0.15)'}; color: ${isActive ? 'var(--stellar-state-success)' : 'var(--stellar-state-warning)'};">${isActive ? '活跃' : '新注册'}</span>
+          </div>
+          <div class="text-xs text-[var(--stellar-muted-foreground)] font-mono mt-0.5">${maskPhone(user.phone)}</div>
+        </div>
+      </div>
+      <!-- 信息 -->
+      <div class="space-y-3 mb-5">
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">手机号</span>
+          <span class="font-mono">${maskPhone(user.phone)}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">昵称</span>
+          <span>${user.nickname || '游客'}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">注册时间</span>
+          <span>${regStr}</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-[var(--stellar-muted-foreground)]">订单数</span>
+          <span class="font-medium">${orderCount}</span>
+        </div>
+      </div>
+      <!-- 消费 -->
+      <div class="rounded-lg p-4 glow-border mb-5">
+        <div class="flex justify-between items-center">
+          <span class="text-sm">总消费金额</span>
+          <span class="text-xl font-bold gold-text">¥${totalSpending.toLocaleString()}</span>
+        </div>
+      </div>
+      <!-- 订单历史 -->
+      <div class="mb-2">
+        <div class="text-xs text-[var(--stellar-muted-foreground)] mb-2">订单历史</div>
+        <div class="rounded-lg p-3" style="background: var(--stellar-background-elevated);">
+          ${ordersHtml}
+        </div>
+      </div>
+      <!-- 关闭 -->
+      <div class="flex gap-3 mt-5">
+        <button onclick="closeUserDetail()" class="flex-1 py-2.5 rounded-lg border border-[var(--stellar-border)] text-sm text-[var(--stellar-muted-foreground)] hover:bg-[var(--stellar-muted)] transition-colors">关闭</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('user-detail-modal').classList.remove('hidden');
+  document.getElementById('user-detail-modal').classList.add('flex');
+  lucide.createIcons();
+}
+
+function closeUserDetail() {
+  document.getElementById('user-detail-modal').classList.add('hidden');
+  document.getElementById('user-detail-modal').classList.remove('flex');
+}
+
+// 确保用户存在（生成订单时同步创建/更新用户，保证用户列表非空）
+function ensureDemoUser(phone, nickname) {
+  const users = getUsers();
+  if (!users.find(u => u.phone === phone)) {
+    users.unshift({
+      phone: phone,
+      nickname: nickname || ('游客' + String(phone).slice(-4)),
+      registeredAt: new Date().toISOString()
+    });
+    saveUsers(users);
+    showNewUserBadge();
+    return true;
+  }
+  return false;
+}
+
+// 新用户徽章
+function showNewUserBadge() {
+  const badge = document.getElementById('new-user-badge');
+  if (badge) badge.classList.remove('hidden');
+}
+
+// ==================== 实时更新监听 ====================
+function refreshAdminFromSync(source) {
+  const activePanel = document.querySelector('.admin-nav-item.sidebar-item-active')?.dataset.panel || 'dashboard';
+  if (source === 'orders') {
+    const orders = getOrders();
+    if (orders.length > lastOrderCount) {
+      document.getElementById('new-order-badge').classList.remove('hidden');
+      lastOrderCount = orders.length;
+    }
+    if (activePanel === 'dashboard') renderDashboard();
+    if (activePanel === 'orders') renderOrdersTable();
+    if (activePanel === 'users') renderUsersTable();
+    return;
+  }
+  if (source === 'users') {
+    showNewUserBadge();
+    if (activePanel === 'users') renderUsersTable();
+    if (activePanel === 'dashboard') renderDashboard();
+    return;
+  }
+  if (source === 'products') {
+    if (activePanel === 'products') renderProducts();
+    if (activePanel === 'dashboard') renderDashboard();
+    return;
+  }
+  if (source === 'rides') {
+    loadRidesStatus();
+    if (activePanel === 'rides') renderRidesTable();
+    if (activePanel === 'dashboard') renderDashboard();
+  }
+}
+
+if (window.StellarSync) {
+  StellarSync.onDataChange(StellarSync.KEYS.orders, () => refreshAdminFromSync('orders'));
+  StellarSync.onDataChange(StellarSync.KEYS.users, () => refreshAdminFromSync('users'));
+  StellarSync.onDataChange(StellarSync.KEYS.products, () => refreshAdminFromSync('products'));
+  StellarSync.onDataChange(StellarSync.KEYS.ridesStatus, () => refreshAdminFromSync('rides'));
+}
+
+// ==================== 搜索 ====================
+document.addEventListener('input', (e) => {
+  if (e.target.id === 'order-search') {
+    renderOrdersTable();
+  }
+  if (e.target.id === 'user-search') {
+    renderUsersTable();
+  }
+});
+
+// ==================== 时钟 ====================
+function updateClock() {
+  const d = new Date();
+  const days = ['日','一','二','三','四','五','六'];
+  const str = `${d.getFullYear()}-${(d.getMonth()+1).toString().padStart(2,'0')}-${d.getDate().toString().padStart(2,'0')} 周${days[d.getDay()]} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}`;
+  const el = document.getElementById('current-time');
+  if (el) el.textContent = str;
+}
+setInterval(updateClock, 1000);
+
+// ==================== 初始化 ====================
+ensureProductsSeed();
+lastOrderCount = getOrders().length;
+loadRidesStatus();
+renderDashboard();
+updateClock();
+lucide.createIcons();
+</script>
+</main>
+</body>
+</html>

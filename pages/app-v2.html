@@ -1,0 +1,2385 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>App · 星屿乐园</title>
+    <style id="theme-vars">
+/* 星屿乐园 Stellar Park — 沉浸式电影感设计合约
+   单一品牌色：琥珀金 (#E3A63B)，夜空蓝黑背景，电影级光效与深度 */
+
+:root {
+  /* 基础表面 — 中灰 */
+  --stellar-background: #303540;
+  --stellar-background-elevated: #363B48;
+  --stellar-foreground: #ECEFF4;
+
+  --stellar-card: #383E4B;
+  --stellar-card-elevated: #3E4554;
+  --stellar-card-foreground: #ECEFF4;
+
+  --stellar-popover: #343A46;
+  --stellar-popover-foreground: #ECEFF4;
+
+  /* 品牌主色：琥珀金 + 辉光层 */
+  --stellar-primary: #E3A63B;
+  --stellar-primary-bright: #F0BC5A;
+  --stellar-primary-foreground: #14100A;
+  --stellar-primary-strong: #C98F26;
+  --stellar-primary-soft: rgba(227, 166, 59, 0.12);
+  --stellar-primary-glow: rgba(227, 166, 59, 0.35);
+  --stellar-primary-glow-soft: rgba(227, 166, 59, 0.15);
+
+  /* 中性层级 */
+  --stellar-muted: #424857;
+  --stellar-muted-foreground: #A0A5B4;
+  --stellar-ink-3: #74798A;
+
+  /* 线条与输入 */
+  --stellar-border: #454C5C;
+  --stellar-border-glow: rgba(227, 166, 59, 0.2);
+  --stellar-input: #454C5C;
+  --stellar-ring: #E3A63B;
+
+  /* 圆角 */
+  --stellar-radius-sm: 4px;
+  --stellar-radius-md: 10px;
+  --stellar-radius-lg: 18px;
+
+  /* 状态色（仅真实状态使用） */
+  --stellar-state-success: #34D899;
+  --stellar-state-warning: #F0B84A;
+  --stellar-state-error: #FF7B6B;
+  --stellar-state-info: #6BA8E8;
+
+  /* 字体 */
+  --stellar-font-sans: "Inter", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+
+  /* 电影感深度阴影 — 漂浮层专用 */
+  --stellar-shadow-1: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --stellar-shadow-2: 0 20px 60px -20px rgba(0, 0, 0, 0.7);
+  --stellar-shadow-glow: 0 0 40px -8px rgba(227, 166, 59, 0.25);
+  --stellar-shadow-card: 0 8px 32px -8px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(227, 166, 59, 0.04);
+
+  /* 玻璃拟态 */
+  --stellar-glass-bg: rgba(15, 20, 32, 0.65);
+  --stellar-glass-border: rgba(227, 166, 59, 0.12);
+  --stellar-error: #ef4444;
+  --stellar-error-soft: rgba(239, 68, 68, 0.15);
+  --stellar-error-foreground: #ffffff;
+}
+
+/* 登录验证码错误抖动动画 */
+@keyframes login-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-8px); }
+  30% { transform: translateX(8px); }
+  45% { transform: translateX(-6px); }
+  60% { transform: translateX(6px); }
+  75% { transform: translateX(-4px); }
+  90% { transform: translateX(4px); }
+}
+.login-shake {
+  animation: login-shake 0.5s ease-in-out;
+}
+.login-code-error {
+  border-color: var(--stellar-error) !important;
+  box-shadow: 0 0 0 3px var(--stellar-error-soft) !important;
+}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-background: var(--stellar-background);
+    --color-foreground: var(--stellar-foreground);
+    --color-card: var(--stellar-card);
+    --color-card-foreground: var(--stellar-card-foreground);
+    --color-popover: var(--stellar-popover);
+    --color-popover-foreground: var(--stellar-popover-foreground);
+    --color-primary: var(--stellar-primary);
+    --color-primary-foreground: var(--stellar-primary-foreground);
+    --color-muted: var(--stellar-muted);
+    --color-muted-foreground: var(--stellar-muted-foreground);
+    --color-border: var(--stellar-border);
+    --color-input: var(--stellar-input);
+    --color-ring: var(--stellar-ring);
+    --radius-sm: var(--stellar-radius-sm);
+    --radius-md: var(--stellar-radius-md);
+    --radius-lg: var(--stellar-radius-lg);
+  }
+  @layer base {
+    body { background: var(--stellar-background); color: var(--stellar-foreground); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style id="semantic-token-fallback">
+      .bg-background { background-color: var(--stellar-background); }
+      .text-background { color: var(--stellar-background); }
+      .border-background { border-color: var(--stellar-background); }
+      .ring-background { --tw-ring-color: var(--stellar-background); }
+      .bg-foreground { background-color: var(--stellar-foreground); }
+      .text-foreground { color: var(--stellar-foreground); }
+      .border-foreground { border-color: var(--stellar-foreground); }
+      .ring-foreground { --tw-ring-color: var(--stellar-foreground); }
+      .bg-card { background-color: var(--stellar-card); }
+      .text-card { color: var(--stellar-card); }
+      .border-card { border-color: var(--stellar-card); }
+      .ring-card { --tw-ring-color: var(--stellar-card); }
+      .bg-card-foreground { background-color: var(--stellar-card-foreground); }
+      .text-card-foreground { color: var(--stellar-card-foreground); }
+      .border-card-foreground { border-color: var(--stellar-card-foreground); }
+      .ring-card-foreground { --tw-ring-color: var(--stellar-card-foreground); }
+      .bg-popover { background-color: var(--stellar-popover); }
+      .text-popover { color: var(--stellar-popover); }
+      .border-popover { border-color: var(--stellar-popover); }
+      .ring-popover { --tw-ring-color: var(--stellar-popover); }
+      .bg-popover-foreground { background-color: var(--stellar-popover-foreground); }
+      .text-popover-foreground { color: var(--stellar-popover-foreground); }
+      .border-popover-foreground { border-color: var(--stellar-popover-foreground); }
+      .ring-popover-foreground { --tw-ring-color: var(--stellar-popover-foreground); }
+      .bg-primary { background-color: var(--stellar-primary); }
+      .text-primary { color: var(--stellar-primary); }
+      .border-primary { border-color: var(--stellar-primary); }
+      .ring-primary { --tw-ring-color: var(--stellar-primary); }
+      .bg-primary-foreground { background-color: var(--stellar-primary-foreground); }
+      .text-primary-foreground { color: var(--stellar-primary-foreground); }
+      .border-primary-foreground { border-color: var(--stellar-primary-foreground); }
+      .ring-primary-foreground { --tw-ring-color: var(--stellar-primary-foreground); }
+      .bg-muted { background-color: var(--stellar-muted); }
+      .text-muted { color: var(--stellar-muted); }
+      .border-muted { border-color: var(--stellar-muted); }
+      .ring-muted { --tw-ring-color: var(--stellar-muted); }
+      .bg-muted-foreground { background-color: var(--stellar-muted-foreground); }
+      .text-muted-foreground { color: var(--stellar-muted-foreground); }
+      .border-muted-foreground { border-color: var(--stellar-muted-foreground); }
+      .ring-muted-foreground { --tw-ring-color: var(--stellar-muted-foreground); }
+      .bg-border { background-color: var(--stellar-border); }
+      .text-border { color: var(--stellar-border); }
+      .border-border { border-color: var(--stellar-border); }
+      .ring-border { --tw-ring-color: var(--stellar-border); }
+      .bg-input { background-color: var(--stellar-input); }
+      .text-input { color: var(--stellar-input); }
+      .border-input { border-color: var(--stellar-input); }
+      .ring-input { --tw-ring-color: var(--stellar-input); }
+      .bg-ring { background-color: var(--stellar-ring); }
+      .text-ring { color: var(--stellar-ring); }
+      .border-ring { border-color: var(--stellar-ring); }
+      .ring-ring { --tw-ring-color: var(--stellar-ring); }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased">
+<main>
+
+<!-- ==================== 登录/注册 Overlay ==================== -->
+<div id="login-overlay" class="fixed inset-0 z-50 hidden flex items-center justify-center px-5" style="background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+  <!-- 关闭按钮 -->
+  <button onclick="dismissLoginOverlay()" class="absolute top-5 right-5 w-9 h-9 rounded-full flex items-center justify-center z-10 glass-card" aria-label="关闭">
+    <i data-lucide="x" class="w-4 h-4 text-[var(--stellar-foreground)]"></i>
+  </button>
+  <!-- 氛围光效层 -->
+  <div class="fixed inset-0 pointer-events-none">
+    <div class="ambient-glow" style="width:260px;height:260px;background:var(--stellar-primary-glow-soft);top:-60px;right:-60px;"></div>
+    <div class="ambient-glow" style="width:200px;height:200px;background:rgba(91,141,201,0.1);bottom:-40px;left:-40px;animation-delay:-4s;"></div>
+  </div>
+  <div id="login-stars" class="fixed inset-0 pointer-events-none"></div>
+
+  <div class="relative w-full max-w-sm mx-auto">
+    <!-- Logo + 标题 -->
+    <div class="text-center mb-7">
+      <div class="w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4 glow-border" style="background: var(--stellar-primary-soft); box-shadow: 0 0 40px -8px var(--stellar-primary-glow);">
+        <i data-lucide="sparkles" class="w-10 h-10 text-[var(--stellar-primary-bright)]"></i>
+      </div>
+      <h1 class="text-2xl font-bold gold-text">星屿乐园</h1>
+      <p class="text-xs text-[var(--stellar-muted-foreground)] mt-1.5">登录后即可购票和查看订单</p>
+    </div>
+
+    <!-- 登录表单 -->
+    <div class="glass-card rounded-2xl p-5 space-y-4">
+      <!-- 手机号 -->
+      <div>
+        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">手机号</label>
+        <div class="relative">
+          <i data-lucide="phone" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="tel" id="login-phone" maxlength="11" inputmode="numeric" placeholder="请输入11位手机号" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+        </div>
+      </div>
+
+      <!-- 验证码 -->
+      <div>
+        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">短信验证码</label>
+        <div class="flex gap-2">
+          <div class="relative flex-1">
+            <i data-lucide="shield-check" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="tel" id="login-code" maxlength="6" inputmode="numeric" placeholder="6位验证码" oninput="clearLoginError()" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+          </div>
+          <button id="sms-btn" onclick="sendSmsCode()" class="px-3.5 py-3 rounded-xl text-xs font-medium whitespace-nowrap glow-border transition-opacity" style="background: var(--stellar-primary-soft); color: var(--stellar-primary-bright);">获取验证码</button>
+        </div>
+        <p id="sms-hint" class="text-[10px] text-[var(--stellar-primary-bright)] mt-1.5 hidden"></p>
+        <p id="login-error" class="text-[11px] mt-1.5 hidden font-medium" style="color: var(--stellar-error);"></p>
+      </div>
+
+      <!-- 登录按钮 -->
+      <button onclick="handleLogin()" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">登录</button>
+
+      <p class="text-center text-[11px] text-[var(--stellar-ink-3)]">未注册手机号将自动注册</p>
+      <button onclick="dismissLoginOverlay()" class="w-full py-2 text-xs text-[var(--stellar-muted-foreground)]">暂不登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- 登录提示 Toast -->
+<div id="login-toast" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[60] hidden px-5 py-3 rounded-xl glass-card text-sm text-white text-center pointer-events-none" style="border:1px solid var(--stellar-border-glow); box-shadow: var(--stellar-shadow-2); transition: opacity 0.3s ease; opacity:0;"></div>
+
+<!-- 退出登录确认弹窗 -->
+<div id="logout-confirm" class="fixed inset-0 z-[70] hidden items-center justify-center px-8" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
+  <div class="w-full max-w-[280px] rounded-2xl glass-card p-6 text-center" style="box-shadow: var(--stellar-shadow-2);">
+    <p class="text-base font-semibold mb-1" style="color: var(--stellar-foreground);">确认退出吗？</p>
+    <p class="text-xs mb-5" style="color: var(--stellar-muted-foreground);">退出后需重新验证手机号登录</p>
+    <div class="flex gap-3">
+      <button onclick="cancelLogout()" class="flex-1 py-2.5 rounded-xl text-sm font-medium glass-card" style="color: var(--stellar-foreground);">否</button>
+      <button onclick="confirmLogout()" class="flex-1 py-2.5 rounded-xl text-sm font-medium glass-card" style="color: var(--stellar-foreground);">是</button>
+    </div>
+  </div>
+</div>
+
+<div id="app-container" class="max-w-[430px] mx-auto min-h-screen relative flex flex-col overflow-hidden" style="background: var(--stellar-background);">
+
+  <!-- 全局氛围光效层 -->
+  <div class="fixed inset-0 pointer-events-none z-0" style="max-width:430px;left:50%;transform:translateX(-50%);">
+    <div class="ambient-glow" style="width:200px;height:200px;background:var(--stellar-primary-glow-soft);top:-50px;right:-30px;"></div>
+    <div class="ambient-glow" style="width:150px;height:150px;background:rgba(91,141,201,0.08);top:40%;left:-50px;animation-delay:-3s;"></div>
+  </div>
+
+  <!-- ==================== 首页 ==================== -->
+  <div id="tab-home" class="tab-panel flex-1 pb-20 relative z-10">
+
+    <!-- Hero Banner -->
+    <div class="relative h-[340px] overflow-hidden">
+      <img src="../assets/hero-banner-starry.jpg" class="absolute inset-0 w-full h-full object-cover" alt="星屿乐园">
+      <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(48,53,64,0.25) 0%, transparent 35%, rgba(48,53,64,0.85) 100%);"></div>
+
+      <div id="hero-stars" class="hidden"></div>
+
+      <!-- 顶栏：定位 + 搜索 + 通知 -->
+      <div class="relative z-10 px-4 pt-12">
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1 text-xs text-white/90 shrink-0">
+            <i data-lucide="map-pin" class="w-3.5 h-3.5"></i> 园区外
+          </div>
+          <div class="flex-1 relative">
+            <i data-lucide="search" class="w-3.5 h-3.5 text-white/50 absolute left-3 top-1/2 -translate-y-1/2"></i>
+            <input type="text" class="w-full pl-9 pr-3 py-1.5 rounded-full text-[11px] bg-white/15 text-white placeholder-white/50 border border-white/10 outline-none" style="backdrop-filter: blur(12px);" placeholder="搜索项目、票种...">
+          </div>
+          <button class="relative shrink-0">
+            <i data-lucide="bell" class="w-5 h-5 text-white/90"></i>
+            <span class="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full" style="background:#EF4444;"></span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 欢迎文案 + 今日天气卡 -->
+      <div class="absolute bottom-0 left-0 right-0 px-4 pb-4 z-10">
+        <h2 class="text-[22px] font-bold text-white mb-2.5 tracking-wide leading-tight" style="text-shadow: 0 2px 16px rgba(0,0,0,0.6);">
+          欢迎开启你的<span class="gold-text">奇幻太空之旅！</span>
+        </h2>
+        <div class="rounded-2xl p-3 flex items-center justify-between" style="background: rgba(255,255,255,0.08); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1);">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #1E2A5E, #2A1F4A); box-shadow: 0 0 16px -4px rgba(227,166,59,0.35);">
+              <i data-lucide="moon" class="w-5 h-5" style="color:#F0BC5A;"></i>
+            </div>
+            <div>
+              <div class="text-[10px] text-white/60">今日天气</div>
+              <div class="text-xs font-medium text-white">晴 26°C · 适宜游玩</div>
+            </div>
+          </div>
+          <div class="text-right">
+            <div class="text-[10px] text-white/60">在园人数</div>
+            <div class="text-sm font-bold" style="color:#F0BC5A;" id="home-visitor-count">8,426</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 热门项目 横向滚动 -->
+    <div class="pt-5">
+      <div class="flex items-center justify-between mb-3 px-4">
+        <h2 class="text-base font-semibold text-white flex items-center gap-2">
+          <span class="w-1 h-4 rounded-full" style="background: linear-gradient(180deg, #F0BC5A, #E3A63B);"></span>
+          热门项目
+        </h2>
+        <button onclick="switchTab('rides')" class="text-xs text-white/60 flex items-center gap-0.5">全部 <i data-lucide="chevron-right" class="w-3 h-3"></i></button>
+      </div>
+      <div class="flex gap-3 overflow-x-auto no-scrollbar px-4 pb-2" id="home-rides-list"></div>
+    </div>
+
+    <!-- 今日推荐票 -->
+    <div class="px-4 pt-5">
+      <h2 class="text-base font-semibold mb-3 text-white flex items-center gap-2">
+        <span class="w-1 h-4 rounded-full" style="background: linear-gradient(180deg, #F59E0B, #EC4899);"></span>
+        今日推荐
+      </h2>
+      <div class="relative rounded-2xl overflow-hidden" style="background: linear-gradient(135deg, rgba(59,130,246,0.12) 0%, rgba(139,92,246,0.08) 50%, rgba(236,72,153,0.06) 100%); border: 1px solid rgba(139,92,246,0.15);">
+        <div class="absolute inset-0" style="background: radial-gradient(ellipse at 85% 15%, rgba(245,158,11,0.12) 0%, transparent 50%);"></div>
+        <div class="relative p-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: rgba(239,68,68,0.15); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.2);">限时优惠</span>
+              <h3 class="text-base font-semibold text-white mt-2" id="home-rec-name">成人单次入园票</h3>
+              <p class="text-xs text-white/50 mt-0.5" id="home-rec-desc">当日有效 · 畅玩全园所有项目</p>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-white/40 line-through" id="home-rec-original">¥499</div>
+              <div class="text-2xl font-bold" style="background: linear-gradient(135deg, #FCD34D, #F59E0B); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;" id="home-rec-price">¥399</div>
+            </div>
+          </div>
+          <button onclick="openPurchase('single')" class="w-full mt-3 py-2.5 rounded-xl text-sm font-semibold text-white" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED); box-shadow: 0 4px 20px -4px rgba(139,92,246,0.5);" id="home-rec-btn">立即购买</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 门票 ==================== -->
+  <div id="tab-tickets" class="tab-panel hidden flex-1 pb-20 relative z-10">
+    <div class="px-5 pt-14 pb-3 sticky top-0 z-10" style="background: linear-gradient(180deg, var(--stellar-background) 70%, transparent);">
+      <h1 class="text-xl font-bold gold-text">购买门票</h1>
+      <p class="text-xs text-[var(--stellar-muted-foreground)] mt-0.5">选择适合你的票种，开启沉浸之旅</p>
+    </div>
+    <div class="px-5 space-y-3" id="tickets-list"></div>
+    <div class="px-5 pt-6 pb-4">
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center gap-2 mb-3">
+          <i data-lucide="info" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>
+          <h3 class="text-sm font-medium">购票须知</h3>
+        </div>
+        <div class="space-y-2 text-xs text-[var(--stellar-muted-foreground)] leading-relaxed">
+          <p>· 单次票当日有效，出园后作废</p>
+          <p>· 年卡自激活之日起 365 天有效</p>
+          <p>· 快速通行证仅限指定项目使用</p>
+          <p>· 所有票种支持 7 天内未使用退款</p>
+          <p>· 儿童票(1.0m-1.4m)享 7 折优惠</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 项目 ==================== -->
+  <div id="tab-rides" class="tab-panel hidden flex-1 pb-20 relative z-10">
+    <div class="px-5 pt-14 pb-3 sticky top-0 z-10" style="background: linear-gradient(180deg, var(--stellar-background) 70%, transparent);">
+      <h1 class="text-xl font-bold gold-text">游乐项目</h1>
+      <div class="flex gap-2 mt-3 no-scrollbar overflow-x-auto" id="rides-filter-bar">
+        <button class="filter-btn active px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap" data-zone="all">全部</button>
+        <button class="filter-btn px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap" data-zone="星际港">星际港</button>
+        <button class="filter-btn px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap" data-zone="暗影域">暗影域</button>
+        <button class="filter-btn px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap" data-zone="霓虹城">霓虹城</button>
+        <button class="filter-btn px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap" data-zone="幻梦湾">幻梦湾</button>
+      </div>
+    </div>
+    <div class="px-5 space-y-3" id="rides-list"></div>
+  </div>
+
+  <!-- ==================== 地图 ==================== -->
+  <div id="tab-map" class="tab-panel hidden flex-1 pb-20 relative z-10">
+    <div class="px-5 pt-14 pb-3">
+      <h1 class="text-xl font-bold gold-text">园区地图</h1>
+      <p class="text-xs text-[var(--stellar-muted-foreground)] mt-0.5">四大主题区域 · 点击项目查看详情</p>
+    </div>
+    <div class="px-5">
+      <div class="relative rounded-2xl overflow-hidden glass-card" style="aspect-ratio: 3/4;">
+        <!-- 扁平矢量园区地图（深色版） -->
+        <svg class="absolute inset-0 w-full h-full" viewBox="0 0 300 400" fill="none" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <linearGradient id="mapBg" x1="0" y1="0" x2="0.5" y2="1"><stop offset="0%" stop-color="#1A2138"/><stop offset="100%" stop-color="#151824"/></linearGradient>
+          </defs>
+          <!-- 背景 -->
+          <rect width="300" height="400" fill="url(#mapBg)"/>
+
+          <!-- 四区分块（深色高对比 + 呼吸光效 + 点击交互） -->
+          <!-- 星际港 左上 -->
+          <path id="zone-star" d="M 20 60 Q 60 40 110 55 Q 140 75 130 120 Q 110 150 60 145 Q 20 130 20 100 Z" fill="rgba(72,128,210,0.32)" stroke="rgba(107,168,232,0.35)" stroke-width="0.6" style="cursor:pointer;" onclick="focusZone('星际港','星际探索主题区 · 2个游乐项目','rgba(107,168,232,1)')">
+            <animate attributeName="fill" values="rgba(72,128,210,0.32);rgba(72,128,210,0.5);rgba(72,128,210,0.32)" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="stroke" values="rgba(107,168,232,0.35);rgba(107,168,232,0.7);rgba(107,168,232,0.35)" dur="4s" repeatCount="indefinite"/>
+          </path>
+          <!-- 霓虹城 右上 -->
+          <path id="zone-neon" d="M 170 55 Q 220 40 275 60 Q 285 100 275 135 Q 250 160 200 150 Q 165 130 170 90 Z" fill="rgba(227,166,59,0.28)" stroke="rgba(240,188,90,0.35)" stroke-width="0.6" style="cursor:pointer;" onclick="focusZone('霓虹城','赛博朋克主题区 · 2个游乐项目','rgba(240,188,90,1)')">
+            <animate attributeName="fill" values="rgba(227,166,59,0.28);rgba(227,166,59,0.48);rgba(227,166,59,0.28)" dur="5s" repeatCount="indefinite"/>
+            <animate attributeName="stroke" values="rgba(240,188,90,0.35);rgba(240,188,90,0.7);rgba(240,188,90,0.35)" dur="5s" repeatCount="indefinite"/>
+          </path>
+          <!-- 暗影域 左下 -->
+          <path id="zone-shadow" d="M 30 230 Q 55 210 105 220 Q 135 240 125 280 Q 100 310 55 300 Q 20 280 30 255 Z" fill="rgba(196,72,168,0.26)" stroke="rgba(210,110,190,0.3)" stroke-width="0.6" style="cursor:pointer;" onclick="focusZone('暗影域','恐怖悬疑主题区 · 2个游乐项目','rgba(210,110,190,1)')">
+            <animate attributeName="fill" values="rgba(196,72,168,0.26);rgba(196,72,168,0.44);rgba(196,72,168,0.26)" dur="6s" repeatCount="indefinite"/>
+            <animate attributeName="stroke" values="rgba(210,110,190,0.3);rgba(210,110,190,0.6);rgba(210,110,190,0.3)" dur="6s" repeatCount="indefinite"/>
+          </path>
+          <!-- 幻梦湾 右下 -->
+          <path id="zone-dream" d="M 175 225 Q 225 215 275 235 Q 285 270 265 300 Q 230 320 185 305 Q 160 280 175 250 Z" fill="rgba(52,216,153,0.26)" stroke="rgba(80,230,160,0.3)" stroke-width="0.6" style="cursor:pointer;" onclick="focusZone('幻梦湾','梦幻童趣主题区 · 2个游乐项目','rgba(80,230,160,1)')">
+            <animate attributeName="fill" values="rgba(52,216,153,0.26);rgba(52,216,153,0.44);rgba(52,216,153,0.26)" dur="4.5s" repeatCount="indefinite"/>
+            <animate attributeName="stroke" values="rgba(80,230,160,0.3);rgba(80,230,160,0.65);rgba(80,230,160,0.3)" dur="4.5s" repeatCount="indefinite"/>
+          </path>
+
+          <!-- 区域内闪烁星点 -->
+          <g>
+            <circle cx="50" cy="80" r="0.8" fill="rgba(107,168,232,0.6)"><animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite"/></circle>
+            <circle cx="100" cy="65" r="0.6" fill="rgba(107,168,232,0.5)"><animate attributeName="opacity" values="1;0.2;1" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="80" cy="120" r="0.7" fill="rgba(107,168,232,0.4)"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="210" cy="70" r="0.8" fill="rgba(240,188,90,0.6)"><animate attributeName="opacity" values="1;0.2;1" dur="2.2s" repeatCount="indefinite"/></circle>
+            <circle cx="250" cy="100" r="0.6" fill="rgba(240,188,90,0.5)"><animate attributeName="opacity" values="0.2;1;0.2" dur="2.8s" repeatCount="indefinite"/></circle>
+            <circle cx="235" cy="130" r="0.7" fill="rgba(240,188,90,0.4)"><animate attributeName="opacity" values="0.9;0.2;0.9" dur="3.2s" repeatCount="indefinite"/></circle>
+            <circle cx="55" cy="260" r="0.8" fill="rgba(210,110,190,0.5)"><animate attributeName="opacity" values="0.2;1;0.2" dur="2.5s" repeatCount="indefinite"/></circle>
+            <circle cx="100" cy="270" r="0.6" fill="rgba(210,110,190,0.4)"><animate attributeName="opacity" values="1;0.3;1" dur="3s" repeatCount="indefinite"/></circle>
+            <circle cx="80" cy="240" r="0.7" fill="rgba(210,110,190,0.4)"><animate attributeName="opacity" values="0.3;0.9;0.3" dur="2.7s" repeatCount="indefinite"/></circle>
+            <circle cx="215" cy="255" r="0.8" fill="rgba(80,230,160,0.5)"><animate attributeName="opacity" values="1;0.2;1" dur="2.3s" repeatCount="indefinite"/></circle>
+            <circle cx="255" cy="280" r="0.6" fill="rgba(80,230,160,0.4)"><animate attributeName="opacity" values="0.2;1;0.2" dur="2.6s" repeatCount="indefinite"/></circle>
+            <circle cx="230" cy="295" r="0.7" fill="rgba(80,230,160,0.4)"><animate attributeName="opacity" values="0.9;0.3;0.9" dur="3.1s" repeatCount="indefinite"/></circle>
+          </g>
+
+          <!-- 路径（星光轨迹） -->
+          <path d="M 150 170 Q 110 150 75 120" stroke="rgba(227,166,59,0.08)" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M 150 170 Q 110 150 75 120" stroke="rgba(227,166,59,0.5)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-dasharray="1 4"/>
+          <path d="M 150 170 Q 190 150 225 120" stroke="rgba(227,166,59,0.08)" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M 150 170 Q 190 150 225 120" stroke="rgba(227,166,59,0.5)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-dasharray="1 4"/>
+          <path d="M 150 210 Q 110 235 75 265" stroke="rgba(227,166,59,0.08)" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M 150 210 Q 110 235 75 265" stroke="rgba(227,166,59,0.5)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-dasharray="1 4"/>
+          <path d="M 150 210 Q 190 235 225 265" stroke="rgba(227,166,59,0.08)" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M 150 210 Q 190 235 225 265" stroke="rgba(227,166,59,0.5)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-dasharray="1 4"/>
+          <!-- 主街 入口→广场 -->
+          <path d="M 150 210 L 150 170" stroke="rgba(227,166,59,0.08)" stroke-width="9" fill="none" stroke-linecap="round"/>
+          <path d="M 150 210 L 150 170" stroke="rgba(227,166,59,0.5)" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-dasharray="1 4"/>
+          <path d="M 150 290 L 150 210" stroke="rgba(227,166,59,0.1)" stroke-width="10" fill="none" stroke-linecap="round"/>
+          <path d="M 150 290 L 150 210" stroke="rgba(227,166,59,0.55)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-dasharray="1 4"/>
+
+          <!-- 中央广场 -->
+          <circle cx="150" cy="190" r="24" fill="rgba(227,166,59,0.1)" stroke="rgba(227,166,59,0.6)" stroke-width="1.5"/>
+          <circle cx="150" cy="190" r="14" fill="none" stroke="rgba(227,166,59,0.3)" stroke-width="0.8"/>
+          <!-- 天文台图标（简化） -->
+          <path d="M 143 192 A 7 7 0 0 1 157 192 Z" fill="rgba(227,166,59,0.7)"/>
+          <rect x="146" y="188" width="8" height="2" rx="1" transform="rotate(-20 150 189)" fill="rgba(201,143,38,0.8)"/>
+
+          <!-- 区域名 -->
+          <text x="55" y="56" fill="rgba(107,168,232,0.8)" font-size="8.5" font-weight="700" text-anchor="middle">星际港</text>
+          <text x="245" y="56" fill="rgba(227,166,59,0.8)" font-size="8.5" font-weight="700" text-anchor="middle">霓虹城</text>
+          <text x="55" y="230" fill="rgba(196,108,178,0.75)" font-size="8.5" font-weight="700" text-anchor="middle">暗影域</text>
+          <text x="245" y="230" fill="rgba(52,216,153,0.75)" font-size="8.5" font-weight="700" text-anchor="middle">幻梦湾</text>
+
+          <!-- 入口标记 -->
+          <rect x="135" y="286" width="30" height="14" rx="4" fill="rgba(52,216,153,0.25)" stroke="rgba(52,216,153,0.6)" stroke-width="0.8"/>
+          <text x="150" y="296" fill="rgba(52,216,153,0.95)" font-size="7" font-weight="700" text-anchor="middle">入口</text>
+
+          <!-- 停车场 -->
+          <rect x="115" y="340" width="70" height="18" rx="4" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="0.6"/>
+          <text x="150" y="353" fill="rgba(160,165,180,0.7)" font-size="7" font-weight="600" text-anchor="middle">P 停车场</text>
+          <path d="M 150 300 L 150 340" stroke="rgba(227,166,59,0.4)" stroke-width="8" fill="none" stroke-linecap="round"/>
+
+          <!-- 出口标记 -->
+          <rect x="135" y="36" width="30" height="14" rx="4" fill="rgba(255,123,107,0.2)" stroke="rgba(255,123,107,0.6)" stroke-width="0.8"/>
+          <text x="150" y="46" fill="rgba(255,123,107,0.95)" font-size="7" font-weight="700" text-anchor="middle">出口</text>
+          <path d="M 150 50 L 150 60" stroke="rgba(227,166,59,0.35)" stroke-width="7" fill="none" stroke-linecap="round"/>
+        </svg>
+        <!-- 项目标记（动态渲染） -->
+        <div id="map-markers"></div>
+        <!-- 区域聚焦浮层 -->
+        <div id="zone-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 transition-all duration-300" style="background:rgba(0,0,0,0.55);backdrop-filter:blur(2px);">
+          <div class="text-center px-6 py-5 rounded-2xl glass-card" style="border:1px solid var(--stellar-glass-border);min-width:180px;">
+            <div id="zone-overlay-dot" class="w-3 h-3 rounded-full mx-auto mb-2 pulse-dot"></div>
+            <div id="zone-overlay-name" class="text-lg font-bold text-white"></div>
+            <div id="zone-overlay-desc" class="text-xs text-[var(--stellar-muted-foreground)] mt-1"></div>
+            <div class="text-[10px] text-[var(--stellar-ink-3)] mt-3">点击空白处关闭</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 pt-4 grid grid-cols-2 gap-2">
+      <div class="glass-card rounded-xl p-3 flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full pulse-dot" style="background:var(--stellar-primary);"></div>
+        <span class="text-xs text-[var(--stellar-muted-foreground)]">运营中 · 排队 &lt;30min</span>
+      </div>
+      <div class="glass-card rounded-xl p-3 flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full" style="background: var(--stellar-state-warning);"></div>
+        <span class="text-xs text-[var(--stellar-muted-foreground)]">排队较长 30-60min</span>
+      </div>
+      <div class="glass-card rounded-xl p-3 flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full" style="background: var(--stellar-state-error);"></div>
+        <span class="text-xs text-[var(--stellar-muted-foreground)]">排队很长 &gt;60min</span>
+      </div>
+      <div class="glass-card rounded-xl p-3 flex items-center gap-2">
+        <div class="w-2 h-2 rounded-full bg-[var(--stellar-ink-3)]"></div>
+        <span class="text-xs text-[var(--stellar-muted-foreground)]">维护中</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 我的 ==================== -->
+  <div id="tab-profile" class="tab-panel hidden flex-1 pb-20 relative z-10">
+    <div class="px-5 pt-14 pb-4">
+      <div class="flex items-center gap-4">
+        <div id="avatar-wrap" onclick="changeAvatar()" class="w-16 h-16 rounded-2xl flex items-center justify-center glow-border relative cursor-pointer overflow-hidden" style="background: var(--stellar-primary-soft);">
+          <img id="avatar-img" class="w-full h-full object-cover hidden" alt="头像">
+          <i id="avatar-icon" data-lucide="user" class="w-7 h-7 text-[var(--stellar-primary-bright)]"></i>
+          <div class="absolute bottom-0 left-0 right-0 h-5 flex items-center justify-center" style="background: rgba(0,0,0,0.45);">
+            <i data-lucide="camera" class="w-3 h-3 text-white"></i>
+          </div>
+        </div>
+        <input type="file" id="avatar-input" accept="image/*" class="hidden" onchange="onAvatarSelected(event)">
+        <div>
+          <h2 class="text-lg font-bold" id="profile-nickname">游客</h2>
+          <p class="text-xs text-[var(--stellar-muted-foreground)] mt-0.5" id="profile-subtitle">未登录</p>
+          <div class="flex items-center gap-2 mt-1.5">
+            <span class="text-[10px] px-2 py-0.5 rounded-md glass-card text-[var(--stellar-muted-foreground)]" id="profile-order-count">0 笔订单</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="px-5 grid grid-cols-3 gap-2 mb-4">
+      <button onclick="switchTab('profile'); renderOrders('all')" class="glass-card rounded-2xl p-3 text-center lift-card">
+        <div class="text-lg font-bold" id="count-all">0</div>
+        <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-0.5">全部订单</div>
+      </button>
+      <button onclick="switchTab('profile'); renderOrders('paid')" class="glass-card rounded-2xl p-3 text-center lift-card">
+        <div class="text-lg font-bold text-[var(--stellar-primary-bright)]" id="count-paid">0</div>
+        <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-0.5">待使用</div>
+      </button>
+      <button onclick="switchTab('profile'); renderOrders('pending')" class="glass-card rounded-2xl p-3 text-center lift-card">
+        <div class="text-lg font-bold" style="color: var(--stellar-state-warning);" id="count-pending">0</div>
+        <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-0.5">待支付</div>
+      </button>
+    </div>
+    <div class="px-5">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold flex items-center gap-2">
+          <span class="w-1 h-4 rounded-full" style="background:var(--stellar-primary);"></span>
+          我的订单
+        </h3>
+        <div class="flex gap-2">
+          <button onclick="renderOrders('all')" class="order-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="all">全部</button>
+          <button onclick="renderOrders('pending')" class="order-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="pending">待支付</button>
+          <button onclick="renderOrders('paid')" class="order-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="paid">待使用</button>
+          <button onclick="renderOrders('used')" class="order-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="used">已使用</button>
+        </div>
+      </div>
+      <div id="orders-list" class="space-y-3"></div>
+    </div>
+    <!-- 退出登录 -->
+    <div class="px-5 mt-6">
+      <button onclick="logout()" class="w-full py-3 rounded-xl glass-card text-sm font-medium flex items-center justify-center gap-1.5" style="color: var(--stellar-state-error); border: 1px solid rgba(255,123,107,0.25);">
+        <i data-lucide="log-out" class="w-4 h-4"></i>退出登录
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== 底部导航 ==================== -->
+  <nav data-mobile-nav="global" class="mt-auto h-16 fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-30" style="background: var(--stellar-glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--stellar-glass-border); box-shadow: 0 -8px 32px -8px rgba(0,0,0,0.5);">
+    <div class="w-full grid grid-cols-5 h-full">
+      <a href="#" data-nav-key="home" onclick="switchTab('home'); return false;" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full nav-item text-[var(--stellar-primary-bright)] font-medium" data-active="true">
+        <i data-lucide="home" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap">首页</span>
+      </a>
+      <a href="#" data-nav-key="tickets" onclick="switchTab('tickets'); return false;" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full nav-item text-[var(--stellar-muted-foreground)]">
+        <i data-lucide="ticket" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap">门票</span>
+      </a>
+      <a href="#" data-nav-key="rides" onclick="switchTab('rides'); return false;" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full nav-item text-[var(--stellar-muted-foreground)]">
+        <i data-lucide="ferris-wheel" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap">项目</span>
+      </a>
+      <a href="#" data-nav-key="map" onclick="switchTab('map'); return false;" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full nav-item text-[var(--stellar-muted-foreground)]">
+        <i data-lucide="map" class="w-5 h-5 shrink-0"></i>
+        <span class="text-[11px] leading-none whitespace-nowrap">地图</span>
+      </a>
+      <a href="#" data-nav-key="profile" onclick="switchTab('profile'); return false;" class="min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 h-full nav-item text-[var(--stellar-muted-foreground)]" id="profile-nav-item">
+        <span id="profile-nav-icon-wrap"><i data-lucide="user" class="w-5 h-5 shrink-0"></i></span>
+        <span class="text-[11px] leading-none whitespace-nowrap" id="profile-nav-label">我的</span>
+      </a>
+    </div>
+  </nav>
+
+</div>
+
+<!-- ==================== 购票流程 Overlay ==================== -->
+<div id="purchase-overlay" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] max-h-[90vh] overflow-y-auto no-scrollbar rounded-t-3xl overlay-enter" style="background: var(--stellar-background); box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.8);">
+    <div class="px-5 pt-5 pb-3 border-b border-[var(--stellar-border)]">
+      <div class="flex items-center justify-between mb-3">
+        <button onclick="closePurchase()" class="flex items-center gap-1 text-sm text-[var(--stellar-muted-foreground)]">
+          <i data-lucide="x" class="w-4 h-4"></i> 关闭
+        </button>
+        <h2 class="text-sm font-semibold gold-text" id="purchase-title">购买门票</h2>
+        <div class="w-12"></div>
+      </div>
+      <div class="flex items-center justify-center gap-2 text-xs">
+        <div class="flex items-center gap-1.5" id="step-1-indicator">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center step-active font-medium" style="background: var(--stellar-primary-soft);">1</div>
+          <span class="step-active">选择票种</span>
+        </div>
+        <div class="w-8 h-px bg-[var(--stellar-border)]"></div>
+        <div class="flex items-center gap-1.5" id="step-2-indicator">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[var(--stellar-muted-foreground)] font-medium" style="background: var(--stellar-muted);">2</div>
+          <span class="text-[var(--stellar-muted-foreground)]">填写信息</span>
+        </div>
+        <div class="w-8 h-px bg-[var(--stellar-border)]"></div>
+        <div class="flex items-center gap-1.5" id="step-3-indicator">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center text-[var(--stellar-muted-foreground)] font-medium" style="background: var(--stellar-muted);">3</div>
+          <span class="text-[var(--stellar-muted-foreground)]">支付</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1 -->
+    <div id="purchase-step-1" class="p-5">
+      <div class="mb-4">
+        <h3 class="text-sm font-semibold mb-1" id="step1-ticket-name">成人单次入园票</h3>
+        <p class="text-xs text-[var(--stellar-muted-foreground)]" id="step1-ticket-desc">当日有效，畅玩全园所有项目</p>
+      </div>
+      <div class="space-y-2 mb-5" id="step1-ticket-options"></div>
+      <div class="mb-5">
+        <h4 class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-2">选择游玩日期</h4>
+        <div class="flex gap-2 no-scrollbar overflow-x-auto" id="date-options"></div>
+      </div>
+      <div class="mb-5">
+        <h4 class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-2">购买数量</h4>
+        <div class="flex items-center justify-between glass-card rounded-xl p-3">
+          <span class="text-sm">成人票 <span class="text-[var(--stellar-muted-foreground)] text-xs">¥<span id="step1-unit-price">399</span>/张</span></span>
+          <div class="flex items-center gap-3">
+            <button onclick="changeQty(-1)" class="w-8 h-8 rounded-lg glass-card flex items-center justify-center text-[var(--stellar-muted-foreground)]">−</button>
+            <span class="text-base font-semibold w-6 text-center" id="step1-qty">1</span>
+            <button onclick="changeQty(1)" class="w-8 h-8 rounded-lg glow-border flex items-center justify-center text-[var(--stellar-primary-bright)]" style="background:var(--stellar-primary-soft);">+</button>
+          </div>
+        </div>
+      </div>
+      <div class="glass-card rounded-xl p-3 mb-5">
+        <div class="flex items-center justify-between text-xs">
+          <span class="text-[var(--stellar-muted-foreground)]">小计</span>
+          <span>¥<span id="step1-subtotal">399</span></span>
+        </div>
+        <div class="border-t border-[var(--stellar-border)] mt-2 pt-2 flex items-center justify-between">
+          <span class="text-sm font-medium">合计</span>
+          <span class="text-xl font-bold gold-text">¥<span id="step1-total">399</span></span>
+        </div>
+      </div>
+      <button onclick="goToStep(2)" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">下一步</button>
+    </div>
+
+    <!-- Step 2 -->
+    <div id="purchase-step-2" class="p-5 hidden">
+      <div class="space-y-4 mb-5">
+        <div>
+          <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">姓名</label>
+          <input type="text" id="buyer-name" placeholder="请输入购票人姓名" value="" class="w-full px-3 py-2.5 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+          <p id="buyer-name-error" class="hidden text-[11px] mt-1" style="color: var(--stellar-state-error);"></p>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">手机号</label>
+          <input type="tel" id="buyer-phone" placeholder="请输入手机号" value="" class="w-full px-3 py-2.5 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+          <p id="buyer-phone-error" class="hidden text-[11px] mt-1" style="color: var(--stellar-state-error);"></p>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">身份证号</label>
+          <input type="text" id="buyer-id" placeholder="请输入身份证号（用于实名认证）" value="" class="w-full px-3 py-2.5 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+          <p id="buyer-id-error" class="hidden text-[11px] mt-1" style="color: var(--stellar-state-error);"></p>
+        </div>
+      </div>
+      <div class="glass-card rounded-xl p-4 mb-5">
+        <h4 class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-3">订单详情</h4>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-[var(--stellar-muted-foreground)]">票种</span><span id="step2-ticket-name">成人单次入园票</span></div>
+          <div class="flex justify-between"><span class="text-[var(--stellar-muted-foreground)]">日期</span><span id="step2-date">—</span></div>
+          <div class="flex justify-between"><span class="text-[var(--stellar-muted-foreground)]">数量</span><span id="step2-qty">1 张</span></div>
+          <div class="flex justify-between"><span class="text-[var(--stellar-muted-foreground)]">单价</span><span>¥<span id="step2-price">399</span></span></div>
+          <div class="border-t border-[var(--stellar-border)] pt-2 flex justify-between font-medium">
+            <span>合计</span>
+            <span class="gold-text">¥<span id="step2-total">399</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="goToStep(1)" class="flex-1 py-3 rounded-xl glass-card text-sm font-medium">上一步</button>
+        <button onclick="goToStep(3)" class="flex-[2] py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">确认下单</button>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div id="purchase-step-3" class="p-5 hidden">
+      <div class="flex items-center justify-center gap-2 mb-5 text-xs" style="color: var(--stellar-state-warning);">
+        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+        <span>支付剩余时间 <span id="pay-countdown" class="font-mono font-medium">14:59</span></span>
+      </div>
+      <div class="text-center mb-6">
+        <div class="text-xs text-[var(--stellar-muted-foreground)] mb-1">需支付</div>
+        <div class="text-4xl font-bold gold-text text-glow">¥<span id="step3-amount">399</span></div>
+      </div>
+      <div class="mb-6">
+        <div class="flex items-center justify-between glass-card rounded-xl p-4 glow-border">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: rgba(7,193,96,0.15);">
+              <svg viewBox="0 0 24 24" class="w-6 h-6" aria-hidden="true">
+                <path fill="#07C160" d="M8.5 7.5c0-.6.5-1 1.1-1h4.8c.6 0 1.1.4 1.1 1v.2c0 .6-.5 1-1.1 1H9.6c-.6 0-1.1-.4-1.1-1v-.2zm-3.8 2.1C2.4 10.8 1 12.9 1 15.3 1 18.9 4.9 22 9.7 22c2.1 0 4-.6 5.4-1.5l4.9 2.5-.9-4.8c1.4-1.2 2.3-2.9 2.3-4.8 0-3.6-3.9-6.7-8.7-6.7-1.8 0-3.5.4-4.9 1.1z"/>
+              </svg>
+            </div>
+            <div>
+              <div class="text-sm font-medium">微信支付</div>
+              <div class="text-[11px] text-[var(--stellar-muted-foreground)] mt-0.5">安全快捷，支付完成后自动出票</div>
+            </div>
+          </div>
+          <i data-lucide="check-circle-2" class="w-5 h-5" style="color: #07C160;"></i>
+        </div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="closePurchase(false)" class="flex-1 py-3 rounded-xl glass-card text-sm font-medium">取消</button>
+        <button onclick="processPayment()" class="flex-[2] py-3 rounded-xl text-sm font-semibold text-white" style="background: #07C160; box-shadow: 0 4px 20px -4px rgba(7,193,96,0.45);" id="pay-btn">微信支付 ¥<span id="step3-btn-amount">399</span></button>
+      </div>
+    </div>
+
+    <!-- 支付成功 -->
+    <div id="purchase-success" class="p-5 hidden text-center">
+      <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4" style="background: rgba(52,216,153,0.12); box-shadow: 0 0 40px -8px rgba(52,216,153,0.4);">
+        <i data-lucide="check" class="w-10 h-10" style="color: var(--stellar-state-success);"></i>
+      </div>
+      <h3 class="text-lg font-bold mb-1">支付成功</h3>
+      <p class="text-xs text-[var(--stellar-muted-foreground)] mb-5">微信支付成功，电子票待使用</p>
+      <div class="glass-card rounded-xl p-4 text-left mb-5">
+        <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]">订单号</span><span class="font-mono" id="success-order-id">—</span></div>
+        <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]">票种</span><span id="success-ticket-name">—</span></div>
+        <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]">数量</span><span id="success-qty">—</span></div>
+        <div class="flex justify-between text-xs"><span class="text-[var(--stellar-muted-foreground)]">金额</span><span class="gold-text font-medium">¥<span id="success-amount">—</span></span></div>
+      </div>
+      <div class="flex gap-3">
+        <button onclick="closePurchase(); switchTab('profile')" class="flex-1 py-3 rounded-xl glass-card text-sm font-medium">查看订单</button>
+        <button onclick="closePurchase()" class="flex-1 py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">完成</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 微信支付确认层 ==================== -->
+<div id="wechat-pay-overlay" class="fixed inset-0 z-[60] hidden" style="background: rgba(0,0,0,0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] rounded-t-2xl overflow-hidden overlay-enter" style="background: #EDEDED;">
+    <div class="px-5 pt-4 pb-3 flex items-center justify-between" style="background: #EDEDED;">
+      <button onclick="cancelWechatPay()" class="text-sm" style="color: #576B95;">取消</button>
+      <span class="text-sm font-medium" style="color: #191919;">微信支付</span>
+      <div class="w-8"></div>
+    </div>
+    <div class="px-5 pb-6 text-center" style="background: #EDEDED;">
+      <div class="text-sm mb-1" style="color: #888;" id="wechat-pay-merchant">星屿乐园</div>
+      <div class="text-4xl font-semibold mb-1" style="color: #191919; letter-spacing: -0.02em;">¥<span id="wechat-pay-amount">0.00</span></div>
+      <div class="text-xs mb-6" style="color: #888;" id="wechat-pay-desc">门票订单</div>
+      <div class="rounded-xl px-4 py-3 flex items-center justify-between mb-6 text-left" style="background: #fff;">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: rgba(7,193,96,0.12);">
+            <svg viewBox="0 0 24 24" class="w-5 h-5" aria-hidden="true">
+              <path fill="#07C160" d="M8.5 7.5c0-.6.5-1 1.1-1h4.8c.6 0 1.1.4 1.1 1v.2c0 .6-.5 1-1.1 1H9.6c-.6 0-1.1-.4-1.1-1v-.2zm-3.8 2.1C2.4 10.8 1 12.9 1 15.3 1 18.9 4.9 22 9.7 22c2.1 0 4-.6 5.4-1.5l4.9 2.5-.9-4.8c1.4-1.2 2.3-2.9 2.3-4.8 0-3.6-3.9-6.7-8.7-6.7-1.8 0-3.5.4-4.9 1.1z"/>
+            </svg>
+          </div>
+          <span class="text-sm" style="color: #191919;">微信支付</span>
+        </div>
+        <i data-lucide="check" class="w-4 h-4" style="color: #07C160;"></i>
+      </div>
+      <button onclick="confirmWechatPay()" id="wechat-pay-confirm-btn" class="w-full py-3.5 rounded-lg text-base font-medium text-white" style="background: #07C160;">确认支付</button>
+      <p class="text-[11px] mt-3" style="color: #B2B2B2;">演示环境 · 点击确认即完成支付</p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== 项目详情 Overlay ==================== -->
+<div id="ride-detail-overlay" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] max-h-[85vh] overflow-y-auto no-scrollbar rounded-t-3xl overlay-enter" style="background: var(--stellar-background); box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.8);" id="ride-detail-content">
+  </div>
+</div>
+
+<script src="../assets/stellar-sync.js"></script>
+<script>
+// ==================== 数据定义 ====================
+const DEFAULT_TICKET_TYPES = {
+  single: { id: 'single', name: '成人单次入园票', price: 399, originalPrice: 499, desc: '当日有效，畅玩全园所有项目', icon: 'ticket' },
+  annual: { id: 'annual', name: '年卡会员', price: 1299, originalPrice: 1599, desc: '365天无限次入园，享会员专属通道', icon: 'crown' },
+  express: { id: 'express', name: '快速通行证', price: 199, originalPrice: 249, desc: '指定热门项目免排队，最多省 2 小时', icon: 'zap' },
+  child: { id: 'child', name: '儿童单次入园票', price: 279, originalPrice: 349, desc: '身高 1.0m-1.4m 儿童，需成人陪同', icon: 'baby' }
+};
+
+let TICKET_TYPES = {};
+
+// 从后台同步商品数据（localStorage key 与后台一致）
+function loadTicketTypes() {
+  const types = {};
+  // 年卡始终从默认值加载（后台暂不管理年卡）
+  types.annual = { ...DEFAULT_TICKET_TYPES.annual };
+  try {
+    const saved = JSON.parse(localStorage.getItem('stellar_park_products') || '[]');
+    if (Array.isArray(saved) && saved.length > 0) {
+      saved.filter(p => p.active).forEach(p => {
+        types[p.id] = { id: p.id, name: p.name, price: p.price, originalPrice: p.originalPrice, desc: p.desc, icon: p.icon || 'ticket' };
+      });
+    } else {
+      types.single = { ...DEFAULT_TICKET_TYPES.single };
+      types.express = { ...DEFAULT_TICKET_TYPES.express };
+      types.child = { ...DEFAULT_TICKET_TYPES.child };
+    }
+  } catch(e) {
+    types.single = { ...DEFAULT_TICKET_TYPES.single };
+    types.express = { ...DEFAULT_TICKET_TYPES.express };
+    types.child = { ...DEFAULT_TICKET_TYPES.child };
+  }
+  TICKET_TYPES = types;
+}
+
+const RIDES = [
+  { id: 'galaxy', name: '银河穿梭', zone: '星际港', wait: 45, status: 'open', thrill: '刺激', desc: '穿越星际黑洞的高速过山车，感受 4.5G 极限加速度', height: '130cm+', duration: '3分钟', capacity: '24人/批' },
+  { id: 'abyss', name: '深渊坠落', zone: '暗影域', wait: 32, status: 'open', thrill: '极度刺激', desc: '从 80 米高空自由坠落，挑战心理极限', height: '145cm+', duration: '2分钟', capacity: '16人/批' },
+  { id: 'neon', name: '霓虹竞速', zone: '霓虹城', wait: 65, status: 'open', thrill: '刺激', desc: '赛博朋克主题双人竞速轨道车', height: '120cm+', duration: '4分钟', capacity: '12人/批' },
+  { id: 'dream', name: '幻梦漂流', zone: '幻梦湾', wait: 18, status: 'open', thrill: '温和', desc: '沉浸式光影河道漂流，适合全家游玩', height: '无限制', duration: '8分钟', capacity: '20人/批' },
+  { id: 'matrix', name: '矩阵迷宫', zone: '霓虹城', wait: 25, status: 'open', thrill: '探索', desc: 'VR 增强现实互动迷宫，解开数字密码', height: '110cm+', duration: '15分钟', capacity: '6人/批' },
+  { id: 'thunder', name: '雷霆风暴', zone: '星际港', wait: 0, status: 'maintenance', thrill: '极度刺激', desc: '360度旋转悬挂式飞行体验', height: '140cm+', duration: '3分钟', capacity: '32人/批' },
+  { id: 'shadow', name: '暗影鬼屋', zone: '暗影域', wait: 40, status: 'open', thrill: '恐怖', desc: '电影级场景沉浸式恐怖体验', height: '130cm+', duration: '12分钟', capacity: '8人/批' },
+  { id: 'aurora', name: '极光摩天轮', zone: '幻梦湾', wait: 15, status: 'open', thrill: '温和', desc: '88米高空俯瞰全园夜景', height: '无限制', duration: '10分钟', capacity: '8人/舱' }
+];
+
+// ==================== 从后台同步 ride 状态 ====================
+function loadRidesStatus() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('stellar_park_rides_status') || '{}');
+    RIDES.forEach(r => {
+      if (saved[r.id]) r.status = saved[r.id];
+    });
+  } catch(e) {}
+}
+
+// 从后台同步商品数据并刷新 UI
+function refreshTicketsFromAdmin() {
+  loadTicketTypes();
+  renderTickets();
+  renderHomeRecommend();
+  const overlay = document.getElementById('purchase-overlay');
+  if (overlay && !overlay.classList.contains('hidden')) {
+    if (!getPurchaseTicket()) {
+      showLoginToast('所选票种已下架，请重新选择');
+      goToStep(1);
+      return;
+    }
+    const currentStep = purchaseState.step || 1;
+    if (currentStep === 1) {
+      renderStep1();
+    } else if (currentStep === 2) {
+      goToStep(2);
+    } else if (currentStep === 3) {
+      const ticket = getPurchaseTicket();
+      if (ticket) {
+        const total = ticket.price * purchaseState.qty;
+        document.getElementById('step3-amount').textContent = total;
+        document.getElementById('step3-btn-amount').textContent = total;
+      }
+    }
+  }
+}
+
+// 监听后台 ride / 商品变更
+function refreshRidesFromAdmin() {
+  loadRidesStatus();
+  const ridesTab = document.getElementById('tab-rides');
+  if (ridesTab && !ridesTab.classList.contains('hidden')) {
+    const activeFilter = document.querySelector('.ride-filter[data-filter]')?.dataset.filter || 'all';
+    renderRides(activeFilter);
+  }
+  renderHomeRides();
+  renderMapMarkers();
+}
+
+// ==================== 项目专属 SVG 图标 ====================
+function getRideIconSvg(rideId, sizeClass, colorVar, dimmed) {
+  const dimClass = dimmed ? ' dimmed' : '';
+  const colorStyle = dimmed ? 'color: var(--stellar-ink-3)' : `color: ${colorVar}`;
+  if (rideId === 'galaxy') {
+    return `<svg viewBox="0 0 24 24" fill="none" class="${sizeClass} ride-icon-svg${dimClass}" style="${colorStyle}"><path d="M12 12 C 9 11, 6 12, 5 9 C 4 6.5, 7 4.5, 10 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.85"/><path d="M12 12 C 15 13, 18 12, 19 15 C 20 17.5, 17 19.5, 14 18.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none" opacity="0.85"/><path d="M12 12 C 11 14.5, 8.5 16, 6 15.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/><path d="M12 12 C 13 9.5, 15.5 8, 18 8.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none" opacity="0.6"/><circle cx="12" cy="12" r="2" fill="currentColor" opacity="0.9"/><circle cx="12" cy="12" r="0.8" fill="#fff" opacity="0.7"/><circle cx="6" cy="5" r="0.7" fill="currentColor" opacity="0.5"/><circle cx="18.5" cy="19" r="0.6" fill="currentColor" opacity="0.4"/><circle cx="17" cy="5.5" r="0.5" fill="currentColor" opacity="0.35"/></svg>`;
+  }
+  if (rideId === 'abyss') {
+    return `<svg viewBox="0 0 24 24" fill="none" class="${sizeClass} ride-icon-svg${dimClass}" style="${colorStyle}"><path d="M5 3 L 10 11 L 11.5 17 L 12 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/><path d="M19 3 L 14 11 L 12.5 17 L 12 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/><path d="M12 5 L 12 18" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 2.5" opacity="0.55"/><circle cx="12" cy="4" r="1.5" fill="currentColor" opacity="0.9"/><circle cx="12" cy="21" r="2" fill="currentColor" opacity="0.7"/><circle cx="12" cy="21" r="0.7" fill="#07090F" opacity="0.9"/></svg>`;
+  }
+  return null;
+}
+
+// ==================== 状态管理 ====================
+let purchaseState = {
+  ticketId: 'single',
+  date: null,
+  qty: 1,
+  step: 1,
+  buyerName: '',
+  buyerPhone: '',
+  buyerId: '',
+  pendingOrderId: null
+};
+let countdownTimer = null;
+let wechatPayCallback = null;
+
+// ==================== localStorage 订单管理 ====================
+const STORAGE_KEY = 'stellar_park_orders';
+
+function getOrders() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveOrders(orders) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.orders);
+}
+function addOrder(order) {
+  const orders = getOrders();
+  orders.unshift(order);
+  saveOrders(orders);
+}
+function orderBelongsToUser(order, phone) {
+  if (!phone || !order || !order.phone) return false;
+  const masked = maskPhone(phone);
+  return order.phone === phone || order.phone === masked || maskPhone(order.phone) === masked;
+}
+
+function getOrdersForCurrentUser() {
+  const phone = getCurrentUserPhone();
+  if (!phone) return [];
+  return getOrders().filter(o => orderBelongsToUser(o, phone));
+}
+
+function updateOrderStatus(orderId, status) {
+  const orders = getOrders();
+  const order = orders.find(o => o.id === orderId);
+  if (order) {
+    order.status = status;
+    saveOrders(orders);
+  }
+}
+
+// ==================== 用户登录/注册系统 ====================
+const USERS_KEY = 'stellar_park_users';
+const CURRENT_USER_KEY = 'stellar_park_current_user';
+let smsCountdownTimer = null;
+let smsCountdownSec = 0;
+let lastSmsCode = '';
+let pendingLoginAction = null;  // 'purchase' | 'profile' | 'orders'
+let lastAttemptedTicketId = null;
+
+function getUsers() {
+  try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveUsers(users) {
+  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.users);
+}
+function getCurrentUserPhone() {
+  try { return localStorage.getItem(CURRENT_USER_KEY) || null; } catch(e) { return null; }
+}
+function setCurrentUserPhone(phone) {
+  localStorage.setItem(CURRENT_USER_KEY, phone);
+}
+function clearCurrentUser() {
+  localStorage.removeItem(CURRENT_USER_KEY);
+}
+function getUserByPhone(phone) {
+  return getUsers().find(u => u.phone === phone) || null;
+}
+function maskPhone(phone) {
+  if (!phone || phone.length < 7) return phone || '';
+  return phone.slice(0,3) + '****' + phone.slice(-4);
+}
+function getNicknameForPhone(phone) {
+  const last4 = phone && phone.length >= 4 ? phone.slice(-4) : '8888';
+  return '星际探索者' + last4;
+}
+
+function sendSmsCode() {
+  clearLoginError();
+  const phoneInput = document.getElementById('login-phone');
+  const phone = phoneInput.value.trim();
+  if (!/^1\d{10}$/.test(phone)) {
+    showLoginToast('请输入正确的11位手机号');
+    phoneInput.focus();
+    return;
+  }
+  // 生成 6 位演示验证码
+  lastSmsCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hint = document.getElementById('sms-hint');
+  hint.textContent = '演示验证码: ' + lastSmsCode;
+  hint.classList.remove('hidden');
+  showLoginToast('验证码已发送');
+  startSmsCountdown();
+}
+
+function startSmsCountdown() {
+  smsCountdownSec = 60;
+  const btn = document.getElementById('sms-btn');
+  btn.disabled = true;
+  btn.textContent = '重新获取(60s)';
+  btn.style.opacity = '0.55';
+  btn.style.cursor = 'not-allowed';
+  if (smsCountdownTimer) clearInterval(smsCountdownTimer);
+  smsCountdownTimer = setInterval(() => {
+    smsCountdownSec--;
+    if (smsCountdownSec <= 0) {
+      clearInterval(smsCountdownTimer);
+      smsCountdownTimer = null;
+      btn.disabled = false;
+      btn.textContent = '获取验证码';
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+    } else {
+      btn.textContent = '重新获取(' + smsCountdownSec + 's)';
+    }
+  }, 1000);
+}
+
+function showLoginToast(msg) {
+  const toast = document.getElementById('login-toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.classList.remove('hidden');
+  toast.style.opacity = '1';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    setTimeout(() => toast.classList.add('hidden'), 300);
+  }, 2500);
+}
+
+function showLoginError(msg) {
+  // 内联错误提示（持续可见）
+  const errEl = document.getElementById('login-error');
+  if (errEl) {
+    errEl.textContent = msg;
+    errEl.classList.remove('hidden');
+  }
+  // 输入框抖动 + 红色边框
+  const codeInput = document.getElementById('login-code');
+  if (codeInput) {
+    codeInput.classList.add('login-shake', 'login-code-error');
+    setTimeout(() => codeInput.classList.remove('login-shake'), 500);
+  }
+  // 同时显示 toast
+  showLoginToast(msg);
+}
+
+function clearLoginError() {
+  const errEl = document.getElementById('login-error');
+  if (errEl) {
+    errEl.classList.add('hidden');
+    errEl.textContent = '';
+  }
+  const codeInput = document.getElementById('login-code');
+  if (codeInput) {
+    codeInput.classList.remove('login-code-error');
+  }
+}
+
+function handleLogin() {
+  clearLoginError();
+  const phone = document.getElementById('login-phone').value.trim();
+  const code = document.getElementById('login-code').value.trim();
+  if (!/^1\d{10}$/.test(phone)) {
+    showLoginError('请输入正确的11位手机号');
+    return;
+  }
+  if (!/^\d{6}$/.test(code)) {
+    showLoginError('请输入6位验证码');
+    return;
+  }
+  if (!lastSmsCode) {
+    showLoginError('请先获取验证码');
+    return;
+  }
+  if (code !== lastSmsCode) {
+    showLoginError('验证码错误，请输入正确的演示验证码');
+    document.getElementById('login-code').value = '';
+    return;
+  }
+  // 登录 / 自动注册
+  let users = getUsers();
+  let user = users.find(u => u.phone === phone);
+  let isRegister = false;
+  if (!user) {
+    user = {
+      phone: phone,
+      registeredAt: new Date().toISOString(),
+      nickname: getNicknameForPhone(phone)
+    };
+    users.push(user);
+    saveUsers(users);
+    isRegister = true;
+  }
+  setCurrentUserPhone(phone);
+  hideLoginOverlay();
+  updateProfileUserInfo();
+  updateProfileNav();
+  showLoginToast(isRegister ? '注册成功，欢迎加入星屿乐园' : '登录成功');
+  // 处理登录后待执行的操作
+  const pendingAction = pendingLoginAction;
+  pendingLoginAction = null;
+  if (pendingAction === 'purchase' && lastAttemptedTicketId) {
+    const ticketId = lastAttemptedTicketId;
+    lastAttemptedTicketId = null;
+    openPurchase(ticketId);
+  } else if (pendingAction === 'profile' || pendingAction === 'orders') {
+    switchTab('profile');
+  }
+}
+
+function hideLoginOverlay() {
+  document.getElementById('login-overlay').classList.add('hidden');
+}
+
+function showLoginOverlay() {
+  document.getElementById('login-overlay').classList.remove('hidden');
+  // 重置表单
+  document.getElementById('login-phone').value = '';
+  document.getElementById('login-code').value = '';
+  document.getElementById('sms-hint').classList.add('hidden');
+  clearLoginError();
+  if (smsCountdownTimer) { clearInterval(smsCountdownTimer); smsCountdownTimer = null; }
+  const btn = document.getElementById('sms-btn');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = '获取验证码';
+    btn.style.opacity = '1';
+    btn.style.cursor = 'pointer';
+  }
+  generateStars('login-stars', 30);
+  lucide.createIcons();
+}
+
+function isLoggedIn() {
+  return !!getCurrentUserPhone();
+}
+
+function requireLogin(action) {
+  // action: 'purchase' | 'profile' | 'orders'
+  if (isLoggedIn()) return true;
+  pendingLoginAction = action;
+  showLoginOverlay();
+  return false;
+}
+
+function dismissLoginOverlay() {
+  hideLoginOverlay();
+  pendingLoginAction = null;
+}
+
+function updateProfileNav() {
+  const iconWrap = document.getElementById('profile-nav-icon-wrap');
+  const label = document.getElementById('profile-nav-label');
+  if (!iconWrap || !label) return;
+  if (isLoggedIn()) {
+    iconWrap.innerHTML = '<i data-lucide="user" class="w-5 h-5 shrink-0"></i>';
+    label.textContent = '我的';
+  } else {
+    iconWrap.innerHTML = '<i data-lucide="lock" class="w-5 h-5 shrink-0"></i>';
+    label.textContent = '未登录';
+  }
+  lucide.createIcons();
+}
+
+function logout() {
+  const modal = document.getElementById('logout-confirm');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    lucide.createIcons();
+  }
+}
+
+function confirmLogout() {
+  cancelLogout();
+  clearCurrentUser();
+  // 重置 profile 显示
+  document.getElementById('profile-nickname').textContent = '游客';
+  document.getElementById('profile-subtitle').textContent = '未登录';
+  const avatarImg = document.getElementById('avatar-img');
+  const avatarIcon = document.getElementById('avatar-icon');
+  if (avatarImg) avatarImg.classList.add('hidden');
+  if (avatarIcon) avatarIcon.classList.remove('hidden');
+  updateProfileNav();
+  // 退出后回到首页，不弹出登录层，允许游客继续浏览
+  switchTab('home');
+}
+
+function cancelLogout() {
+  const modal = document.getElementById('logout-confirm');
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+function updateProfileUserInfo() {
+  const phone = getCurrentUserPhone();
+  const avatarImg = document.getElementById('avatar-img');
+  const avatarIcon = document.getElementById('avatar-icon');
+  if (!phone) {
+    document.getElementById('profile-nickname').textContent = '游客';
+    document.getElementById('profile-subtitle').textContent = '未登录';
+    if (avatarImg) avatarImg.classList.add('hidden');
+    if (avatarIcon) avatarIcon.classList.remove('hidden');
+    return;
+  }
+  const user = getUserByPhone(phone);
+  const nickname = user ? user.nickname : getNicknameForPhone(phone);
+  document.getElementById('profile-nickname').textContent = nickname;
+  document.getElementById('profile-subtitle').textContent = maskPhone(phone);
+  // 显示自定义头像
+  const savedAvatar = localStorage.getItem('stellar_park_avatar_' + phone);
+  if (savedAvatar && avatarImg) {
+    avatarImg.src = savedAvatar;
+    avatarImg.classList.remove('hidden');
+    if (avatarIcon) avatarIcon.classList.add('hidden');
+  } else {
+    if (avatarImg) avatarImg.classList.add('hidden');
+    if (avatarIcon) avatarIcon.classList.remove('hidden');
+  }
+}
+
+// ==================== 头像更换 ====================
+function changeAvatar() {
+  const phone = getCurrentUserPhone();
+  if (!phone) {
+    showLoginToast('请先登录');
+    requireLogin('profile');
+    return;
+  }
+  document.getElementById('avatar-input').click();
+}
+
+function onAvatarSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showLoginToast('请选择图片文件');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const phone = getCurrentUserPhone();
+    if (!phone) return;
+    // 压缩图片到合理大小（通过 canvas 缩放）
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const maxSize = 200;
+      let w = img.width, h = img.height;
+      if (w > h) { h = Math.round(h * maxSize / w); w = maxSize; }
+      else { w = Math.round(w * maxSize / h); h = maxSize; }
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+      localStorage.setItem('stellar_park_avatar_' + phone, dataUrl);
+      // 更新显示
+      const avatarImg = document.getElementById('avatar-img');
+      const avatarIcon = document.getElementById('avatar-icon');
+      if (avatarImg) {
+        avatarImg.src = dataUrl;
+        avatarImg.classList.remove('hidden');
+      }
+      if (avatarIcon) avatarIcon.classList.add('hidden');
+      showLoginToast('头像更新成功');
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  // 重置 input 以便重复选择同一文件
+  event.target.value = '';
+}
+
+function initLogin() {
+  const phone = getCurrentUserPhone();
+  if (phone) {
+    updateProfileUserInfo();
+  }
+  // 未登录时不弹出登录层，允许游客自由浏览
+  updateProfileNav();
+}
+
+// ==================== 星空粒子生成 ====================
+function generateStars(containerId, count = 30) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  for (let i = 0; i < count; i++) {
+    const star = document.createElement('div');
+    star.className = 'star-particle';
+    const size = Math.random() * 2 + 0.5;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.opacity = Math.random() * 0.6 + 0.2;
+    star.style.animation = `twinkle ${Math.random() * 3 + 2}s ease-in-out infinite`;
+    star.style.animationDelay = Math.random() * 3 + 's';
+    if (Math.random() > 0.7) star.style.background = 'rgba(227,166,59,0.8)';
+    container.appendChild(star);
+  }
+}
+
+// ==================== Tab 切换 ====================
+function switchTab(tabName) {
+  // "我的" 需要登录
+  if (tabName === 'profile' && !requireLogin('profile')) {
+    return;
+  }
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('tab-' + tabName).classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('text-[var(--stellar-primary-bright)]', 'font-medium');
+    item.classList.add('text-[var(--stellar-muted-foreground)]');
+    item.removeAttribute('data-active');
+  });
+  const activeNav = document.querySelector(`[data-nav-key="${tabName}"]`);
+  if (activeNav) {
+    activeNav.classList.add('text-[var(--stellar-primary-bright)]', 'font-medium');
+    activeNav.classList.remove('text-[var(--stellar-muted-foreground)]');
+    activeNav.setAttribute('data-active', 'true');
+  }
+  if (tabName === 'profile') renderOrders('all');
+  if (tabName === 'rides') renderRides('all');
+  window.scrollTo(0, 0);
+}
+
+// ==================== 首页热门项目渲染 ====================
+function renderHomeRides() {
+  const RIDE_IMAGES = {
+    galaxy: 'ride-galaxy.jpg',
+    abyss: 'ride-abyss.jpg',
+    aurora: 'ride-aurora.jpg',
+    neon: 'ride-neon.jpg',
+    shadow: 'ride-shadow.jpg'
+  };
+  const GRADIENTS = {
+    neon: 'linear-gradient(135deg, #16224F, #0E1530)',
+    dream: 'linear-gradient(135deg, #0E3A4A, #0A2230)',
+    matrix: 'linear-gradient(135deg, #2A1F4A, #14102A)',
+    thunder: 'linear-gradient(135deg, #3A2A10, #1A1408)',
+    shadow: 'linear-gradient(135deg, #2A0E1A, #14080F)'
+  };
+  const homeRideOrder = ['neon', 'galaxy', 'shadow', 'abyss', 'aurora'];
+  const topRides = homeRideOrder
+    .map(id => RIDES.find(r => r.id === id))
+    .filter(r => r && r.status === 'open');
+  const html = topRides.map(ride => {
+    const waitColor = ride.wait > 60 ? '#EF4444' : ride.wait > 30 ? '#F59E0B' : '#34D899';
+    const imgBg = RIDE_IMAGES[ride.id]
+      ? `<img data-ride-img="${RIDE_IMAGES[ride.id]}" class="absolute inset-0 w-full h-full object-cover">`
+      : `<div class="absolute inset-0" style="background: ${GRADIENTS[ride.id] || 'linear-gradient(135deg, #1E2740, #0F1420)'};"></div>`;
+    const hotBadge = ride.wait > 50 ? `<span class="absolute top-2 right-2 text-[9px] px-1.5 py-0.5 rounded-full font-medium text-white z-10" style="background: rgba(239,68,68,0.9);">热门</span>` : '';
+    return `
+      <div onclick="openRideDetail('${ride.id}')" class="relative w-40 h-44 rounded-2xl overflow-hidden shrink-0 cursor-pointer">
+        ${imgBg}
+        <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(48,53,64,0.45) 0%, transparent 45%, rgba(48,53,64,0.92) 100%);"></div>
+        ${hotBadge}
+        <div class="absolute bottom-0 left-0 right-0 p-3">
+          <div class="text-[10px] text-white/70 mb-0.5">${ride.zone}</div>
+          <div class="text-sm font-bold text-white truncate">${ride.name}</div>
+          <div class="flex items-center gap-2 mt-1.5">
+            <span class="text-[10px] flex items-center gap-1 font-medium" style="color: ${waitColor};">
+              <i data-lucide="clock" class="w-3 h-3"></i>${ride.wait}min
+            </span>
+            <span class="text-[10px] text-white/50">${ride.thrill}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('home-rides-list').innerHTML = html;
+  document.querySelectorAll('[data-ride-img]').forEach(function(img) { img.src = '../assets/' + img.dataset.rideImg; });
+  lucide.createIcons();
+}
+
+// ==================== 门票列表渲染 ====================
+function renderHomeRecommend() {
+  const rec = TICKET_TYPES['single'];
+  if (!rec) return;
+  const nameEl = document.getElementById('home-rec-name');
+  const descEl = document.getElementById('home-rec-desc');
+  const origEl = document.getElementById('home-rec-original');
+  const priceEl = document.getElementById('home-rec-price');
+  const btnEl = document.getElementById('home-rec-btn');
+  if (nameEl) nameEl.textContent = rec.name;
+  if (descEl) descEl.textContent = rec.desc;
+  if (origEl) origEl.textContent = '¥' + rec.originalPrice;
+  if (priceEl) priceEl.textContent = '¥' + rec.price;
+  if (btnEl) btnEl.setAttribute('onclick', `openPurchase('${rec.id}')`);
+}
+
+function renderTickets() {
+  const html = Object.values(TICKET_TYPES).map(ticket => `
+    <div onclick="openPurchase('${ticket.id}')" class="glass-card rounded-2xl p-4 lift-card cursor-pointer relative overflow-hidden">
+      ${ticket.originalPrice > ticket.price ? `<span class="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-md font-medium" style="background:var(--stellar-primary-soft);color:var(--stellar-primary-bright);border:1px solid var(--stellar-border-glow);">限时优惠</span>` : ''}
+      <div class="flex items-start gap-3">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 glow-border" style="background: var(--stellar-primary-soft);">
+          <i data-lucide="${ticket.icon}" class="w-6 h-6 text-[var(--stellar-primary-bright)]"></i>
+        </div>
+        <div class="flex-1">
+          <h3 class="text-sm font-semibold">${ticket.name}</h3>
+          <p class="text-xs text-[var(--stellar-muted-foreground)] mt-0.5 leading-relaxed">${ticket.desc}</p>
+          <div class="flex items-center gap-2 mt-2">
+            <span class="text-xl font-bold gold-text">¥${ticket.price}</span>
+            ${ticket.originalPrice > ticket.price ? `<span class="text-xs text-[var(--stellar-muted-foreground)] line-through">¥${ticket.originalPrice}</span>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  document.getElementById('tickets-list').innerHTML = html;
+  lucide.createIcons();
+}
+
+// ==================== 项目列表渲染 ====================
+function renderRides(zone = 'all') {
+  const filtered = zone === 'all' ? RIDES : RIDES.filter(r => r.zone === zone);
+  const html = filtered.map(ride => {
+    const waitColor = ride.status === 'maintenance' ? 'var(--stellar-ink-3)' : ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
+    const statusBadge = ride.status === 'maintenance'
+      ? `<span class="text-[10px] px-1.5 py-0.5 rounded shrink-0" style="background: var(--stellar-muted); color: var(--stellar-muted-foreground);">维护中</span>`
+      : ride.wait > 60
+        ? `<span class="text-[10px] px-1.5 py-0.5 rounded shrink-0 font-medium" style="background: rgba(255,123,107,0.15); color: var(--stellar-state-error);">热门</span>`
+        : '';
+    const rideIcon = getRideIconSvg(ride.id, 'w-6 h-6', 'var(--stellar-primary-bright)', ride.status === 'maintenance')
+      || `<i data-lucide="ferris-wheel" class="w-6 h-6 ${ride.status === 'maintenance' ? 'text-[var(--stellar-ink-3)]' : 'text-[var(--stellar-primary-bright)]'}"></i>`;
+    return `
+      <div onclick="openRideDetail('${ride.id}')" class="glass-card rounded-2xl p-3 lift-card cursor-pointer">
+        <div class="flex items-start gap-3">
+          <div class="w-14 h-14 rounded-xl flex items-center justify-center shrink-0" style="background: ${ride.status === 'maintenance' ? 'var(--stellar-muted)' : 'linear-gradient(135deg, var(--stellar-primary-soft), var(--stellar-muted))'}; ${ride.status !== 'maintenance' ? 'border:1px solid var(--stellar-glass-border);' : ''}">
+            ${rideIcon}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2">
+              <span class="text-sm font-medium">${ride.name}</span>
+              ${statusBadge}
+            </div>
+            <p class="text-[11px] text-[var(--stellar-muted-foreground)] mt-0.5 line-clamp-1">${ride.desc}</p>
+            <div class="flex items-center gap-3 mt-1.5">
+              <span class="text-[11px] flex items-center gap-1 font-medium" style="color: ${waitColor};">
+                <i data-lucide="clock" class="w-3 h-3"></i>${ride.status === 'maintenance' ? '暂停运营' : ride.wait + 'min'}
+              </span>
+              <span class="text-[11px] text-[var(--stellar-muted-foreground)]">${ride.zone} · ${ride.thrill}</span>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--stellar-muted-foreground)] shrink-0 mt-1"></i>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('rides-list').innerHTML = html;
+  lucide.createIcons();
+}
+
+// ==================== 项目筛选 ====================
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('filter-btn')) {
+    document.querySelectorAll('.filter-btn').forEach(b => {
+      b.classList.remove('active');
+      b.style.background = '';
+      b.style.color = '';
+      b.classList.add('text-[var(--stellar-muted-foreground)]');
+    });
+    e.target.classList.add('active');
+    e.target.style.background = 'var(--stellar-primary)';
+    e.target.style.color = 'var(--stellar-primary-foreground)';
+    e.target.style.boxShadow = '0 0 20px -4px var(--stellar-primary-glow)';
+    e.target.classList.remove('text-[var(--stellar-muted-foreground)]');
+    renderRides(e.target.dataset.zone);
+  }
+});
+
+// ==================== 项目详情 ====================
+function openRideDetail(rideId) {
+  const ride = RIDES.find(r => r.id === rideId);
+  if (!ride) return;
+  const waitColor = ride.status === 'maintenance' ? 'var(--stellar-ink-3)' : ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
+  const detailIcon = getRideIconSvg(ride.id, 'w-20 h-20', 'rgba(227,166,59,0.35)', false)
+    || `<i data-lucide="ferris-wheel" class="w-20 h-20" style="color: rgba(227,166,59,0.3);"></i>`;
+
+  document.getElementById('ride-detail-content').innerHTML = `
+    <div class="relative h-44 overflow-hidden rounded-t-3xl">
+      <div class="absolute inset-0" style="background: linear-gradient(135deg, #1A1F35 0%, #0F1420 50%, #07090F 100%);"></div>
+      <div class="absolute inset-0" style="background: radial-gradient(ellipse at 70% 30%, rgba(227,166,59,0.2) 0%, transparent 50%);"></div>
+      <div id="detail-stars"></div>
+      <button onclick="closeRideDetail()" class="absolute top-4 right-4 w-9 h-9 rounded-full flex items-center justify-center z-10 glass-card">
+        <i data-lucide="x" class="w-4 h-4 text-[var(--stellar-foreground)]"></i>
+      </button>
+      <div class="absolute inset-0 flex items-center justify-center">
+        ${detailIcon}
+      </div>
+      <div class="absolute bottom-4 left-5">
+        <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: var(--stellar-primary-soft); color: var(--stellar-primary-bright); border:1px solid var(--stellar-border-glow);">${ride.zone}</span>
+      </div>
+    </div>
+    <div class="p-5">
+      <h2 class="text-xl font-bold gold-text">${ride.name}</h2>
+      <p class="text-sm text-[var(--stellar-muted-foreground)] mt-1 leading-relaxed">${ride.desc}</p>
+      <div class="grid grid-cols-3 gap-2 mt-4">
+        <div class="glass-card rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)]">排队时间</div>
+          <div class="text-sm font-bold mt-0.5" style="color: ${waitColor};">${ride.status === 'maintenance' ? '—' : ride.wait + 'min'}</div>
+        </div>
+        <div class="glass-card rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)]">身高要求</div>
+          <div class="text-sm font-medium mt-0.5">${ride.height}</div>
+        </div>
+        <div class="glass-card rounded-xl p-2.5 text-center">
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)]">体验时长</div>
+          <div class="text-sm font-medium mt-0.5">${ride.duration}</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mt-3 text-xs">
+        <span class="text-[var(--stellar-muted-foreground)]">刺激等级:</span>
+        <span class="px-2 py-0.5 rounded-md text-[var(--stellar-primary-bright)]" style="background: var(--stellar-primary-soft); border:1px solid var(--stellar-border-glow);">${ride.thrill}</span>
+        <span class="text-[var(--stellar-muted-foreground)]">· 载客量: ${ride.capacity}</span>
+      </div>
+      ${ride.status === 'maintenance' ? `
+        <div class="mt-4 glass-card rounded-xl p-3 flex items-center gap-2">
+          <i data-lucide="wrench" class="w-4 h-4 text-[var(--stellar-muted-foreground)]"></i>
+          <span class="text-xs text-[var(--stellar-muted-foreground)]">该项目正在维护中，暂时无法体验</span>
+        </div>
+      ` : ride.wait > 30 ? `
+        <div class="mt-4 rounded-2xl p-4 glow-border relative overflow-hidden" style="background: linear-gradient(135deg, rgba(227,166,59,0.12), var(--stellar-card));">
+          <div class="absolute inset-0" style="background: radial-gradient(ellipse at 80% 20%, rgba(227,166,59,0.15) 0%, transparent 50%);"></div>
+          <div class="relative flex items-start gap-3">
+            <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 glow-border" style="background: var(--stellar-primary-soft);">
+              <i data-lucide="zap" class="w-5 h-5 text-[var(--stellar-primary-bright)]"></i>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-sm font-semibold">快速通行证</h3>
+              <p class="text-xs text-[var(--stellar-muted-foreground)] mt-0.5">当前排队 ${ride.wait} 分钟，购买快速通行证可免排队直接入场</p>
+              <button onclick="closeRideDetail(); openPurchase('express')" class="w-full mt-3 py-2.5 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">¥199 立即购买</button>
+            </div>
+          </div>
+        </div>
+      ` : `
+        <div class="mt-4 glass-card rounded-xl p-3 flex items-center gap-2">
+          <i data-lucide="check-circle" class="w-4 h-4" style="color: var(--stellar-state-success);"></i>
+          <span class="text-xs text-[var(--stellar-muted-foreground)]">当前排队较短，可直接前往体验</span>
+        </div>
+      `}
+    </div>
+  `;
+  document.getElementById('ride-detail-overlay').classList.remove('hidden');
+  generateStars('detail-stars', 20);
+  lucide.createIcons();
+}
+function closeRideDetail() {
+  document.getElementById('ride-detail-overlay').classList.add('hidden');
+}
+
+// ==================== 购票流程 ====================
+function openPurchase(ticketId) {
+  if (!requireLogin('purchase')) {
+    lastAttemptedTicketId = ticketId;
+    return;
+  }
+  purchaseState = { ticketId, date: null, qty: 1, step: 1, buyerName: '', buyerPhone: '', buyerId: '', pendingOrderId: null };
+  renderStep1();
+  document.getElementById('purchase-overlay').classList.remove('hidden');
+  lucide.createIcons();
+}
+function closePurchase(resetFlow) {
+  document.getElementById('purchase-overlay').classList.add('hidden');
+  cancelWechatPay(true);
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  if (resetFlow !== false) {
+    ['purchase-step-1','purchase-step-2','purchase-step-3','purchase-success'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+    document.getElementById('purchase-step-1').classList.remove('hidden');
+    purchaseState.pendingOrderId = null;
+  }
+}
+
+function renderStep1() {
+  const ticket = TICKET_TYPES[purchaseState.ticketId];
+  document.getElementById('step1-ticket-name').textContent = ticket.name;
+  document.getElementById('step1-ticket-desc').textContent = ticket.desc;
+  document.getElementById('step1-unit-price').textContent = ticket.price;
+  document.getElementById('step1-qty').textContent = purchaseState.qty;
+  document.getElementById('step1-subtotal').textContent = ticket.price * purchaseState.qty;
+  document.getElementById('step1-total').textContent = ticket.price * purchaseState.qty;
+
+  const optionsHtml = Object.values(TICKET_TYPES).map(t => `
+    <div onclick="selectTicket('${t.id}')" class="flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer ${t.id === purchaseState.ticketId ? 'glow-border' : 'glass-card'}" style="background: ${t.id === purchaseState.ticketId ? 'var(--stellar-primary-soft)' : 'var(--stellar-glass-bg)'};">
+      <i data-lucide="${t.icon}" class="w-4 h-4 ${t.id === purchaseState.ticketId ? 'text-[var(--stellar-primary-bright)]' : 'text-[var(--stellar-muted-foreground)]'}"></i>
+      <div class="flex-1">
+        <div class="text-sm ${t.id === purchaseState.ticketId ? 'font-medium' : ''}">${t.name}</div>
+        <div class="text-[11px] text-[var(--stellar-muted-foreground)]">¥${t.price}</div>
+      </div>
+      ${t.id === purchaseState.ticketId ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>' : ''}
+    </div>
+  `).join('');
+  document.getElementById('step1-ticket-options').innerHTML = optionsHtml;
+
+  const dates = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    dates.push(d);
+  }
+  const dayNames = ['日','一','二','三','四','五','六'];
+  const dateHtml = dates.map((d, i) => {
+    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+    const isSelected = purchaseState.date === dateStr;
+    const isToday = i === 0;
+    return `
+      <button onclick="selectDate('${dateStr}')" class="shrink-0 w-16 py-2 rounded-xl border ${isSelected ? 'glow-border' : 'glass-card'} text-center" style="background: ${isSelected ? 'var(--stellar-primary-soft)' : 'var(--stellar-glass-bg)'};">
+        <div class="text-[10px] ${isSelected ? 'text-[var(--stellar-primary-bright)]' : 'text-[var(--stellar-muted-foreground)]'}">${isToday ? '今天' : '周' + dayNames[d.getDay()]}</div>
+        <div class="text-sm font-medium ${isSelected ? 'text-[var(--stellar-primary-bright)]' : ''} mt-0.5">${dateStr}</div>
+      </button>
+    `;
+  }).join('');
+  document.getElementById('date-options').innerHTML = dateHtml;
+  lucide.createIcons();
+}
+
+function selectTicket(ticketId) {
+  purchaseState.ticketId = ticketId;
+  renderStep1();
+}
+function selectDate(dateStr) {
+  purchaseState.date = dateStr;
+  renderStep1();
+}
+function changeQty(delta) {
+  purchaseState.qty = Math.max(1, Math.min(10, purchaseState.qty + delta));
+  renderStep1();
+}
+
+// 显示字段错误
+function showFieldError(fieldId, msg) {
+  const input = document.getElementById(fieldId);
+  const err = document.getElementById(fieldId + '-error');
+  if (input) input.style.borderColor = 'var(--stellar-state-error)';
+  if (err) { err.textContent = msg; err.classList.remove('hidden'); }
+}
+// 清除字段错误
+function clearFieldError(fieldId) {
+  const input = document.getElementById(fieldId);
+  const err = document.getElementById(fieldId + '-error');
+  if (input) input.style.borderColor = '';
+  if (err) { err.textContent = ''; err.classList.add('hidden'); }
+}
+
+// 验证购票人表单
+function validateBuyerForm() {
+  let valid = true;
+  const name = document.getElementById('buyer-name').value.trim();
+  const phone = document.getElementById('buyer-phone').value.trim();
+  const idCard = document.getElementById('buyer-id').value.trim();
+
+  // 清除之前的错误
+  clearFieldError('buyer-name');
+  clearFieldError('buyer-phone');
+  clearFieldError('buyer-id');
+
+  // 姓名校验
+  if (!name) {
+    showFieldError('buyer-name', '请输入购票人姓名');
+    valid = false;
+  }
+
+  // 手机号校验（支持脱敏格式 138****8888，但需还原为完整号码）
+  const rawPhone = phone.replace(/\s/g, '');
+  if (!rawPhone) {
+    showFieldError('buyer-phone', '请输入手机号');
+    valid = false;
+  } else {
+    // 获取真实手机号（如果是脱敏格式，从登录用户取）
+    const curPhone = getCurrentUserPhone();
+    let realPhone = rawPhone;
+    if (rawPhone.includes('*') && curPhone) {
+      realPhone = curPhone;
+    }
+    if (!/^1[3-9]\d{9}$/.test(realPhone)) {
+      showFieldError('buyer-phone', '请输入正确的 11 位手机号');
+      valid = false;
+    }
+  }
+
+  // 身份证校验
+  if (!idCard) {
+    showFieldError('buyer-id', '请输入身份证号');
+    valid = false;
+  } else if (idCard.includes('*')) {
+    showFieldError('buyer-id', '请输入完整的身份证号码（不支持脱敏格式）');
+    valid = false;
+  } else if (!/^\d{17}[\dXx]$/.test(idCard)) {
+    showFieldError('buyer-id', '身份证号格式不正确（需 18 位）');
+    valid = false;
+  } else {
+    // 身份证校验码验证
+    const weights = [7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2];
+    const checkCodes = ['1','0','X','9','8','7','6','5','4','3','2'];
+    let sum = 0;
+    for (let i = 0; i < 17; i++) {
+      sum += parseInt(idCard[i]) * weights[i];
+    }
+    const checkCode = checkCodes[sum % 11];
+    if (checkCode !== idCard[17].toUpperCase()) {
+      showFieldError('buyer-id', '身份证号校验码不正确，请检查');
+      valid = false;
+    } else {
+      // 年龄校验：根据票种动态判断
+      const birthYear = parseInt(idCard.substring(6, 10));
+      const birthMonth = parseInt(idCard.substring(10, 12));
+      const birthDay = parseInt(idCard.substring(12, 14));
+      const now = new Date();
+      let age = now.getFullYear() - birthYear;
+      const monthDiff = now.getMonth() - (birthMonth - 1);
+      const dayDiff = now.getDate() - birthDay;
+      if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+        age--;
+      }
+      const isChildTicket = purchaseState.ticketId === 'child';
+      if (isChildTicket && age >= 12) {
+        showFieldError('buyer-id', '儿童票仅限 12 周岁以下儿童（当前 ' + age + ' 岁）');
+        valid = false;
+      } else if (!isChildTicket && age < 12) {
+        showFieldError('buyer-id', '购票人须年满 12 周岁（当前 ' + age + ' 岁）');
+        valid = false;
+      }
+    }
+  }
+
+  return valid;
+}
+
+function getPurchaseTicket() {
+  let ticket = TICKET_TYPES[purchaseState.ticketId];
+  if (!ticket) {
+    const firstId = Object.keys(TICKET_TYPES)[0];
+    if (firstId) {
+      purchaseState.ticketId = firstId;
+      ticket = TICKET_TYPES[firstId];
+    }
+  }
+  return ticket || null;
+}
+
+function resetPurchaseScroll() {
+  const scroller = document.querySelector('#purchase-overlay .overflow-y-auto');
+  if (scroller) scroller.scrollTop = 0;
+}
+
+function goToStep(step) {
+  if (step === 2 && !purchaseState.date) {
+    showLoginToast('请选择游玩日期');
+    return;
+  }
+  // Step 3 前进行表单验证
+  if (step === 3 && !validateBuyerForm()) {
+    return;
+  }
+  purchaseState.step = step;
+
+  [1,2,3].forEach(s => {
+    const indicator = document.getElementById(`step-${s}-indicator`);
+    const circle = indicator.querySelector('div');
+    const label = indicator.querySelector('span');
+    if (s < step) {
+      circle.className = 'w-6 h-6 rounded-full flex items-center justify-center step-done font-medium';
+      circle.style.background = 'rgba(52,216,153,0.15)';
+      circle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      label.className = 'step-done';
+    } else if (s === step) {
+      circle.className = 'w-6 h-6 rounded-full flex items-center justify-center step-active font-medium';
+      circle.style.background = 'var(--stellar-primary-soft)';
+      circle.textContent = s;
+      label.className = 'step-active';
+    } else {
+      circle.className = 'w-6 h-6 rounded-full flex items-center justify-center text-[var(--stellar-muted-foreground)] font-medium';
+      circle.style.background = 'var(--stellar-muted)';
+      circle.textContent = s;
+      label.className = 'text-[var(--stellar-muted-foreground)]';
+    }
+  });
+
+  ['purchase-step-1','purchase-step-2','purchase-step-3','purchase-success'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+
+  if (step === 2) {
+    const ticket = getPurchaseTicket();
+    if (!ticket) {
+      showLoginToast('票种信息异常，请重新选择');
+      goToStep(1);
+      return;
+    }
+    document.getElementById('step2-ticket-name').textContent = ticket.name;
+    document.getElementById('step2-date').textContent = purchaseState.date;
+    document.getElementById('step2-qty').textContent = purchaseState.qty + ' 张';
+    document.getElementById('step2-price').textContent = ticket.price;
+    document.getElementById('step2-total').textContent = ticket.price * purchaseState.qty;
+    // 预填登录用户信息：买家姓名=昵称，手机号=脱敏显示（实际值存入订单）
+    const curPhone = getCurrentUserPhone();
+    if (curPhone) {
+      document.getElementById('buyer-name').value = getNicknameForPhone(curPhone);
+      document.getElementById('buyer-phone').value = curPhone;
+    }
+    document.getElementById('purchase-step-2').classList.remove('hidden');
+    resetPurchaseScroll();
+  } else if (step === 3) {
+    const ticket = getPurchaseTicket();
+    if (!ticket) {
+      showLoginToast('票种信息异常，请重新选择');
+      goToStep(1);
+      return;
+    }
+    const total = ticket.price * purchaseState.qty;
+    document.getElementById('step3-amount').textContent = total;
+    document.getElementById('step3-btn-amount').textContent = total;
+    document.getElementById('purchase-step-3').classList.remove('hidden');
+    resetPurchaseScroll();
+    startCountdown();
+    lucide.createIcons();
+    try {
+      createPendingOrderForPurchase();
+      showLoginToast('订单已创建（' + purchaseState.pendingOrderId + '），请完成支付');
+    } catch (err) {
+      console.error('createPendingOrderForPurchase failed:', err);
+      showLoginToast('订单创建失败，仍可继续支付');
+    }
+  } else if (step === 1) {
+    document.getElementById('purchase-step-1').classList.remove('hidden');
+    resetPurchaseScroll();
+  }
+}
+
+function startCountdown() {
+  let seconds = 14 * 60 + 59;
+  if (countdownTimer) clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    seconds--;
+    const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+    const s = (seconds % 60).toString().padStart(2, '0');
+    const el = document.getElementById('pay-countdown');
+    if (el) el.textContent = `${m}:${s}`;
+    if (seconds <= 0) {
+      clearInterval(countdownTimer);
+      closePurchase(false);
+      showLoginToast('支付超时，订单仍为待支付，可在「我的」继续支付');
+    }
+  }, 1000);
+}
+
+function generateOrderId() {
+  const d = new Date();
+  const pad = (n, len) => String(n).padStart(len, '0');
+  const datePart = d.getFullYear().toString() +
+    pad(d.getMonth() + 1, 2) +
+    pad(d.getDate(), 2) +
+    pad(d.getHours(), 2) +
+    pad(d.getMinutes(), 2) +
+    pad(d.getSeconds(), 2);
+  const rand = pad(Math.floor(Math.random() * 10000), 4);
+  return 'SP' + datePart + rand;
+}
+
+const ORDER_STATUS = {
+  pending: { label: '待支付', color: 'var(--stellar-state-warning)', bg: 'rgba(240,184,74,0.15)' },
+  paid: { label: '待使用', color: 'var(--stellar-state-success)', bg: 'rgba(52,216,153,0.15)' },
+  used: { label: '已使用', color: 'var(--stellar-muted-foreground)', bg: 'var(--stellar-muted)' },
+  refunded: { label: '已退款', color: 'var(--stellar-state-error)', bg: 'rgba(255,123,107,0.15)' }
+};
+
+function getOrderStatusMeta(status) {
+  return ORDER_STATUS[status] || ORDER_STATUS.paid;
+}
+
+function buildOrderPayload(status) {
+  const ticket = getPurchaseTicket();
+  if (!ticket) throw new Error('invalid ticket');
+  const total = ticket.price * purchaseState.qty;
+  const curPhone = getCurrentUserPhone();
+  const orderPhone = curPhone || document.getElementById('buyer-phone').value || '';
+  const user = curPhone ? getUserByPhone(curPhone) : null;
+  const orderBuyer = user?.nickname || (curPhone ? getNicknameForPhone(curPhone) : (document.getElementById('buyer-name').value || '星际探索者'));
+  return {
+    id: purchaseState.pendingOrderId || generateOrderId(),
+    ticketId: purchaseState.ticketId,
+    ticketName: ticket.name,
+    date: purchaseState.date,
+    qty: purchaseState.qty,
+    unitPrice: ticket.price,
+    total: total,
+    status: status,
+    paymentMethod: 'wechat',
+    buyer: orderBuyer,
+    phone: orderPhone,
+    createdAt: new Date().toISOString()
+  };
+}
+
+function createPendingOrderForPurchase() {
+  const order = buildOrderPayload('pending');
+  const orders = getOrders();
+
+  if (purchaseState.pendingOrderId) {
+    const idx = orders.findIndex(o => o.id === purchaseState.pendingOrderId);
+    if (idx >= 0 && orders[idx].status === 'pending') {
+      order.id = purchaseState.pendingOrderId;
+      order.createdAt = orders[idx].createdAt;
+      orders[idx] = order;
+      saveOrders(orders);
+      return;
+    }
+  }
+
+  purchaseState.pendingOrderId = order.id;
+  orders.unshift(order);
+  saveOrders(orders);
+}
+
+function showWechatPaySheet(options) {
+  const overlay = document.getElementById('wechat-pay-overlay');
+  document.getElementById('wechat-pay-merchant').textContent = options.merchant || '星屿乐园';
+  document.getElementById('wechat-pay-amount').textContent = Number(options.amount).toFixed(2);
+  document.getElementById('wechat-pay-desc').textContent = options.desc || '门票订单';
+  const btn = document.getElementById('wechat-pay-confirm-btn');
+  btn.textContent = '确认支付';
+  btn.disabled = false;
+  wechatPayCallback = options.onConfirm || null;
+  overlay.classList.remove('hidden');
+  lucide.createIcons();
+}
+
+function cancelWechatPay(silent) {
+  const overlay = document.getElementById('wechat-pay-overlay');
+  if (overlay) overlay.classList.add('hidden');
+  wechatPayCallback = null;
+  const btn = document.getElementById('pay-btn');
+  if (btn) {
+    const total = document.getElementById('step3-btn-amount')?.textContent || '';
+    btn.textContent = '微信支付 ¥' + total;
+    btn.disabled = false;
+  }
+  if (!silent) showLoginToast('已取消支付');
+}
+
+function confirmWechatPay() {
+  const btn = document.getElementById('wechat-pay-confirm-btn');
+  btn.textContent = '支付中...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    if (typeof wechatPayCallback === 'function') {
+      wechatPayCallback();
+    }
+    document.getElementById('wechat-pay-overlay').classList.add('hidden');
+    wechatPayCallback = null;
+  }, 900);
+}
+
+function finishPurchaseSuccess(order) {
+  ['purchase-step-1','purchase-step-2','purchase-step-3'].forEach(id => {
+    document.getElementById(id).classList.add('hidden');
+  });
+  document.getElementById('success-order-id').textContent = order.id;
+  document.getElementById('success-ticket-name').textContent = order.ticketName;
+  document.getElementById('success-qty').textContent = order.qty + ' 张';
+  document.getElementById('success-amount').textContent = order.total;
+  document.getElementById('purchase-success').classList.remove('hidden');
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  purchaseState.pendingOrderId = null;
+  updateProfileCounts();
+  lucide.createIcons();
+}
+
+function processPayment() {
+  const ticket = getPurchaseTicket();
+  if (!ticket) {
+    showLoginToast('票种信息异常，请重新选择');
+    goToStep(1);
+    return;
+  }
+  const total = ticket.price * purchaseState.qty;
+  const btn = document.getElementById('pay-btn');
+  btn.textContent = '正在调起微信支付...';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    showWechatPaySheet({
+      amount: total,
+      merchant: '星屿乐园',
+      desc: ticket.name + ' × ' + purchaseState.qty,
+      onConfirm: () => {
+        const orders = getOrders();
+        const order = orders.find(o => o.id === purchaseState.pendingOrderId);
+        if (order) {
+          order.status = 'paid';
+          order.paymentMethod = 'wechat';
+          order.paidAt = new Date().toISOString();
+          saveOrders(orders);
+          finishPurchaseSuccess(order);
+        } else {
+          const newOrder = buildOrderPayload('paid');
+          newOrder.paidAt = new Date().toISOString();
+          addOrder(newOrder);
+          finishPurchaseSuccess(newOrder);
+        }
+        btn.textContent = '微信支付 ¥' + total;
+        btn.disabled = false;
+        showLoginToast('支付成功，订单待使用');
+      }
+    });
+    btn.textContent = '微信支付 ¥' + total;
+    btn.disabled = false;
+  }, 300);
+}
+
+// ==================== 订单渲染 ====================
+function renderOrders(filter = 'all') {
+  document.querySelectorAll('.order-filter').forEach(b => {
+    b.style.background = '';
+    b.style.color = '';
+    b.style.boxShadow = '';
+    b.classList.add('text-[var(--stellar-muted-foreground)]');
+  });
+  const activeFilter = document.querySelector(`.order-filter[data-filter="${filter}"]`);
+  if (activeFilter) {
+    activeFilter.style.background = 'var(--stellar-primary-soft)';
+    activeFilter.style.color = 'var(--stellar-primary-bright)';
+    activeFilter.style.boxShadow = '0 0 16px -4px var(--stellar-primary-glow)';
+    activeFilter.classList.remove('text-[var(--stellar-muted-foreground)]');
+  }
+
+  const orders = getOrdersForCurrentUser();
+  const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
+  updateProfileCounts();
+  if (!getCurrentUserPhone()) {
+    document.getElementById('orders-list').innerHTML = `
+      <div class="text-center py-12">
+        <i data-lucide="lock" class="w-12 h-12 text-[var(--stellar-ink-3)] mx-auto mb-3"></i>
+        <p class="text-sm text-[var(--stellar-muted-foreground)]">登录后查看订单</p>
+        <button onclick="requireLogin('orders')" class="mt-4 text-xs px-4 py-2 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] font-medium btn-glow">立即登录</button>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+  if (filtered.length === 0) {
+    const hasNoOrders = orders.length === 0;
+    document.getElementById('orders-list').innerHTML = `
+      <div class="text-center py-12">
+        <i data-lucide="receipt" class="w-12 h-12 text-[var(--stellar-ink-3)] mx-auto mb-3"></i>
+        <p class="text-sm text-[var(--stellar-muted-foreground)]">${hasNoOrders ? '暂无订单' : '暂无相关订单'}</p>
+        ${hasNoOrders ? `<button onclick="switchTab('tickets')" class="mt-4 text-xs px-4 py-2 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] font-medium btn-glow">去购票</button>` : ''}
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const statusMap = ORDER_STATUS;
+
+  const html = filtered.map(order => {
+    const s = getOrderStatusMeta(order.status);
+    const date = new Date(order.createdAt);
+    const dateStr = `${date.getMonth()+1}月${date.getDate()}日 ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+    return `
+      <div class="glass-card rounded-2xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="${TICKET_TYPES[order.ticketId]?.icon || 'ticket'}" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>
+            <span class="text-sm font-medium">${order.ticketName}</span>
+          </div>
+          <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+        </div>
+        <div class="space-y-1.5 text-xs text-[var(--stellar-muted-foreground)]">
+          <div class="flex justify-between"><span>订单号</span><span class="font-mono text-[var(--stellar-foreground)]">${order.id}</span></div>
+          <div class="flex justify-between"><span>游玩日期</span><span>${order.date || '—'}</span></div>
+          <div class="flex justify-between"><span>数量</span><span>${order.qty} 张</span></div>
+          <div class="flex justify-between"><span>下单时间</span><span>${dateStr}</span></div>
+          <div class="flex justify-between"><span>支付方式</span><span>${order.paymentMethod === 'wechat' ? '微信支付' : (order.paymentMethod || '—')}</span></div>
+        </div>
+        <div class="border-t border-[var(--stellar-border)] mt-3 pt-3 flex items-center justify-between">
+          <span class="text-sm font-bold gold-text">¥${order.total}</span>
+          <div class="flex gap-2 items-center">
+            ${order.status === 'pending' ? `<button onclick="payPendingOrder('${order.id}')" class="text-[11px] px-3 py-1.5 rounded-lg text-white font-medium" style="background:#07C160;">微信支付</button>` : ''}
+            ${order.status === 'paid' ? `<span class="text-[11px]" style="color: var(--stellar-state-error);">请携带本人身份证入园</span>` : ''}
+            ${order.status === 'refunded' ? `<span class="text-[11px] text-[var(--stellar-state-error)]">已退款</span>` : ''}
+            ${order.status === 'used' ? `<span class="text-[11px] text-[var(--stellar-muted-foreground)]">已使用</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('orders-list').innerHTML = html;
+  lucide.createIcons();
+}
+
+function updateProfileCounts() {
+  const orders = getOrdersForCurrentUser();
+  document.getElementById('count-all').textContent = orders.length;
+  document.getElementById('count-paid').textContent = orders.filter(o => o.status === 'paid').length;
+  document.getElementById('count-pending').textContent = orders.filter(o => o.status === 'pending').length;
+  document.getElementById('profile-order-count').textContent = (getCurrentUserPhone() ? orders.length : 0) + ' 笔订单';
+}
+
+function payPendingOrder(orderId) {
+  const order = getOrders().find(o => o.id === orderId);
+  if (!order || order.status !== 'pending') return;
+
+  showWechatPaySheet({
+    amount: order.total,
+    merchant: '星屿乐园',
+    desc: order.ticketName + ' × ' + order.qty,
+    onConfirm: () => {
+      const orders = getOrders();
+      const target = orders.find(o => o.id === orderId);
+      if (target) {
+        target.status = 'paid';
+        target.paymentMethod = 'wechat';
+        target.paidAt = new Date().toISOString();
+        saveOrders(orders);
+      }
+      showLoginToast('支付成功，订单待使用');
+      renderOrders(document.querySelector('.order-filter[data-filter]')?.dataset.filter || 'all');
+    }
+  });
+}
+
+function initCrossPageSync() {
+  if (!window.StellarSync) return;
+  StellarSync.onDataChange(StellarSync.KEYS.ridesStatus, refreshRidesFromAdmin);
+  StellarSync.onDataChange(StellarSync.KEYS.products, refreshTicketsFromAdmin);
+  StellarSync.onDataChange(StellarSync.KEYS.orders, () => {
+    updateProfileCounts();
+    if (!document.getElementById('tab-profile').classList.contains('hidden')) {
+      const activeFilter = document.querySelector('.order-filter[data-filter]')?.dataset.filter || 'all';
+      renderOrders(activeFilter);
+    }
+  });
+}
+
+// ==================== 初始化 ====================
+function initFilterButtons() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    if (btn.classList.contains('active')) {
+      btn.style.background = 'var(--stellar-primary)';
+      btn.style.color = 'var(--stellar-primary-foreground)';
+      btn.style.boxShadow = '0 0 20px -4px var(--stellar-primary-glow)';
+    } else {
+      btn.classList.add('text-[var(--stellar-muted-foreground)]');
+    }
+  });
+}
+
+renderHomeRides();
+// ==================== 地图项目标记渲染 ====================
+function renderMapMarkers() {
+  // 项目在地图上的坐标（百分比），按区域沿路分布
+  const MAP_POS = {
+    galaxy:  { top: '17%', left: '21%' },
+    thunder: { top: '27%', left: '36%' },
+    neon:    { top: '19%', left: '76%' },
+    matrix:  { top: '29%', left: '72%' },
+    abyss:   { top: '59%', left: '17%' },
+    shadow:  { top: '73%', left: '30%' },
+    dream:   { top: '57%', left: '80%' },
+    aurora:  { top: '66%', left: '73%' }
+  };
+  const html = RIDES.map(ride => {
+    const pos = MAP_POS[ride.id];
+    if (!pos) return '';
+    const dotColor = ride.status === 'maintenance' ? 'var(--stellar-ink-3)'
+      : ride.wait > 60 ? 'var(--stellar-state-error)'
+      : ride.wait > 30 ? 'var(--stellar-state-warning)'
+      : 'var(--stellar-state-success)';
+    const pulseClass = ride.status === 'open' && ride.wait > 50 ? 'pulse-dot' : '';
+    return `
+      <div class="absolute" style="top:${pos.top};left:${pos.left};transform:translateX(-50%);">
+        <div onclick="openRideDetail('${ride.id}')" class="flex flex-col items-center cursor-pointer group">
+          <div class="relative flex items-center gap-1 px-2 py-1 rounded-lg glass-card lift-card whitespace-nowrap" style="border:1px solid var(--stellar-glass-border);">
+            <div class="w-1.5 h-1.5 rounded-full ${pulseClass}" style="background:${dotColor};"></div>
+            <span class="text-[10px] font-medium text-white">${ride.name}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  const container = document.getElementById('map-markers');
+  if (container) container.innerHTML = html;
+}
+
+// ==================== 初始化 ====================
+loadRidesStatus();
+loadTicketTypes();
+renderHomeRecommend();
+renderTickets();
+renderRides('all');
+renderOrders('all');
+renderMapMarkers();
+renderHomeRides();
+initFilterButtons();
+generateStars('hero-stars', 35);
+// map-stars removed — using illustration image
+lucide.createIcons();
+
+// ==================== 登录系统初始化 ====================
+initCrossPageSync();
+initLogin();
+
+// ==================== 地图区域点击交互 ====================
+let zoneActive = false;
+function focusZone(name, desc, color) {
+  const overlay = document.getElementById('zone-overlay');
+  if (!overlay) return;
+  document.getElementById('zone-overlay-name').textContent = name;
+  document.getElementById('zone-overlay-desc').textContent = desc;
+  document.getElementById('zone-overlay-dot').style.background = color;
+  document.getElementById('zone-overlay-dot').style.boxShadow = '0 0 12px ' + color;
+  overlay.style.opacity = '1';
+  overlay.style.pointerEvents = 'auto';
+  zoneActive = true;
+  // 高亮选中区域
+  ['zone-star','zone-neon','zone-shadow','zone-dream'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el) el.style.filter = '';
+  });
+}
+function closeZone() {
+  var overlay = document.getElementById('zone-overlay');
+  if (!overlay) return;
+  overlay.style.opacity = '0';
+  overlay.style.pointerEvents = 'none';
+  zoneActive = false;
+}
+document.addEventListener('click', function(e) {
+  if (!zoneActive) return;
+  var overlay = document.getElementById('zone-overlay');
+  if (overlay && !overlay.contains(e.target) && !e.target.closest('[id^="zone-"]')) {
+    closeZone();
+  }
+});
+
+// ==================== 在园人数实时变动 ====================
+let visitorCount = 8426;
+function updateVisitorCount() {
+  const delta = Math.floor(Math.random() * 21) - 10;
+  visitorCount = Math.max(7800, Math.min(9200, visitorCount + delta));
+  const el = document.getElementById('home-visitor-count');
+  if (el) el.textContent = visitorCount.toLocaleString();
+}
+setInterval(updateVisitorCount, 5000);
+</script>
+</main>
+
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] { display: inline-flex; align-items: center; justify-content: center; }
+
+      /* 玻璃拟态卡片 */
+      .glass-card {
+        background: var(--stellar-glass-bg);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--stellar-glass-border);
+        box-shadow: var(--stellar-shadow-card);
+      }
+
+      /* 金色辉光边框 */
+      .glow-border {
+        border: 1px solid var(--stellar-border-glow);
+        box-shadow: 0 0 24px -8px var(--stellar-primary-glow), inset 0 1px 0 rgba(227,166,59,0.06);
+      }
+
+      /* 金色文字辉光 */
+      .text-glow {
+        text-shadow: 0 0 20px var(--stellar-primary-glow-soft), 0 0 40px var(--stellar-primary-glow-soft);
+      }
+
+      /* 金色按钮辉光 */
+      .btn-glow {
+        box-shadow: 0 4px 24px -4px var(--stellar-primary-glow), 0 0 0 1px rgba(227,166,59,0.3);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .btn-glow:hover { box-shadow: 0 6px 32px -4px var(--stellar-primary-glow), 0 0 0 1px rgba(227,166,59,0.5); }
+      .btn-glow:active { transform: scale(0.97); box-shadow: 0 2px 12px -2px var(--stellar-primary-glow); }
+
+      /* 动画 */
+      .tab-panel { animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      .overlay-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+      @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      .fade-in { animation: fadeIn 0.2s ease; }
+
+      .step-active { color: var(--stellar-primary); }
+      .step-done { color: var(--stellar-state-success); }
+
+      /* 脉冲点 */
+      .pulse-dot { animation: pulseDot 2.5s ease-in-out infinite; }
+      @keyframes pulseDot { 0%, 100% { opacity: 1; box-shadow: 0 0 8px currentColor; } 50% { opacity: 0.5; box-shadow: 0 0 4px currentColor; } }
+
+      /* 星空粒子 */
+      .star-particle { position: absolute; border-radius: 50%; background: white; pointer-events: none; }
+      @keyframes twinkle { 0%, 100% { opacity: 0.2; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1.2); } }
+
+      /* 光束 */
+      .light-beam {
+        position: absolute;
+        background: linear-gradient(to bottom, var(--stellar-primary-glow-soft), transparent);
+        filter: blur(40px);
+        pointer-events: none;
+        animation: beamSway 8s ease-in-out infinite;
+      }
+      @keyframes beamSway { 0%, 100% { opacity: 0.3; transform: rotate(-5deg); } 50% { opacity: 0.6; transform: rotate(5deg); } }
+
+      /* 浮动光晕 */
+      .ambient-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        pointer-events: none;
+        animation: glowFloat 10s ease-in-out infinite;
+      }
+      @keyframes glowFloat { 0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.4; } 33% { transform: translate(20px, -15px) scale(1.1); opacity: 0.6; } 66% { transform: translate(-15px, 10px) scale(0.9); opacity: 0.3; } }
+
+      /* 电影感暗角 */
+      .cinematic-vignette::after {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.5) 100%);
+        z-index: 100;
+      }
+
+      /* 卡片悬浮效果 */
+      .lift-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+      .lift-card:active { transform: scale(0.97); }
+
+      /* 金色金属质感文字 */
+      .gold-text {
+        background: linear-gradient(135deg, #F0BC5A 0%, #E3A63B 50%, #C98F26 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      /* 滚动条美化 */
+      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar-track { background: transparent; }
+      ::-webkit-scrollbar-thumb { background: var(--stellar-border); border-radius: 2px; }
+
+      /* 项目专属 SVG 图标辉光 */
+      .ride-icon-svg { filter: drop-shadow(0 0 3px var(--stellar-primary-glow-soft)) drop-shadow(0 0 6px var(--stellar-primary-glow-soft)); }
+      .ride-icon-svg.dimmed { filter: none !important; opacity: 0.4; }
+    </style>
+</body>
+</html>
