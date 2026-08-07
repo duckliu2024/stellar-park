@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>星屿乐园 · 演示入口</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(160deg, #1a1f2e 0%, #303540 100%);
+      color: #eceff4;
+      padding: 24px;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(56, 62, 75, 0.85);
+      border: 1px solid rgba(227, 166, 59, 0.25);
+      border-radius: 20px;
+      padding: 32px 28px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    }
+    h1 {
+      font-size: 1.5rem;
+      color: #f0bc5a;
+      margin-bottom: 8px;
+    }
+    p {
+      font-size: 0.875rem;
+      color: #a0a5b4;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+    a {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #eceff4;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    a:hover {
+      border-color: rgba(227, 166, 59, 0.45);
+      background: rgba(227, 166, 59, 0.08);
+    }
+    a strong { font-size: 0.95rem; }
+    a span { font-size: 0.75rem; color: #a0a5b4; }
+    .tip {
+      margin-top: 20px;
+      font-size: 0.75rem;
+      color: #74798a;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>星屿乐园 Stellar Park</h1>
+    <p>演示项目入口。建议在同一浏览器开两个标签页，分别打开 App 与后台，可体验订单实时同步。</p>
+    <a href="pages/app-v2.html">
+      <strong>📱 移动端 App</strong>
+      <span>用户购票 / 订单</span>
+    </a>
+    <a href="pages/admin-v2.html">
+      <strong>🖥️ 管理后台</strong>
+      <span>订单 / 用户 / 项目</span>
+    </a>
+    <p class="tip">部署后把本页链接发给对方即可；也可直接分享上面两个页面的完整 URL。</p>
+  </div>
+</body>
+</html>

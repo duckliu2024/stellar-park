@@ -276,7 +276,7 @@
 
     <!-- Hero Banner -->
     <div class="relative h-[340px] overflow-hidden">
-      <img src="../assets/hero-banner-starry.jpg" class="absolute inset-0 w-full h-full object-cover" alt="星屿乐园">
+      <img src="../assets/hero-banner-whimsical-concept.png" class="absolute inset-0 w-full h-full object-cover" alt="星屿乐园">
       <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(48,53,64,0.25) 0%, transparent 35%, rgba(48,53,64,0.85) 100%);"></div>
 
       <div id="hero-stars" class="hidden"></div>
@@ -577,12 +577,50 @@
       </div>
       <div id="orders-list" class="space-y-3"></div>
     </div>
+    <div class="px-5 mt-6">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold flex items-center gap-2">
+          <span class="w-1 h-4 rounded-full" style="background:var(--stellar-state-info);"></span>
+          快速通行证
+        </h3>
+        <div class="flex gap-2 flex-wrap justify-end">
+          <button onclick="renderExpressPasses('all')" class="express-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="all">全部</button>
+          <button onclick="renderExpressPasses('pending')" class="express-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="pending">待支付</button>
+          <button onclick="renderExpressPasses('paid')" class="express-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="paid">待使用</button>
+          <button onclick="renderExpressPasses('used')" class="express-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="used">已使用</button>
+          <button onclick="renderExpressPasses('refunded')" class="express-filter text-[11px] px-2.5 py-1 rounded-lg" data-filter="refunded">已退款</button>
+        </div>
+      </div>
+      <div id="express-passes-list" class="space-y-3"></div>
+    </div>
     <!-- 退出登录 -->
     <div class="px-5 mt-6">
       <button onclick="logout()" class="w-full py-3 rounded-xl glass-card text-sm font-medium flex items-center justify-center gap-1.5" style="color: var(--stellar-state-error); border: 1px solid rgba(255,123,107,0.25);">
         <i data-lucide="log-out" class="w-4 h-4"></i>退出登录
       </button>
     </div>
+  </div>
+
+  <!-- ==================== 订单详情 ==================== -->
+  <div id="tab-order-detail" class="tab-panel hidden flex-1 pb-8 relative z-10">
+    <div class="px-5 pt-12 pb-3 sticky top-0 z-10" style="background: linear-gradient(180deg, var(--stellar-background) 70%, transparent);">
+      <button onclick="closeOrderDetail()" class="flex items-center gap-1 text-sm text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)] transition-colors">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i> 返回
+      </button>
+      <h1 class="text-xl font-bold gold-text mt-2">订单详情</h1>
+    </div>
+    <div class="px-5 pb-6" id="order-detail-body"></div>
+  </div>
+
+  <!-- ==================== 快速通行证详情 ==================== -->
+  <div id="tab-express-detail" class="tab-panel hidden flex-1 pb-8 relative z-10">
+    <div class="px-5 pt-12 pb-3 sticky top-0 z-10" style="background: linear-gradient(180deg, var(--stellar-background) 70%, transparent);">
+      <button onclick="closeExpressDetail()" class="flex items-center gap-1 text-sm text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)] transition-colors">
+        <i data-lucide="chevron-left" class="w-4 h-4"></i> 返回
+      </button>
+      <h1 class="text-xl font-bold gold-text mt-2">快速通行证</h1>
+    </div>
+    <div class="px-5 pb-6" id="express-detail-body"></div>
   </div>
 
   <!-- ==================== 底部导航 ==================== -->
@@ -614,8 +652,8 @@
 </div>
 
 <!-- ==================== 购票流程 Overlay ==================== -->
-<div id="purchase-overlay" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
-  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] max-h-[90vh] overflow-y-auto no-scrollbar rounded-t-3xl overlay-enter" style="background: var(--stellar-background); box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.8);">
+<div id="purchase-overlay" class="fixed inset-0 z-50 hidden overflow-hidden overscroll-none" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <div id="purchase-panel" class="overlay-scroll-panel absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] max-h-[90vh] overflow-y-auto no-scrollbar rounded-t-3xl overlay-enter" style="background: var(--stellar-background); box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.8);">
     <div class="px-5 pt-5 pb-3 border-b border-[var(--stellar-border)]">
       <div class="flex items-center justify-between mb-3">
         <button onclick="closePurchase()" class="flex items-center gap-1 text-sm text-[var(--stellar-muted-foreground)]">
@@ -649,11 +687,22 @@
         <p class="text-xs text-[var(--stellar-muted-foreground)]" id="step1-ticket-desc">当日有效，畅玩全园所有项目</p>
       </div>
       <div class="space-y-2 mb-5" id="step1-ticket-options"></div>
-      <div class="mb-5">
+      <div class="mb-5 hidden" id="step1-ride-info">
+        <div class="glass-card rounded-xl p-3 flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style="background: var(--stellar-primary-soft);">
+            <i data-lucide="zap" class="w-5 h-5 text-[var(--stellar-primary-bright)]"></i>
+          </div>
+          <div>
+            <div class="text-[10px] text-[var(--stellar-muted-foreground)]">适用项目</div>
+            <div class="text-sm font-medium" id="step1-ride-name">—</div>
+          </div>
+        </div>
+      </div>
+      <div class="mb-5" id="step1-date-section">
         <h4 class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-2">选择游玩日期</h4>
         <div class="flex gap-2 no-scrollbar overflow-x-auto" id="date-options"></div>
       </div>
-      <div class="mb-5">
+      <div class="mb-5" id="step1-qty-section">
         <h4 class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-2">购买数量</h4>
         <div class="flex items-center justify-between glass-card rounded-xl p-3">
           <span class="text-sm">成人票 <span class="text-[var(--stellar-muted-foreground)] text-xs">¥<span id="step1-unit-price">399</span>/张</span></span>
@@ -674,7 +723,7 @@
           <span class="text-xl font-bold gold-text">¥<span id="step1-total">399</span></span>
         </div>
       </div>
-      <button onclick="goToStep(2)" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">下一步</button>
+      <button onclick="handlePurchaseNext()" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow" id="purchase-next-btn">下一步</button>
     </div>
 
     <!-- Step 2 -->
@@ -752,16 +801,24 @@
       <div class="w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4" style="background: rgba(52,216,153,0.12); box-shadow: 0 0 40px -8px rgba(52,216,153,0.4);">
         <i data-lucide="check" class="w-10 h-10" style="color: var(--stellar-state-success);"></i>
       </div>
-      <h3 class="text-lg font-bold mb-1">支付成功</h3>
-      <p class="text-xs text-[var(--stellar-muted-foreground)] mb-5">微信支付成功，电子票待使用</p>
+      <h3 class="text-lg font-bold mb-1" id="success-title">支付成功</h3>
+      <p class="text-xs text-[var(--stellar-muted-foreground)] mb-5" id="success-subtitle">微信支付成功，电子票待使用</p>
+      <div id="success-express-qr-wrap" class="hidden mb-5">
+        <div class="glass-card rounded-xl p-4">
+          <div class="text-xs text-[var(--stellar-muted-foreground)] mb-3">核销二维码（请在闸机处出示）</div>
+          <div id="success-express-qr" class="flex justify-center"></div>
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-3 font-mono" id="success-verify-code">—</div>
+        </div>
+      </div>
       <div class="glass-card rounded-xl p-4 text-left mb-5">
         <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]">订单号</span><span class="font-mono" id="success-order-id">—</span></div>
-        <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]">票种</span><span id="success-ticket-name">—</span></div>
-        <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]">数量</span><span id="success-qty">—</span></div>
+        <div class="flex justify-between text-xs mb-2"><span class="text-[var(--stellar-muted-foreground)]" id="success-type-label">票种</span><span id="success-ticket-name">—</span></div>
+        <div class="flex justify-between text-xs mb-2 hidden" id="success-ride-row"><span class="text-[var(--stellar-muted-foreground)]">适用项目</span><span id="success-ride-name">—</span></div>
+        <div class="flex justify-between text-xs mb-2" id="success-qty-row"><span class="text-[var(--stellar-muted-foreground)]">数量</span><span id="success-qty">—</span></div>
         <div class="flex justify-between text-xs"><span class="text-[var(--stellar-muted-foreground)]">金额</span><span class="gold-text font-medium">¥<span id="success-amount">—</span></span></div>
       </div>
       <div class="flex gap-3">
-        <button onclick="closePurchase(); switchTab('profile')" class="flex-1 py-3 rounded-xl glass-card text-sm font-medium">查看订单</button>
+        <button onclick="handlePurchaseSuccessView()" class="flex-1 py-3 rounded-xl glass-card text-sm font-medium" id="success-view-btn">查看订单</button>
         <button onclick="closePurchase()" class="flex-1 py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">完成</button>
       </div>
     </div>
@@ -798,12 +855,13 @@
 </div>
 
 <!-- ==================== 项目详情 Overlay ==================== -->
-<div id="ride-detail-overlay" class="fixed inset-0 z-50 hidden" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
-  <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] max-h-[85vh] overflow-y-auto no-scrollbar rounded-t-3xl overlay-enter" style="background: var(--stellar-background); box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.8);" id="ride-detail-content">
+<div id="ride-detail-overlay" class="fixed inset-0 z-50 hidden overflow-hidden overscroll-none" style="background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <div class="overlay-scroll-panel absolute bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] max-h-[85vh] overflow-y-auto no-scrollbar rounded-t-3xl overlay-enter" style="background: var(--stellar-background); box-shadow: 0 -20px 60px -10px rgba(0,0,0,0.8);" id="ride-detail-content">
   </div>
 </div>
 
-<script src="../assets/stellar-sync.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.4/build/qrcode.min.js"></script>
+    <script src="../assets/stellar-sync.js"></script>
 <script>
 // ==================== 数据定义 ====================
 const DEFAULT_TICKET_TYPES = {
@@ -840,22 +898,41 @@ function loadTicketTypes() {
 }
 
 const RIDES = [
-  { id: 'galaxy', name: '银河穿梭', zone: '星际港', wait: 45, status: 'open', thrill: '刺激', desc: '穿越星际黑洞的高速过山车，感受 4.5G 极限加速度', height: '130cm+', duration: '3分钟', capacity: '24人/批' },
-  { id: 'abyss', name: '深渊坠落', zone: '暗影域', wait: 32, status: 'open', thrill: '极度刺激', desc: '从 80 米高空自由坠落，挑战心理极限', height: '145cm+', duration: '2分钟', capacity: '16人/批' },
-  { id: 'neon', name: '霓虹竞速', zone: '霓虹城', wait: 65, status: 'open', thrill: '刺激', desc: '赛博朋克主题双人竞速轨道车', height: '120cm+', duration: '4分钟', capacity: '12人/批' },
-  { id: 'dream', name: '幻梦漂流', zone: '幻梦湾', wait: 18, status: 'open', thrill: '温和', desc: '沉浸式光影河道漂流，适合全家游玩', height: '无限制', duration: '8分钟', capacity: '20人/批' },
-  { id: 'matrix', name: '矩阵迷宫', zone: '霓虹城', wait: 25, status: 'open', thrill: '探索', desc: 'VR 增强现实互动迷宫，解开数字密码', height: '110cm+', duration: '15分钟', capacity: '6人/批' },
-  { id: 'thunder', name: '雷霆风暴', zone: '星际港', wait: 0, status: 'maintenance', thrill: '极度刺激', desc: '360度旋转悬挂式飞行体验', height: '140cm+', duration: '3分钟', capacity: '32人/批' },
-  { id: 'shadow', name: '暗影鬼屋', zone: '暗影域', wait: 40, status: 'open', thrill: '恐怖', desc: '电影级场景沉浸式恐怖体验', height: '130cm+', duration: '12分钟', capacity: '8人/批' },
-  { id: 'aurora', name: '极光摩天轮', zone: '幻梦湾', wait: 15, status: 'open', thrill: '温和', desc: '88米高空俯瞰全园夜景', height: '无限制', duration: '10分钟', capacity: '8人/舱' }
+  { id: 'galaxy', name: '银河穿梭', zone: '星际港', wait: 45, status: 'open', thrill: '刺激', desc: '穿越星际黑洞的高速过山车，感受 4.5G 极限加速度', height: '130cm+', duration: '3分钟', capacity: '24人/批', weight: 700 },
+  { id: 'abyss', name: '深渊坠落', zone: '暗影域', wait: 32, status: 'open', thrill: '极度刺激', desc: '从 80 米高空自由坠落，挑战心理极限', height: '145cm+', duration: '2分钟', capacity: '16人/批', weight: 500 },
+  { id: 'neon', name: '霓虹竞速', zone: '霓虹城', wait: 65, status: 'open', thrill: '刺激', desc: '赛博朋克主题双人竞速轨道车', height: '120cm+', duration: '4分钟', capacity: '12人/批', weight: 800 },
+  { id: 'dream', name: '幻梦漂流', zone: '幻梦湾', wait: 18, status: 'open', thrill: '温和', desc: '沉浸式光影河道漂流，适合全家游玩', height: '无限制', duration: '8分钟', capacity: '20人/批', weight: 200 },
+  { id: 'matrix', name: '矩阵迷宫', zone: '霓虹城', wait: 25, status: 'open', thrill: '探索', desc: 'VR 增强现实互动迷宫，解开数字密码', height: '110cm+', duration: '15分钟', capacity: '6人/批', weight: 300 },
+  { id: 'thunder', name: '雷霆风暴', zone: '星际港', wait: 0, status: 'maintenance', thrill: '极度刺激', desc: '360度旋转悬挂式飞行体验', height: '140cm+', duration: '3分钟', capacity: '32人/批', weight: 100 },
+  { id: 'shadow', name: '暗影鬼屋', zone: '暗影域', wait: 40, status: 'open', thrill: '恐怖', desc: '电影级场景沉浸式恐怖体验', height: '130cm+', duration: '12分钟', capacity: '8人/批', weight: 600 },
+  { id: 'aurora', name: '极光摩天轮', zone: '幻梦湾', wait: 15, status: 'open', thrill: '温和', desc: '88米高空俯瞰全园夜景', height: '无限制', duration: '10分钟', capacity: '8人/舱', weight: 400 }
 ];
 
-// ==================== 从后台同步 ride 状态 ====================
+function getRideWeight(ride) {
+  const w = Number(ride.weight);
+  return Number.isFinite(w) ? w : 0;
+}
+
+function sortRidesByWeight(list) {
+  return list.slice().sort((a, b) => getRideWeight(b) - getRideWeight(a) || a.id.localeCompare(b.id));
+}
+
+// ==================== 从后台同步 ride 数据 ====================
 function loadRidesStatus() {
   try {
     const saved = JSON.parse(localStorage.getItem('stellar_park_rides_status') || '{}');
     RIDES.forEach(r => {
-      if (saved[r.id]) r.status = saved[r.id];
+      const data = saved[r.id];
+      if (!data) return;
+      if (typeof data === 'string') {
+        r.status = data;
+        return;
+      }
+      if (data.status != null) r.status = data.status;
+      if (data.name != null) r.name = data.name;
+      if (data.thrill != null) r.thrill = data.thrill;
+      if (data.wait != null) r.wait = Number(data.wait);
+      if (data.weight != null) r.weight = Number(data.weight);
     });
   } catch(e) {}
 }
@@ -922,16 +999,74 @@ let purchaseState = {
   buyerName: '',
   buyerPhone: '',
   buyerId: '',
-  pendingOrderId: null
+  pendingOrderId: null,
+  rideId: null,
+  rideName: null
 };
 let countdownTimer = null;
 let wechatPayCallback = null;
 
+// ==================== 弹窗滚动锁定 ====================
+let _scrollLockDepth = 0;
+let _scrollLockY = 0;
+
+function lockPageScroll() {
+  if (_scrollLockDepth++ > 0) return;
+  _scrollLockY = window.scrollY || document.documentElement.scrollTop;
+  document.documentElement.classList.add('scroll-locked');
+  document.body.classList.add('scroll-locked');
+  document.body.style.top = `-${_scrollLockY}px`;
+}
+
+function unlockPageScroll() {
+  if (_scrollLockDepth <= 0) return;
+  if (--_scrollLockDepth > 0) return;
+  document.documentElement.classList.remove('scroll-locked');
+  document.body.classList.remove('scroll-locked');
+  document.body.style.top = '';
+  window.scrollTo(0, _scrollLockY);
+}
+
+function bindOverlayScrollGuard(overlayEl) {
+  if (!overlayEl || overlayEl.dataset.scrollGuard) return;
+  overlayEl.dataset.scrollGuard = '1';
+  overlayEl.addEventListener('touchmove', function(e) {
+    const panel = e.target.closest('.overlay-scroll-panel');
+    if (panel && panel.scrollHeight > panel.clientHeight) return;
+    e.preventDefault();
+  }, { passive: false });
+}
+
 // ==================== localStorage 订单管理 ====================
 const STORAGE_KEY = 'stellar_park_orders';
+const EXPRESS_STORAGE_KEY = 'stellar_park_express_passes';
+
+function isExpressPurchase() {
+  return purchaseState.ticketId === 'express';
+}
+
+function isExpressPassRecord(record) {
+  return window.StellarSync ? StellarSync.isExpressPass(record) : !!(record && record.ticketId === 'express');
+}
+
+function getExpressPasses() {
+  try { return JSON.parse(localStorage.getItem(EXPRESS_STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+function saveExpressPasses(list) {
+  localStorage.setItem(EXPRESS_STORAGE_KEY, JSON.stringify(list));
+  if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.expressPasses);
+}
+function getExpressPassesForCurrentUser() {
+  const phone = getCurrentUserPhone();
+  if (!phone) return [];
+  return getExpressPasses().filter(o => orderBelongsToUser(o, phone));
+}
 
 function getOrders() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
+}
+function getTicketOrders() {
+  return getOrders().filter(o => !isExpressPassRecord(o));
 }
 function saveOrders(orders) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
@@ -942,6 +1077,11 @@ function addOrder(order) {
   orders.unshift(order);
   saveOrders(orders);
 }
+function addExpressPass(pass) {
+  const list = getExpressPasses();
+  list.unshift(pass);
+  saveExpressPasses(list);
+}
 function orderBelongsToUser(order, phone) {
   if (!phone || !order || !order.phone) return false;
   const masked = maskPhone(phone);
@@ -951,7 +1091,7 @@ function orderBelongsToUser(order, phone) {
 function getOrdersForCurrentUser() {
   const phone = getCurrentUserPhone();
   if (!phone) return [];
-  return getOrders().filter(o => orderBelongsToUser(o, phone));
+  return getTicketOrders().filter(o => orderBelongsToUser(o, phone));
 }
 
 function updateOrderStatus(orderId, status) {
@@ -1136,10 +1276,12 @@ function handleLogin() {
 
 function hideLoginOverlay() {
   document.getElementById('login-overlay').classList.add('hidden');
+  unlockPageScroll();
 }
 
 function showLoginOverlay() {
   document.getElementById('login-overlay').classList.remove('hidden');
+  lockPageScroll();
   // 重置表单
   document.getElementById('login-phone').value = '';
   document.getElementById('login-code').value = '';
@@ -1335,6 +1477,9 @@ function switchTab(tabName) {
   if (tabName === 'profile' && !requireLogin('profile')) {
     return;
   }
+  currentOrderDetailId = null;
+  const nav = document.querySelector('[data-mobile-nav="global"]');
+  if (nav) nav.classList.remove('hidden');
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
   document.getElementById('tab-' + tabName).classList.remove('hidden');
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -1348,7 +1493,10 @@ function switchTab(tabName) {
     activeNav.classList.remove('text-[var(--stellar-muted-foreground)]');
     activeNav.setAttribute('data-active', 'true');
   }
-  if (tabName === 'profile') renderOrders('all');
+  if (tabName === 'profile') {
+    renderOrders('all');
+    renderExpressPasses('all');
+  }
   if (tabName === 'rides') renderRides('all');
   window.scrollTo(0, 0);
 }
@@ -1360,7 +1508,8 @@ function renderHomeRides() {
     abyss: 'ride-abyss.jpg',
     aurora: 'ride-aurora.jpg',
     neon: 'ride-neon.jpg',
-    shadow: 'ride-shadow.jpg'
+    shadow: 'ride-shadow.jpg',
+    matrix: 'ride-matrix.jpg'
   };
   const GRADIENTS = {
     neon: 'linear-gradient(135deg, #16224F, #0E1530)',
@@ -1369,10 +1518,7 @@ function renderHomeRides() {
     thunder: 'linear-gradient(135deg, #3A2A10, #1A1408)',
     shadow: 'linear-gradient(135deg, #2A0E1A, #14080F)'
   };
-  const homeRideOrder = ['neon', 'galaxy', 'shadow', 'abyss', 'aurora'];
-  const topRides = homeRideOrder
-    .map(id => RIDES.find(r => r.id === id))
-    .filter(r => r && r.status === 'open');
+  const topRides = sortRidesByWeight(RIDES.filter(r => r.status === 'open')).slice(0, 5);
   const html = topRides.map(ride => {
     const waitColor = ride.wait > 60 ? '#EF4444' : ride.wait > 30 ? '#F59E0B' : '#34D899';
     const imgBg = RIDE_IMAGES[ride.id]
@@ -1419,7 +1565,7 @@ function renderHomeRecommend() {
 }
 
 function renderTickets() {
-  const html = Object.values(TICKET_TYPES).map(ticket => `
+  const html = Object.values(TICKET_TYPES).filter(t => t.id !== 'express').map(ticket => `
     <div onclick="openPurchase('${ticket.id}')" class="glass-card rounded-2xl p-4 lift-card cursor-pointer relative overflow-hidden">
       ${ticket.originalPrice > ticket.price ? `<span class="absolute top-3 right-3 text-[10px] px-2 py-0.5 rounded-md font-medium" style="background:var(--stellar-primary-soft);color:var(--stellar-primary-bright);border:1px solid var(--stellar-border-glow);">限时优惠</span>` : ''}
       <div class="flex items-start gap-3">
@@ -1443,7 +1589,7 @@ function renderTickets() {
 
 // ==================== 项目列表渲染 ====================
 function renderRides(zone = 'all') {
-  const filtered = zone === 'all' ? RIDES : RIDES.filter(r => r.zone === zone);
+  const filtered = sortRidesByWeight(zone === 'all' ? RIDES : RIDES.filter(r => r.zone === zone));
   const html = filtered.map(ride => {
     const waitColor = ride.status === 'maintenance' ? 'var(--stellar-ink-3)' : ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
     const statusBadge = ride.status === 'maintenance'
@@ -1559,7 +1705,7 @@ function openRideDetail(rideId) {
             <div class="flex-1">
               <h3 class="text-sm font-semibold">快速通行证</h3>
               <p class="text-xs text-[var(--stellar-muted-foreground)] mt-0.5">当前排队 ${ride.wait} 分钟，购买快速通行证可免排队直接入场</p>
-              <button onclick="closeRideDetail(); openPurchase('express')" class="w-full mt-3 py-2.5 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">¥199 立即购买</button>
+              <button onclick="closeRideDetail(); openPurchase('express', { rideId: '${ride.id}', rideName: '${ride.name}' })" class="w-full mt-3 py-2.5 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">¥199 立即购买</button>
             </div>
           </div>
         </div>
@@ -1572,77 +1718,131 @@ function openRideDetail(rideId) {
     </div>
   `;
   document.getElementById('ride-detail-overlay').classList.remove('hidden');
+  lockPageScroll();
   generateStars('detail-stars', 20);
   lucide.createIcons();
 }
 function closeRideDetail() {
   document.getElementById('ride-detail-overlay').classList.add('hidden');
+  unlockPageScroll();
 }
 
 // ==================== 购票流程 ====================
-function openPurchase(ticketId) {
+function openPurchase(ticketId, context) {
   if (!requireLogin('purchase')) {
     lastAttemptedTicketId = ticketId;
     return;
   }
-  purchaseState = { ticketId, date: null, qty: 1, step: 1, buyerName: '', buyerPhone: '', buyerId: '', pendingOrderId: null };
+  context = context || {};
+  purchaseState = {
+    ticketId,
+    date: null,
+    qty: ticketId === 'express' ? 1 : 1,
+    step: 1,
+    buyerName: '',
+    buyerPhone: '',
+    buyerId: '',
+    pendingOrderId: null,
+    rideId: context.rideId || null,
+    rideName: context.rideName || null
+  };
+  document.getElementById('purchase-title').textContent = ticketId === 'express' ? '购买快速通行证' : '购买门票';
   renderStep1();
+  goToStep(1);
   document.getElementById('purchase-overlay').classList.remove('hidden');
+  lockPageScroll();
   lucide.createIcons();
+}
+
+function handlePurchaseNext() {
+  if (isExpressPurchase()) {
+    goToStep(3);
+    return;
+  }
+  goToStep(2);
+}
+
+function handlePurchaseSuccessView() {
+  const wasExpress = purchaseState.ticketId === 'express';
+  closePurchase();
+  switchTab('profile');
+  if (wasExpress) renderExpressPasses('paid');
+  else renderOrders('paid');
 }
 function closePurchase(resetFlow) {
   document.getElementById('purchase-overlay').classList.add('hidden');
   cancelWechatPay(true);
+  unlockPageScroll();
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
   if (resetFlow !== false) {
     ['purchase-step-1','purchase-step-2','purchase-step-3','purchase-success'].forEach(id => {
       document.getElementById(id).classList.add('hidden');
     });
     document.getElementById('purchase-step-1').classList.remove('hidden');
+    document.getElementById('success-express-qr-wrap').classList.add('hidden');
+    document.getElementById('success-express-qr').innerHTML = '';
     purchaseState.pendingOrderId = null;
   }
 }
 
 function renderStep1() {
   const ticket = TICKET_TYPES[purchaseState.ticketId];
+  const express = isExpressPurchase();
   document.getElementById('step1-ticket-name').textContent = ticket.name;
   document.getElementById('step1-ticket-desc').textContent = ticket.desc;
   document.getElementById('step1-unit-price').textContent = ticket.price;
   document.getElementById('step1-qty').textContent = purchaseState.qty;
   document.getElementById('step1-subtotal').textContent = ticket.price * purchaseState.qty;
   document.getElementById('step1-total').textContent = ticket.price * purchaseState.qty;
+  document.getElementById('purchase-next-btn').textContent = express ? '确认并支付' : '下一步';
 
-  const optionsHtml = Object.values(TICKET_TYPES).map(t => `
-    <div onclick="selectTicket('${t.id}')" class="flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer ${t.id === purchaseState.ticketId ? 'glow-border' : 'glass-card'}" style="background: ${t.id === purchaseState.ticketId ? 'var(--stellar-primary-soft)' : 'var(--stellar-glass-bg)'};">
-      <i data-lucide="${t.icon}" class="w-4 h-4 ${t.id === purchaseState.ticketId ? 'text-[var(--stellar-primary-bright)]' : 'text-[var(--stellar-muted-foreground)]'}"></i>
-      <div class="flex-1">
-        <div class="text-sm ${t.id === purchaseState.ticketId ? 'font-medium' : ''}">${t.name}</div>
-        <div class="text-[11px] text-[var(--stellar-muted-foreground)]">¥${t.price}</div>
+  const optionsWrap = document.getElementById('step1-ticket-options');
+  const dateSection = document.getElementById('step1-date-section');
+  const qtySection = document.getElementById('step1-qty-section');
+  const rideInfo = document.getElementById('step1-ride-info');
+  if (express) {
+    optionsWrap.classList.add('hidden');
+    dateSection.classList.add('hidden');
+    qtySection.classList.add('hidden');
+    rideInfo.classList.remove('hidden');
+    document.getElementById('step1-ride-name').textContent = purchaseState.rideName || '指定热门项目';
+  } else {
+    optionsWrap.classList.remove('hidden');
+    dateSection.classList.remove('hidden');
+    qtySection.classList.remove('hidden');
+    rideInfo.classList.add('hidden');
+    const optionsHtml = Object.values(TICKET_TYPES).filter(t => t.id !== 'express').map(t => `
+      <div onclick="selectTicket('${t.id}')" class="flex items-center gap-3 p-2.5 rounded-xl border cursor-pointer ${t.id === purchaseState.ticketId ? 'glow-border' : 'glass-card'}" style="background: ${t.id === purchaseState.ticketId ? 'var(--stellar-primary-soft)' : 'var(--stellar-glass-bg)'};">
+        <i data-lucide="${t.icon}" class="w-4 h-4 ${t.id === purchaseState.ticketId ? 'text-[var(--stellar-primary-bright)]' : 'text-[var(--stellar-muted-foreground)]'}"></i>
+        <div class="flex-1">
+          <div class="text-sm ${t.id === purchaseState.ticketId ? 'font-medium' : ''}">${t.name}</div>
+          <div class="text-[11px] text-[var(--stellar-muted-foreground)]">¥${t.price}</div>
+        </div>
+        ${t.id === purchaseState.ticketId ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>' : ''}
       </div>
-      ${t.id === purchaseState.ticketId ? '<i data-lucide="check-circle-2" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>' : ''}
-    </div>
-  `).join('');
-  document.getElementById('step1-ticket-options').innerHTML = optionsHtml;
+    `).join('');
+    optionsWrap.innerHTML = optionsHtml;
 
-  const dates = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date();
-    d.setDate(d.getDate() + i);
-    dates.push(d);
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+      const d = new Date();
+      d.setDate(d.getDate() + i);
+      dates.push(d);
+    }
+    const dayNames = ['日','一','二','三','四','五','六'];
+    const dateHtml = dates.map((d, i) => {
+      const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+      const isSelected = purchaseState.date === dateStr;
+      const isToday = i === 0;
+      return `
+        <button onclick="selectDate('${dateStr}')" class="shrink-0 w-16 py-2 rounded-xl border ${isSelected ? 'glow-border' : 'glass-card'} text-center" style="background: ${isSelected ? 'var(--stellar-primary-soft)' : 'var(--stellar-glass-bg)'};">
+          <div class="text-[10px] ${isSelected ? 'text-[var(--stellar-primary-bright)]' : 'text-[var(--stellar-muted-foreground)]'}">${isToday ? '今天' : '周' + dayNames[d.getDay()]}</div>
+          <div class="text-sm font-medium ${isSelected ? 'text-[var(--stellar-primary-bright)]' : ''} mt-0.5">${dateStr}</div>
+        </button>
+      `;
+    }).join('');
+    document.getElementById('date-options').innerHTML = dateHtml;
   }
-  const dayNames = ['日','一','二','三','四','五','六'];
-  const dateHtml = dates.map((d, i) => {
-    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
-    const isSelected = purchaseState.date === dateStr;
-    const isToday = i === 0;
-    return `
-      <button onclick="selectDate('${dateStr}')" class="shrink-0 w-16 py-2 rounded-xl border ${isSelected ? 'glow-border' : 'glass-card'} text-center" style="background: ${isSelected ? 'var(--stellar-primary-soft)' : 'var(--stellar-glass-bg)'};">
-        <div class="text-[10px] ${isSelected ? 'text-[var(--stellar-primary-bright)]' : 'text-[var(--stellar-muted-foreground)]'}">${isToday ? '今天' : '周' + dayNames[d.getDay()]}</div>
-        <div class="text-sm font-medium ${isSelected ? 'text-[var(--stellar-primary-bright)]' : ''} mt-0.5">${dateStr}</div>
-      </button>
-    `;
-  }).join('');
-  document.getElementById('date-options').innerHTML = dateHtml;
   lucide.createIcons();
 }
 
@@ -1771,17 +1971,16 @@ function getPurchaseTicket() {
 }
 
 function resetPurchaseScroll() {
-  const scroller = document.querySelector('#purchase-overlay .overflow-y-auto');
+  const scroller = document.getElementById('purchase-panel');
   if (scroller) scroller.scrollTop = 0;
 }
 
 function goToStep(step) {
-  if (step === 2 && !purchaseState.date) {
+  if (step === 2 && !isExpressPurchase() && !purchaseState.date) {
     showLoginToast('请选择游玩日期');
     return;
   }
-  // Step 3 前进行表单验证
-  if (step === 3 && !validateBuyerForm()) {
+  if (step === 3 && !isExpressPurchase() && !validateBuyerForm()) {
     return;
   }
   purchaseState.step = step;
@@ -1900,6 +2099,44 @@ function getOrderStatusMeta(status) {
   return ORDER_STATUS[status] || ORDER_STATUS.paid;
 }
 
+function generateExpressId() {
+  const d = new Date();
+  const pad = (n, len) => String(n).padStart(len, '0');
+  const datePart = d.getFullYear().toString() +
+    pad(d.getMonth() + 1, 2) +
+    pad(d.getDate(), 2) +
+    pad(d.getHours(), 2) +
+    pad(d.getMinutes(), 2) +
+    pad(d.getSeconds(), 2);
+  const rand = pad(Math.floor(Math.random() * 10000), 4);
+  return 'EP' + datePart + rand;
+}
+
+function buildExpressPayload(status) {
+  const ticket = getPurchaseTicket();
+  if (!ticket) throw new Error('invalid ticket');
+  const curPhone = getCurrentUserPhone();
+  const user = curPhone ? getUserByPhone(curPhone) : null;
+  const orderBuyer = user?.nickname || (curPhone ? getNicknameForPhone(curPhone) : '星际探索者');
+  return {
+    id: purchaseState.pendingOrderId || generateExpressId(),
+    orderType: 'express',
+    ticketId: 'express',
+    ticketName: ticket.name,
+    rideId: purchaseState.rideId || null,
+    rideName: purchaseState.rideName || null,
+    qty: 1,
+    unitPrice: ticket.price,
+    total: ticket.price,
+    status: status,
+    paymentMethod: status === 'pending' ? null : 'wechat',
+    buyer: orderBuyer,
+    phone: curPhone || '',
+    verifyCode: null,
+    createdAt: new Date().toISOString()
+  };
+}
+
 function buildOrderPayload(status) {
   const ticket = getPurchaseTicket();
   if (!ticket) throw new Error('invalid ticket');
@@ -1925,6 +2162,25 @@ function buildOrderPayload(status) {
 }
 
 function createPendingOrderForPurchase() {
+  if (isExpressPurchase()) {
+    const pass = buildExpressPayload('pending');
+    const list = getExpressPasses();
+    if (purchaseState.pendingOrderId) {
+      const idx = list.findIndex(o => o.id === purchaseState.pendingOrderId);
+      if (idx >= 0 && list[idx].status === 'pending') {
+        pass.id = purchaseState.pendingOrderId;
+        pass.createdAt = list[idx].createdAt;
+        list[idx] = pass;
+        saveExpressPasses(list);
+        return;
+      }
+    }
+    purchaseState.pendingOrderId = pass.id;
+    list.unshift(pass);
+    saveExpressPasses(list);
+    return;
+  }
+
   const order = buildOrderPayload('pending');
   const orders = getOrders();
 
@@ -1954,12 +2210,16 @@ function showWechatPaySheet(options) {
   btn.disabled = false;
   wechatPayCallback = options.onConfirm || null;
   overlay.classList.remove('hidden');
+  lockPageScroll();
   lucide.createIcons();
 }
 
 function cancelWechatPay(silent) {
   const overlay = document.getElementById('wechat-pay-overlay');
-  if (overlay) overlay.classList.add('hidden');
+  if (overlay && !overlay.classList.contains('hidden')) {
+    overlay.classList.add('hidden');
+    unlockPageScroll();
+  }
   wechatPayCallback = null;
   const btn = document.getElementById('pay-btn');
   if (btn) {
@@ -1979,19 +2239,70 @@ function confirmWechatPay() {
     if (typeof wechatPayCallback === 'function') {
       wechatPayCallback();
     }
-    document.getElementById('wechat-pay-overlay').classList.add('hidden');
+    const wechatOverlay = document.getElementById('wechat-pay-overlay');
+    if (wechatOverlay && !wechatOverlay.classList.contains('hidden')) {
+      wechatOverlay.classList.add('hidden');
+      unlockPageScroll();
+    }
     wechatPayCallback = null;
   }, 900);
+}
+
+function markAllStepsDone() {
+  [1, 2, 3].forEach(s => {
+    const indicator = document.getElementById(`step-${s}-indicator`);
+    if (!indicator) return;
+    const circle = indicator.querySelector('div');
+    const label = indicator.querySelector('span');
+    circle.className = 'w-6 h-6 rounded-full flex items-center justify-center step-done font-medium';
+    circle.style.background = 'rgba(52,216,153,0.15)';
+    circle.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    label.className = 'step-done';
+  });
 }
 
 function finishPurchaseSuccess(order) {
   ['purchase-step-1','purchase-step-2','purchase-step-3'].forEach(id => {
     document.getElementById(id).classList.add('hidden');
   });
+  markAllStepsDone();
+  const express = isExpressPassRecord(order);
+  document.getElementById('success-title').textContent = '支付成功';
+  document.getElementById('success-subtitle').textContent = express
+    ? '快速通行证已生效，请在项目闸机处扫码核销'
+    : '微信支付成功，电子票待使用';
   document.getElementById('success-order-id').textContent = order.id;
   document.getElementById('success-ticket-name').textContent = order.ticketName;
+  document.getElementById('success-type-label').textContent = express ? '类型' : '票种';
   document.getElementById('success-qty').textContent = order.qty + ' 张';
   document.getElementById('success-amount').textContent = order.total;
+
+  const qrWrap = document.getElementById('success-express-qr-wrap');
+  const rideRow = document.getElementById('success-ride-row');
+  const qtyRow = document.getElementById('success-qty-row');
+  const viewBtn = document.getElementById('success-view-btn');
+  if (express) {
+    qtyRow.classList.add('hidden');
+    rideRow.classList.remove('hidden');
+    document.getElementById('success-ride-name').textContent = order.rideName || '指定热门项目';
+    viewBtn.textContent = '查看通行证';
+    if (order.verifyCode) {
+      qrWrap.classList.remove('hidden');
+      document.getElementById('success-verify-code').textContent = '核销码：' + order.verifyCode;
+      const qrEl = document.getElementById('success-express-qr');
+      if (window.StellarSync) {
+        StellarSync.renderQRCode(qrEl, StellarSync.buildExpressScanPayload(order), 168);
+      }
+    } else {
+      qrWrap.classList.add('hidden');
+    }
+  } else {
+    qrWrap.classList.add('hidden');
+    rideRow.classList.add('hidden');
+    qtyRow.classList.remove('hidden');
+    viewBtn.textContent = '查看订单';
+  }
+
   document.getElementById('purchase-success').classList.remove('hidden');
   if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
   purchaseState.pendingOrderId = null;
@@ -2017,23 +2328,43 @@ function processPayment() {
       merchant: '星屿乐园',
       desc: ticket.name + ' × ' + purchaseState.qty,
       onConfirm: () => {
-        const orders = getOrders();
-        const order = orders.find(o => o.id === purchaseState.pendingOrderId);
-        if (order) {
-          order.status = 'paid';
-          order.paymentMethod = 'wechat';
-          order.paidAt = new Date().toISOString();
-          saveOrders(orders);
-          finishPurchaseSuccess(order);
+        if (isExpressPurchase()) {
+          const list = getExpressPasses();
+          const pass = list.find(o => o.id === purchaseState.pendingOrderId);
+          if (pass) {
+            pass.status = 'paid';
+            pass.paymentMethod = 'wechat';
+            pass.paidAt = new Date().toISOString();
+            pass.verifyCode = window.StellarSync ? StellarSync.generateVerifyCode() : ('EP' + Date.now().toString().slice(-8));
+            saveExpressPasses(list);
+            finishPurchaseSuccess(pass);
+          } else {
+            const newPass = buildExpressPayload('paid');
+            newPass.paidAt = new Date().toISOString();
+            newPass.verifyCode = window.StellarSync ? StellarSync.generateVerifyCode() : ('EP' + Date.now().toString().slice(-8));
+            addExpressPass(newPass);
+            finishPurchaseSuccess(newPass);
+          }
+          showLoginToast('支付成功，快速通行证待使用');
         } else {
-          const newOrder = buildOrderPayload('paid');
-          newOrder.paidAt = new Date().toISOString();
-          addOrder(newOrder);
-          finishPurchaseSuccess(newOrder);
+          const orders = getOrders();
+          const order = orders.find(o => o.id === purchaseState.pendingOrderId);
+          if (order) {
+            order.status = 'paid';
+            order.paymentMethod = 'wechat';
+            order.paidAt = new Date().toISOString();
+            saveOrders(orders);
+            finishPurchaseSuccess(order);
+          } else {
+            const newOrder = buildOrderPayload('paid');
+            newOrder.paidAt = new Date().toISOString();
+            addOrder(newOrder);
+            finishPurchaseSuccess(newOrder);
+          }
+          showLoginToast('支付成功，订单待使用');
         }
         btn.textContent = '微信支付 ¥' + total;
         btn.disabled = false;
-        showLoginToast('支付成功，订单待使用');
       }
     });
     btn.textContent = '微信支付 ¥' + total;
@@ -2088,27 +2419,36 @@ function renderOrders(filter = 'all') {
 
   const html = filtered.map(order => {
     const s = getOrderStatusMeta(order.status);
-    const date = new Date(order.createdAt);
-    const dateStr = `${date.getMonth()+1}月${date.getDate()}日 ${date.getHours().toString().padStart(2,'0')}:${date.getMinutes().toString().padStart(2,'0')}`;
+    const timeRowsHtml = window.StellarSync
+      ? StellarSync.renderOrderTimeRowsHtml(order, {
+          rowClass: 'flex justify-between',
+          labelClass: '',
+          valueClass: 'text-[var(--stellar-foreground)]',
+          style: 'short'
+        })
+      : '';
     return `
-      <div class="glass-card rounded-2xl p-4">
+      <div onclick="openOrderDetail('${order.id}')" class="glass-card rounded-2xl p-4 cursor-pointer lift-card">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-2">
             <i data-lucide="${TICKET_TYPES[order.ticketId]?.icon || 'ticket'}" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>
             <span class="text-sm font-medium">${order.ticketName}</span>
           </div>
-          <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--stellar-muted-foreground)]"></i>
+          </div>
         </div>
         <div class="space-y-1.5 text-xs text-[var(--stellar-muted-foreground)]">
           <div class="flex justify-between"><span>订单号</span><span class="font-mono text-[var(--stellar-foreground)]">${order.id}</span></div>
           <div class="flex justify-between"><span>游玩日期</span><span>${order.date || '—'}</span></div>
           <div class="flex justify-between"><span>数量</span><span>${order.qty} 张</span></div>
-          <div class="flex justify-between"><span>下单时间</span><span>${dateStr}</span></div>
+          ${timeRowsHtml}
           <div class="flex justify-between"><span>支付方式</span><span>${order.paymentMethod === 'wechat' ? '微信支付' : (order.paymentMethod || '—')}</span></div>
         </div>
         <div class="border-t border-[var(--stellar-border)] mt-3 pt-3 flex items-center justify-between">
           <span class="text-sm font-bold gold-text">¥${order.total}</span>
-          <div class="flex gap-2 items-center">
+          <div class="flex gap-2 items-center" onclick="event.stopPropagation()">
             ${order.status === 'pending' ? `<button onclick="payPendingOrder('${order.id}')" class="text-[11px] px-3 py-1.5 rounded-lg text-white font-medium" style="background:#07C160;">微信支付</button>` : ''}
             ${order.status === 'paid' ? `<span class="text-[11px]" style="color: var(--stellar-state-error);">请携带本人身份证入园</span>` : ''}
             ${order.status === 'refunded' ? `<span class="text-[11px] text-[var(--stellar-state-error)]">已退款</span>` : ''}
@@ -2119,6 +2459,297 @@ function renderOrders(filter = 'all') {
     `;
   }).join('');
   document.getElementById('orders-list').innerHTML = html;
+  lucide.createIcons();
+}
+
+let lastExpressFilter = 'all';
+let currentExpressDetailId = null;
+
+function renderExpressPasses(filter = 'all') {
+  lastExpressFilter = filter;
+  document.querySelectorAll('.express-filter').forEach(b => {
+    b.style.background = '';
+    b.style.color = '';
+    b.style.boxShadow = '';
+    b.classList.add('text-[var(--stellar-muted-foreground)]');
+  });
+  const activeFilter = document.querySelector(`.express-filter[data-filter="${filter}"]`);
+  if (activeFilter) {
+    activeFilter.style.background = 'rgba(96,165,250,0.12)';
+    activeFilter.style.color = 'var(--stellar-state-info)';
+    activeFilter.style.boxShadow = '0 0 16px -4px rgba(96,165,250,0.35)';
+    activeFilter.classList.remove('text-[var(--stellar-muted-foreground)]');
+  }
+
+  const passes = getExpressPassesForCurrentUser();
+  const filtered = filter === 'all' ? passes : passes.filter(o => o.status === filter);
+  if (!getCurrentUserPhone()) {
+    document.getElementById('express-passes-list').innerHTML = `
+      <div class="text-center py-10">
+        <i data-lucide="zap" class="w-10 h-10 text-[var(--stellar-ink-3)] mx-auto mb-3"></i>
+        <p class="text-sm text-[var(--stellar-muted-foreground)]">登录后查看快速通行证</p>
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+  if (filtered.length === 0) {
+    document.getElementById('express-passes-list').innerHTML = `
+      <div class="text-center py-10">
+        <i data-lucide="zap" class="w-10 h-10 text-[var(--stellar-ink-3)] mx-auto mb-3"></i>
+        <p class="text-sm text-[var(--stellar-muted-foreground)]">${passes.length === 0 ? '暂无快速通行证' : '暂无相关通行证'}</p>
+        ${passes.length === 0 ? `<button onclick="switchTab('rides')" class="mt-4 text-xs px-4 py-2 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] font-medium btn-glow">去项目页购买</button>` : ''}
+      </div>
+    `;
+    lucide.createIcons();
+    return;
+  }
+
+  const html = filtered.map(pass => {
+    const s = getOrderStatusMeta(pass.status);
+    const timeRowsHtml = window.StellarSync
+      ? StellarSync.renderOrderTimeRowsHtml(pass, {
+          rowClass: 'flex justify-between',
+          labelClass: '',
+          valueClass: 'text-[var(--stellar-foreground)]',
+          style: 'short'
+        })
+      : '';
+    return `
+      <div onclick="openExpressDetail('${pass.id}')" class="glass-card rounded-2xl p-4 cursor-pointer lift-card">
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <i data-lucide="zap" class="w-4 h-4 text-[var(--stellar-primary-bright)]"></i>
+            <span class="text-sm font-medium">快速通行证</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+            <i data-lucide="chevron-right" class="w-4 h-4 text-[var(--stellar-muted-foreground)]"></i>
+          </div>
+        </div>
+        <div class="space-y-1.5 text-xs text-[var(--stellar-muted-foreground)]">
+          <div class="flex justify-between"><span>订单号</span><span class="font-mono text-[var(--stellar-foreground)]">${pass.id}</span></div>
+          <div class="flex justify-between"><span>适用项目</span><span>${pass.rideName || '指定热门项目'}</span></div>
+          ${timeRowsHtml}
+          <div class="flex justify-between"><span>支付方式</span><span>${pass.paymentMethod === 'wechat' ? '微信支付' : (pass.paymentMethod || '—')}</span></div>
+        </div>
+        <div class="border-t border-[var(--stellar-border)] mt-3 pt-3 flex items-center justify-between">
+          <span class="text-sm font-bold gold-text">¥${pass.total}</span>
+          <div class="flex gap-2 items-center" onclick="event.stopPropagation()">
+            ${pass.status === 'pending' ? `<button onclick="payPendingExpress('${pass.id}')" class="text-[11px] px-3 py-1.5 rounded-lg text-white font-medium" style="background:#07C160;">微信支付</button>` : ''}
+            ${pass.status === 'paid' ? `<span class="text-[11px] text-[var(--stellar-state-info)]">出示二维码核销</span>` : ''}
+            ${pass.status === 'refunded' ? `<span class="text-[11px] text-[var(--stellar-state-error)]">已退款</span>` : ''}
+            ${pass.status === 'used' ? `<span class="text-[11px] text-[var(--stellar-muted-foreground)]">已使用</span>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+  document.getElementById('express-passes-list').innerHTML = html;
+  lucide.createIcons();
+}
+
+function openExpressDetail(passId) {
+  if (!requireLogin('orders')) return;
+  currentExpressDetailId = passId;
+  renderExpressDetailPage(passId);
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('tab-express-detail').classList.remove('hidden');
+  const nav = document.querySelector('[data-mobile-nav="global"]');
+  if (nav) nav.classList.add('hidden');
+  window.scrollTo(0, 0);
+}
+
+function closeExpressDetail() {
+  currentExpressDetailId = null;
+  document.getElementById('tab-express-detail').classList.add('hidden');
+  document.getElementById('tab-profile').classList.remove('hidden');
+  const nav = document.querySelector('[data-mobile-nav="global"]');
+  if (nav) nav.classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('text-[var(--stellar-primary-bright)]', 'font-medium');
+    item.classList.add('text-[var(--stellar-muted-foreground)]');
+    item.removeAttribute('data-active');
+  });
+  const profileNav = document.querySelector('[data-nav-key="profile"]');
+  if (profileNav) {
+    profileNav.classList.add('text-[var(--stellar-primary-bright)]', 'font-medium');
+    profileNav.classList.remove('text-[var(--stellar-muted-foreground)]');
+    profileNav.setAttribute('data-active', 'true');
+  }
+  renderExpressPasses(lastExpressFilter);
+  window.scrollTo(0, 0);
+}
+
+function renderExpressDetailPage(passId) {
+  const pass = getExpressPassesForCurrentUser().find(o => o.id === passId);
+  const container = document.getElementById('express-detail-body');
+  if (!pass || !container) {
+    if (container) {
+      container.innerHTML = '<div class="text-center py-12 text-sm text-[var(--stellar-muted-foreground)]">通行证不存在或无权查看</div>';
+    }
+    return;
+  }
+  const s = getOrderStatusMeta(pass.status);
+  const timeRowsHtml = window.StellarSync
+    ? StellarSync.renderOrderTimeRowsHtml(pass, {
+        rowClass: 'flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50 last:border-0',
+        labelClass: 'text-[var(--stellar-muted-foreground)]',
+        valueClass: 'text-[var(--stellar-foreground)]',
+        style: 'short'
+      })
+    : '';
+  const qrBlock = pass.status === 'paid' && pass.verifyCode ? `
+    <div class="glass-card rounded-2xl p-4 mb-4 text-center">
+      <div class="text-xs text-[var(--stellar-muted-foreground)] mb-3">核销二维码（请在项目闸机处出示）</div>
+      <div id="express-detail-qr" class="flex justify-center"></div>
+      <div class="text-[10px] text-[var(--stellar-muted-foreground)] mt-3 font-mono">核销码：${pass.verifyCode}</div>
+    </div>
+  ` : '';
+  container.innerHTML = `
+    ${qrBlock}
+    <div class="glass-card rounded-2xl p-4 mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="zap" class="w-5 h-5 text-[var(--stellar-primary-bright)]"></i>
+          <span class="text-base font-semibold">快速通行证</span>
+        </div>
+        <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+      </div>
+      <div class="text-xs">
+        <div class="flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50"><span class="text-[var(--stellar-muted-foreground)]">订单号</span><span class="font-mono text-[var(--stellar-foreground)]">${pass.id}</span></div>
+        <div class="flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50"><span class="text-[var(--stellar-muted-foreground)]">适用项目</span><span>${pass.rideName || '指定热门项目'}</span></div>
+        ${timeRowsHtml}
+        <div class="flex justify-between py-2.5"><span class="text-[var(--stellar-muted-foreground)]">支付方式</span><span>${pass.paymentMethod === 'wechat' ? '微信支付' : (pass.paymentMethod || '—')}</span></div>
+      </div>
+    </div>
+    <div class="glass-card rounded-2xl p-4 flex items-center justify-between mb-4">
+      <span class="text-sm text-[var(--stellar-muted-foreground)]">订单金额</span>
+      <span class="text-2xl font-bold gold-text">¥${pass.total}</span>
+    </div>
+    <div>
+      ${pass.status === 'pending' ? `<button onclick="payPendingExpress('${pass.id}')" class="w-full py-3 rounded-xl text-sm font-semibold text-white" style="background:#07C160;">微信支付 ¥${pass.total}</button>` : ''}
+      ${pass.status === 'paid' ? `<p class="text-center text-xs text-[var(--stellar-state-info)]">请在指定项目闸机处扫码核销</p>` : ''}
+      ${pass.status === 'refunded' ? `<p class="text-center text-xs text-[var(--stellar-state-error)]">该通行证已退款</p>` : ''}
+      ${pass.status === 'used' ? `<p class="text-center text-xs text-[var(--stellar-muted-foreground)]">该通行证已核销使用</p>` : ''}
+    </div>
+  `;
+  if (pass.status === 'paid' && pass.verifyCode && window.StellarSync) {
+    StellarSync.renderQRCode(document.getElementById('express-detail-qr'), StellarSync.buildExpressScanPayload(pass), 200);
+  }
+  lucide.createIcons();
+}
+
+function payPendingExpress(passId) {
+  const pass = getExpressPasses().find(o => o.id === passId);
+  if (!pass || pass.status !== 'pending') return;
+  showWechatPaySheet({
+    amount: pass.total,
+    merchant: '星屿乐园',
+    desc: '快速通行证 × 1',
+    onConfirm: () => {
+      const list = getExpressPasses();
+      const target = list.find(o => o.id === passId);
+      if (target) {
+        target.status = 'paid';
+        target.paymentMethod = 'wechat';
+        target.paidAt = new Date().toISOString();
+        target.verifyCode = window.StellarSync ? StellarSync.generateVerifyCode() : ('EP' + Date.now().toString().slice(-8));
+        saveExpressPasses(list);
+      }
+      showLoginToast('支付成功，快速通行证待使用');
+      if (currentExpressDetailId === passId) {
+        renderExpressDetailPage(passId);
+      } else {
+        renderExpressPasses(lastExpressFilter);
+      }
+      updateProfileCounts();
+    }
+  });
+}
+
+let lastOrdersFilter = 'all';
+let currentOrderDetailId = null;
+
+function openOrderDetail(orderId) {
+  if (!requireLogin('orders')) return;
+  lastOrdersFilter = document.querySelector('.order-filter[data-filter]')?.dataset.filter || 'all';
+  currentOrderDetailId = orderId;
+  renderOrderDetailPage(orderId);
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('tab-order-detail').classList.remove('hidden');
+  const nav = document.querySelector('[data-mobile-nav="global"]');
+  if (nav) nav.classList.add('hidden');
+  window.scrollTo(0, 0);
+}
+
+function closeOrderDetail() {
+  currentOrderDetailId = null;
+  document.getElementById('tab-order-detail').classList.add('hidden');
+  document.getElementById('tab-profile').classList.remove('hidden');
+  const nav = document.querySelector('[data-mobile-nav="global"]');
+  if (nav) nav.classList.remove('hidden');
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('text-[var(--stellar-primary-bright)]', 'font-medium');
+    item.classList.add('text-[var(--stellar-muted-foreground)]');
+    item.removeAttribute('data-active');
+  });
+  const profileNav = document.querySelector('[data-nav-key="profile"]');
+  if (profileNav) {
+    profileNav.classList.add('text-[var(--stellar-primary-bright)]', 'font-medium');
+    profileNav.classList.remove('text-[var(--stellar-muted-foreground)]');
+    profileNav.setAttribute('data-active', 'true');
+  }
+  renderOrders(lastOrdersFilter);
+  window.scrollTo(0, 0);
+}
+
+function renderOrderDetailPage(orderId) {
+  const order = getOrdersForCurrentUser().find(o => o.id === orderId);
+  const container = document.getElementById('order-detail-body');
+  if (!order || !container) {
+    if (container) {
+      container.innerHTML = '<div class="text-center py-12 text-sm text-[var(--stellar-muted-foreground)]">订单不存在或无权查看</div>';
+    }
+    return;
+  }
+  const s = getOrderStatusMeta(order.status);
+  const timeRowsHtml = window.StellarSync
+    ? StellarSync.renderOrderTimeRowsHtml(order, {
+        rowClass: 'flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50 last:border-0',
+        labelClass: 'text-[var(--stellar-muted-foreground)]',
+        valueClass: 'text-[var(--stellar-foreground)]',
+        style: 'short'
+      })
+    : '';
+  container.innerHTML = `
+    <div class="glass-card rounded-2xl p-4 mb-4">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2">
+          <i data-lucide="${TICKET_TYPES[order.ticketId]?.icon || 'ticket'}" class="w-5 h-5 text-[var(--stellar-primary-bright)]"></i>
+          <span class="text-base font-semibold">${order.ticketName}</span>
+        </div>
+        <span class="text-[10px] px-2 py-0.5 rounded-md font-medium" style="background: ${s.bg}; color: ${s.color};">${s.label}</span>
+      </div>
+      <div class="text-xs">
+        <div class="flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50"><span class="text-[var(--stellar-muted-foreground)]">订单号</span><span class="font-mono text-[var(--stellar-foreground)]">${order.id}</span></div>
+        <div class="flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50"><span class="text-[var(--stellar-muted-foreground)]">游玩日期</span><span>${order.date || '—'}</span></div>
+        <div class="flex justify-between py-2.5 border-b border-[var(--stellar-border)]/50"><span class="text-[var(--stellar-muted-foreground)]">数量</span><span>${order.qty} 张</span></div>
+        ${timeRowsHtml}
+        <div class="flex justify-between py-2.5"><span class="text-[var(--stellar-muted-foreground)]">支付方式</span><span>${order.paymentMethod === 'wechat' ? '微信支付' : (order.paymentMethod || '—')}</span></div>
+      </div>
+    </div>
+    <div class="glass-card rounded-2xl p-4 flex items-center justify-between">
+      <span class="text-sm text-[var(--stellar-muted-foreground)]">订单金额</span>
+      <span class="text-2xl font-bold gold-text">¥${order.total}</span>
+    </div>
+    <div class="mt-4">
+      ${order.status === 'pending' ? `<button onclick="payPendingOrder('${order.id}')" class="w-full py-3 rounded-xl text-sm font-semibold text-white" style="background:#07C160;">微信支付 ¥${order.total}</button>` : ''}
+      ${order.status === 'paid' ? `<p class="text-center text-xs" style="color: var(--stellar-state-error);">请携带本人身份证入园</p>` : ''}
+      ${order.status === 'refunded' ? `<p class="text-center text-xs text-[var(--stellar-state-error)]">该订单已退款</p>` : ''}
+      ${order.status === 'used' ? `<p class="text-center text-xs text-[var(--stellar-muted-foreground)]">该订单已使用</p>` : ''}
+    </div>
+  `;
   lucide.createIcons();
 }
 
@@ -2148,7 +2779,12 @@ function payPendingOrder(orderId) {
         saveOrders(orders);
       }
       showLoginToast('支付成功，订单待使用');
-      renderOrders(document.querySelector('.order-filter[data-filter]')?.dataset.filter || 'all');
+      const activeFilter = document.querySelector('.order-filter[data-filter]')?.dataset.filter || 'all';
+      if (currentOrderDetailId === orderId) {
+        renderOrderDetailPage(orderId);
+      } else {
+        renderOrders(activeFilter);
+      }
     }
   });
 }
@@ -2159,9 +2795,23 @@ function initCrossPageSync() {
   StellarSync.onDataChange(StellarSync.KEYS.products, refreshTicketsFromAdmin);
   StellarSync.onDataChange(StellarSync.KEYS.orders, () => {
     updateProfileCounts();
+    if (currentOrderDetailId && !document.getElementById('tab-order-detail').classList.contains('hidden')) {
+      renderOrderDetailPage(currentOrderDetailId);
+      return;
+    }
     if (!document.getElementById('tab-profile').classList.contains('hidden')) {
       const activeFilter = document.querySelector('.order-filter[data-filter]')?.dataset.filter || 'all';
       renderOrders(activeFilter);
+    }
+  });
+  StellarSync.onDataChange(StellarSync.KEYS.expressPasses, () => {
+    updateProfileCounts();
+    if (currentExpressDetailId && !document.getElementById('tab-express-detail').classList.contains('hidden')) {
+      renderExpressDetailPage(currentExpressDetailId);
+      return;
+    }
+    if (!document.getElementById('tab-profile').classList.contains('hidden')) {
+      renderExpressPasses(lastExpressFilter || 'all');
     }
   });
 }
@@ -2223,6 +2873,7 @@ renderHomeRecommend();
 renderTickets();
 renderRides('all');
 renderOrders('all');
+renderExpressPasses('all');
 renderMapMarkers();
 renderHomeRides();
 initFilterButtons();
@@ -2233,6 +2884,9 @@ lucide.createIcons();
 // ==================== 登录系统初始化 ====================
 initCrossPageSync();
 initLogin();
+['purchase-overlay', 'ride-detail-overlay', 'wechat-pay-overlay', 'login-overlay'].forEach(function(id) {
+  bindOverlayScrollGuard(document.getElementById(id));
+});
 
 // ==================== 地图区域点击交互 ====================
 let zoneActive = false;
@@ -2315,6 +2969,23 @@ setInterval(updateVisitorCount, 5000);
       /* 动画 */
       .tab-panel { animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
       @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      html.scroll-locked,
+      body.scroll-locked {
+        overflow: hidden !important;
+        height: 100%;
+      }
+      body.scroll-locked {
+        position: fixed;
+        width: 100%;
+        left: 0;
+        right: 0;
+      }
+      .overlay-scroll-panel {
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+      }
+      .overscroll-none { overscroll-behavior: none; }
+
       .overlay-enter { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
       @keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
       .fade-in { animation: fadeIn 0.2s ease; }
