@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>后台 · 用户管理</title>
+    <title>后台 · 登录</title>
     <style id="theme-vars">
 /* 星屿乐园 Stellar Park — 后台浅色主题
    单一品牌色：琥珀金 (#E3A63B)，浅灰白背景，清爽数据工作台 */
@@ -213,7 +213,25 @@
 <!-- Toast 提示 -->
 <div id="admin-toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[90] hidden px-5 py-3 rounded-xl text-sm text-center pointer-events-none" style="background: var(--stellar-card); border: 1px solid var(--stellar-border-glow); box-shadow: var(--stellar-shadow-2); color: var(--stellar-foreground); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0;"></div>
 
-<div class="flex min-h-screen relative z-10">
+<div id="admin-gate" class="fixed inset-0 z-[100] flex items-center justify-center px-4" style="background: var(--stellar-background);">
+  <div class="w-full max-w-sm rounded-2xl p-6" style="background: var(--stellar-card); border: 1px solid var(--stellar-border); box-shadow: var(--stellar-shadow-2);">
+    <h1 class="text-lg font-bold mb-1">星屿乐园后台</h1>
+    <p class="text-xs mb-4" style="color: var(--stellar-muted-foreground);">请用已开通权限的邮箱登录。未登录不能查看订单、用户或修改项目。</p>
+    <label class="text-xs block mb-1" style="color: var(--stellar-muted-foreground);">邮箱</label>
+    <input id="admin-email" type="email" autocomplete="username" class="w-full mb-3 px-3 py-2 rounded-lg border text-sm" style="border-color: var(--stellar-border); background: var(--stellar-background);">
+    <label class="text-xs block mb-1" style="color: var(--stellar-muted-foreground);">密码</label>
+    <input id="admin-password" type="password" autocomplete="current-password" class="w-full mb-3 px-3 py-2 rounded-lg border text-sm" style="border-color: var(--stellar-border); background: var(--stellar-background);">
+    <label class="text-xs block mb-1" style="color: var(--stellar-muted-foreground);">邮箱验证码</label>
+    <div class="flex gap-2 mb-1">
+      <input id="admin-code" inputmode="numeric" maxlength="8" class="flex-1 px-3 py-2 rounded-lg border text-sm" style="border-color: var(--stellar-border); background: var(--stellar-background);">
+      <button id="admin-code-btn" type="button" onclick="adminSendCode()" class="px-3 py-2 rounded-lg text-xs" style="background: var(--stellar-primary-soft); color: var(--stellar-primary);">获取验证码</button>
+    </div>
+    <p id="admin-login-error" class="text-xs mb-3 hidden" style="color: var(--stellar-state-error);"></p>
+    <button type="button" onclick="adminSubmitLogin()" class="w-full py-2.5 rounded-lg text-sm font-semibold" style="background: var(--stellar-primary); color: var(--stellar-primary-foreground);">登录后台</button>
+  </div>
+</div>
+
+<div id="admin-shell" class="hidden min-h-screen relative z-10 flex">
 
   <!-- ==================== 侧边栏 ==================== -->
   <aside class="w-[232px] shrink-0 border-r-[1px] border-[var(--stellar-glass-border)] flex flex-col" style="background: var(--stellar-glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
@@ -269,7 +287,7 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="text-xs font-medium truncate">管理员</div>
-          <div class="text-[10px] text-[var(--stellar-muted-foreground)]">admin@stellar.com</div>
+          <div class="text-[10px] text-[var(--stellar-muted-foreground)]" id="admin-user-email">未登录</div>
         </div>
       </div>
     </div>
@@ -297,7 +315,7 @@
       <!-- ==================== 数据仪表盘 ==================== -->
       <div id="panel-dashboard" class="panel-enter">
         <!-- 核心指标 -->
-        <div class="grid grid-cols-4 gap-4 mb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
           <div class="glass-card lift-card rounded-xl p-4">
             <div class="flex items-start justify-between mb-2">
               <div>
@@ -380,7 +398,7 @@
         <!-- 票种销售占比 -->
         <div class="mt-4 glass-card rounded-xl p-4">
           <h3 class="text-sm font-semibold mb-4">票种销售分布</h3>
-          <div class="grid grid-cols-4 gap-4" id="dash-ticket-stats">
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4" id="dash-ticket-stats">
             <div class="text-center">
               <div class="text-2xl font-bold gold-text" id="stat-single">0</div>
               <div class="text-xs text-[var(--stellar-muted-foreground)] mt-1">成人单次入园票</div>
@@ -431,7 +449,7 @@
         </div>
 
         <!-- 区域概览 -->
-        <div class="grid grid-cols-4 gap-4 mt-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mt-4">
           <div class="glass-card lift-card rounded-xl p-4">
             <div class="flex items-center gap-2 mb-2">
               <div class="w-2 h-2 rounded-full text-[var(--stellar-primary)] pulse-dot" style="background: var(--stellar-primary);"></div>
@@ -639,7 +657,7 @@
           <div class="flex items-center justify-end gap-2">
             <div class="relative">
               <i data-lucide="search" class="w-3.5 h-3.5 text-[var(--stellar-muted-foreground)] absolute left-2.5 top-1/2 -translate-y-1/2"></i>
-              <input type="text" id="user-search" placeholder="搜索手机号/昵称..." class="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-[var(--stellar-input)] w-56 focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);">
+              <input type="text" id="user-search" placeholder="搜索邮箱/昵称..." class="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-[var(--stellar-input)] w-56 focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);">
             </div>
             <button onclick="renderUsersTable()" class="hover-glow text-xs px-3 py-1.5 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-all flex items-center gap-1">
               <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i> 刷新
@@ -653,7 +671,7 @@
             <table class="w-full text-sm">
               <thead>
                 <tr class="text-xs text-[var(--stellar-muted-foreground)] border-b border-[var(--stellar-glass-border)]">
-                  <th class="text-left px-4 py-2.5 font-normal">手机号</th>
+                  <th class="text-left px-4 py-2.5 font-normal">邮箱</th>
                   <th class="text-left px-4 py-2.5 font-normal">昵称</th>
                   <th class="text-left px-4 py-2.5 font-normal">注册时间</th>
                   <th class="text-left px-4 py-2.5 font-normal">订单数</th>
@@ -766,11 +784,13 @@
       </div>
       <div>
         <label class="text-xs text-[var(--stellar-muted-foreground)] mb-1.5 block">库存</label>
-        <input type="number" id="product-edit-stock" min="0" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);" placeholder="0">
+        <input type="text" id="product-edit-stock" class="w-full px-3 py-2 rounded-lg border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)]" style="background: var(--stellar-background);" placeholder="留空表示不限">
+        <p id="product-stock-hint" class="text-[10px] mt-1 hidden" style="color: var(--stellar-muted-foreground);">留空或填写不限，列表里会显示为不限。</p>
       </div>
       <div class="flex justify-end gap-2 pt-2">
-        <button onclick="closeProductDetail()" class="text-xs px-4 py-2 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)] transition-colors">取消</button>
-        <button onclick="saveProductDetail()" class="text-xs px-4 py-2 rounded-lg text-white transition-all" style="background: var(--stellar-primary); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">保存</button>
+        <button type="button" onclick="closeProductDetail()" class="text-xs px-4 py-2 rounded-lg border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-foreground)] transition-colors">关闭</button>
+        <button type="button" id="product-edit-btn" onclick="showProductDetail(editingProductId, 'edit')" class="hidden text-xs px-4 py-2 rounded-lg border border-[var(--stellar-border)]">编辑商品</button>
+        <button type="button" id="product-save-btn" onclick="saveProductDetail()" class="text-xs px-4 py-2 rounded-lg text-white transition-all" style="background: var(--stellar-primary); box-shadow: 0 0 16px -4px var(--stellar-primary-glow);">保存</button>
       </div>
     </div>
   </div>
@@ -808,6 +828,10 @@ function getRideIconSvg(rideId, sizeClass, colorVar, dimmed) {
   }
   if (rideId === 'abyss') {
     return `<svg viewBox="0 0 24 24" fill="none" class="${sizeClass} ride-icon-svg${dimClass}" style="${colorStyle}"><path d="M5 3 L 10 11 L 11.5 17 L 12 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/><path d="M19 3 L 14 11 L 12.5 17 L 12 21" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/><path d="M12 5 L 12 18" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-dasharray="2 2.5" opacity="0.55"/><circle cx="12" cy="4" r="1.5" fill="currentColor" opacity="0.9"/><circle cx="12" cy="21" r="2" fill="currentColor" opacity="0.7"/><circle cx="12" cy="21" r="0.7" fill="var(--stellar-background)" opacity="0.9"/></svg>`;
+  }
+  if (window.StellarSync && StellarSync.rideIconSvg) {
+    const extra = StellarSync.rideIconSvg(rideId, sizeClass, colorStyle, dimClass);
+    if (extra) return extra;
   }
   return null;
 }
@@ -933,7 +957,9 @@ function switchAdminPanel(panelName) {
     'express-detail': '通行证详情',
     'order-detail': '订单详情'
   };
-  document.getElementById('page-title').textContent = titles[panelName] || titles.dashboard;
+  const title = titles[panelName] || titles.dashboard;
+  document.getElementById('page-title').textContent = title;
+  document.title = '后台 · ' + title;
 
   if (panelName === 'dashboard') renderDashboard();
   if (panelName === 'rides') renderRidesTable();
@@ -967,6 +993,10 @@ function renderDashboard() {
   document.getElementById('dash-revenue').textContent = revenue.toLocaleString();
   document.getElementById('dash-flow').textContent = flow.toLocaleString();
   document.getElementById('dash-rides-open').textContent = RIDES.filter(r => r.status === 'open').length;
+
+  if (window.StellarSync && StellarSync.parkVisitorCount) {
+    document.getElementById('dash-visitors').textContent = StellarSync.parkVisitorCount().toLocaleString();
+  }
 
   const ticketCounts = { single: 0, annual: 0, express: 0, child: 0 };
   ticketOrders.forEach(o => {
@@ -1003,15 +1033,20 @@ function renderDashboard() {
   }
 
   // 项目排队概览
-  const topRides = RIDES.filter(r => r.status === 'open').sort((a,b) => b.wait - a.wait).slice(0, 5);
+  const topRides = RIDES.slice().sort((a, b) => {
+    if (a.status !== b.status) return a.status === 'open' ? -1 : 1;
+    return b.wait - a.wait;
+  });
   document.getElementById('dash-rides-status').innerHTML = topRides.map(ride => {
-    const color = ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
-    const pct = Math.min(100, (ride.wait / 90) * 100);
+    const closed = ride.status !== 'open';
+    const color = closed ? 'var(--stellar-ink-3)' : ride.wait > 60 ? 'var(--stellar-state-error)' : ride.wait > 30 ? 'var(--stellar-state-warning)' : 'var(--stellar-state-success)';
+    const pct = closed ? 0 : Math.min(100, (ride.wait / 90) * 100);
+    const label = closed ? '维护中' : ride.wait + 'min';
     return `
       <div>
         <div class="flex items-center justify-between mb-1">
           <span class="text-xs font-medium">${ride.name}</span>
-          <span class="text-xs font-bold" style="color: ${color};">${ride.wait}min</span>
+          <span class="text-xs font-bold" style="color: ${color};">${label}</span>
         </div>
         <div class="h-1.5 rounded-full overflow-hidden" style="background: var(--stellar-muted);">
           <div class="h-full rounded-full transition-all" style="width: ${pct}%; background: ${color}; box-shadow: 0 0 8px -2px ${color};"></div>
@@ -1166,7 +1201,7 @@ function toggleRideStatus(rideId) {
 }
 
 function confirmRideToggle() {
-  if (!pendingRideToggleId) return;
+  if (!adminReady || !pendingRideToggleId) return;
   const ride = RIDES.find(r => r.id === pendingRideToggleId);
   if (ride) {
     ride.status = ride.status === 'open' ? 'maintenance' : 'open';
@@ -1424,6 +1459,7 @@ function showExpressDetail(passId) {
   document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'));
   document.getElementById('panel-express-detail').classList.remove('hidden');
   document.getElementById('page-title').textContent = '通行证详情';
+  document.title = '后台 · 通行证详情';
   window.scrollTo(0, 0);
 }
 
@@ -1503,6 +1539,7 @@ function refreshOrders() {
 }
 
 async function adminClearAllOrders() {
+  if (!adminReady) return;
   if (!confirm('确认清空全部历史订单与快速通行证？此操作不可恢复。')) return;
   if (window.StellarCloud) {
     try { await StellarCloud.clearAll(); } catch (err) { alert(err.message || '清空失败'); return; }
@@ -1583,6 +1620,7 @@ function showOrderDetail(orderId) {
   document.querySelectorAll('[id^="panel-"]').forEach(p => p.classList.add('hidden'));
   document.getElementById('panel-order-detail').classList.remove('hidden');
   document.getElementById('page-title').textContent = '订单详情';
+  document.title = '后台 · 订单详情';
   window.scrollTo(0, 0);
 }
 
@@ -1782,6 +1820,7 @@ function filterUsers() {
 // ==================== 商品管理 ====================
 const PRODUCTS = [
   { id: 'single', name: '成人单次入园票', desc: '当日有效，畅玩全园所有项目', price: 399, originalPrice: 499, stock: 9999, icon: 'ticket', active: true },
+  { id: 'annual', name: '年卡会员', desc: '365天无限次入园，享会员专属通道', price: 1299, originalPrice: 1599, stock: 9999, icon: 'crown', active: true },
   { id: 'child', name: '儿童单次入园票', desc: '身高 1.0m-1.4m 儿童，需成人陪同', price: 279, originalPrice: 349, stock: 9999, icon: 'baby', active: true },
   { id: 'express', name: '快速通行证', desc: '指定热门项目免排队，最多省 2 小时', price: 199, originalPrice: 249, stock: 500, icon: 'zap', active: true }
 ];
@@ -1805,7 +1844,16 @@ function ensureProductsSeed() {
     const saved = JSON.parse(localStorage.getItem(PRODUCTS_KEY) || 'null');
     if (!saved || !Array.isArray(saved) || saved.length === 0) {
       localStorage.setItem(PRODUCTS_KEY, JSON.stringify(PRODUCTS));
+      return;
     }
+    let changed = false;
+    PRODUCTS.forEach(item => {
+      if (!saved.some(row => row.id === item.id)) {
+        saved.push({ ...item });
+        changed = true;
+      }
+    });
+    if (changed) localStorage.setItem(PRODUCTS_KEY, JSON.stringify(saved));
   } catch (e) {
     localStorage.setItem(PRODUCTS_KEY, JSON.stringify(PRODUCTS));
   }
@@ -1862,7 +1910,8 @@ function renderProducts() {
         <td class="px-4 py-3">${statusBadge}</td>
         <td class="px-4 py-3">
           <div class="flex items-center gap-1.5">
-            <button onclick="showProductDetail('${p.id}')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-colors">查看详情</button>
+            <button onclick="showProductDetail('${p.id}', 'view')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-colors">查看详情</button>
+            <button onclick="showProductDetail('${p.id}', 'edit')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] text-[var(--stellar-muted-foreground)] hover:text-[var(--stellar-primary)] hover:border-[var(--stellar-primary)] transition-colors">编辑</button>
             <button onclick="toggleProduct('${p.id}')" class="text-[10px] px-2.5 py-1 rounded-md border border-[var(--stellar-border)] transition-colors" style="color: ${toggleColor};" onmouseover="this.style.borderColor='${toggleColor}'" onmouseout="this.style.borderColor='var(--stellar-border)'">${toggleLabel}</button>
           </div>
         </td>
@@ -1882,19 +1931,39 @@ function toggleProduct(productId) {
   renderProducts();
 }
 
-function showProductDetail(productId) {
-  editingProductId = productId;
+function unlimitedStock(stock) {
+  return stock == null || stock === '' || Number(stock) >= 9999;
+}
+
+function setProductFormMode(mode) {
+  const editing = mode === 'edit' || mode === 'create';
+  ['product-edit-name', 'product-edit-desc', 'product-edit-price', 'product-edit-original-price', 'product-edit-stock'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.readOnly = !editing;
+  });
+  const save = document.getElementById('product-save-btn');
+  const edit = document.getElementById('product-edit-btn');
+  const hint = document.getElementById('product-stock-hint');
+  if (save) save.classList.toggle('hidden', !editing);
+  if (edit) edit.classList.toggle('hidden', editing || !editingProductId);
+  if (hint) hint.classList.toggle('hidden', !editing);
+}
+
+function showProductDetail(productId, mode) {
+  editingProductId = productId || null;
   const modal = document.getElementById('product-detail-modal');
+  const formMode = productId ? (mode || 'view') : 'create';
   if (productId) {
     const products = getProducts();
     const product = products.find(p => p.id === productId);
     if (!product) return;
-    document.getElementById('product-modal-title').textContent = '编辑商品';
+    document.getElementById('product-modal-title').textContent = formMode === 'view' ? '商品详情' : '编辑商品';
     document.getElementById('product-edit-name').value = product.name || '';
     document.getElementById('product-edit-desc').value = product.desc || '';
     document.getElementById('product-edit-price').value = product.price || 0;
     document.getElementById('product-edit-original-price').value = product.originalPrice || 0;
-    document.getElementById('product-edit-stock').value = product.stock !== undefined ? product.stock : 0;
+    const stockEl = document.getElementById('product-edit-stock');
+    stockEl.value = unlimitedStock(product.stock) ? (formMode === 'view' ? '不限' : '') : product.stock;
   } else {
     document.getElementById('product-modal-title').textContent = '添加商品';
     document.getElementById('product-edit-name').value = '';
@@ -1903,6 +1972,7 @@ function showProductDetail(productId) {
     document.getElementById('product-edit-original-price').value = '';
     document.getElementById('product-edit-stock').value = '';
   }
+  setProductFormMode(formMode);
   modal.classList.remove('hidden');
   lucide.createIcons();
 }
@@ -1917,7 +1987,8 @@ function saveProductDetail() {
   const desc = document.getElementById('product-edit-desc').value.trim();
   const price = parseInt(document.getElementById('product-edit-price').value) || 0;
   const originalPrice = parseInt(document.getElementById('product-edit-original-price').value) || 0;
-  const stock = parseInt(document.getElementById('product-edit-stock').value) || 0;
+  const stockRaw = document.getElementById('product-edit-stock').value.trim();
+  const stock = (!stockRaw || stockRaw === '不限') ? 9999 : (parseInt(stockRaw, 10) || 0);
 
   if (!name) {
     alert('请输入商品名称');
@@ -2035,7 +2106,7 @@ function showUserDetail(phone) {
       <!-- 信息 -->
       <div class="space-y-3 mb-5">
         <div class="flex justify-between text-sm">
-          <span class="text-[var(--stellar-muted-foreground)]">手机号</span>
+          <span class="text-[var(--stellar-muted-foreground)]">邮箱</span>
           <span class="font-mono">${maskPhone(user.phone)}</span>
         </div>
         <div class="flex justify-between text-sm">
@@ -2185,7 +2256,115 @@ function updateClock() {
 setInterval(updateClock, 1000);
 
 // ==================== 初始化 ====================
+let adminReady = false;
+let adminCodeSent = false;
+
+function adminLoginError(message) {
+  const el = document.getElementById('admin-login-error');
+  if (!el) return;
+  el.textContent = message || '';
+  el.classList.toggle('hidden', !message);
+}
+
+function explainAdminAuth(data, fallback) {
+  if (!data) return fallback;
+  if (data.userMessage) return data.userMessage;
+  const message = data.message || '';
+  if (/reply_to|reply-to/i.test(message) || data.error === 'EMAIL_SMTP_SEND_FAILED') {
+    if (/invalid `to`|testing email address/i.test(message) && !/reply_to|reply-to/i.test(message)) {
+      return '请换一个真实邮箱，example.com 这类地址收不到。';
+    }
+    if (data.error === 'EMAIL_SMTP_SEND_FAILED' || /reply_to|reply-to/i.test(message)) {
+      return '验证码暂时发不出去，请稍后再试。';
+    }
+  }
+  return message || data.error || fallback;
+}
+
+async function adminSendCode() {
+  adminLoginError('');
+  const email = document.getElementById('admin-email').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    adminLoginError('请输入正确的邮箱');
+    return;
+  }
+  const result = await StellarCloud.resend(email);
+  if (!result.ok) {
+    adminLoginError(explainAdminAuth(result.data, '验证码发送失败'));
+    return;
+  }
+  adminCodeSent = true;
+  const btn = document.getElementById('admin-code-btn');
+  if (btn) btn.textContent = '重发验证码';
+  adminLoginError('');
+}
+
+async function adminSubmitLogin() {
+  adminLoginError('');
+  const email = document.getElementById('admin-email').value.trim();
+  const password = document.getElementById('admin-password').value;
+  const code = document.getElementById('admin-code').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    adminLoginError('请输入正确的邮箱');
+    return;
+  }
+  if (!password || password.length < 6) {
+    adminLoginError('密码至少 6 位');
+    return;
+  }
+  try {
+    if (code) {
+      const verified = await StellarCloud.verify(email, code);
+      if (!verified.ok || !verified.data.accessToken) {
+        adminLoginError(explainAdminAuth(verified.data, '验证码不正确'));
+        return;
+      }
+    } else {
+      const signedUp = await StellarCloud.register(email, password);
+      if (!(signedUp.data && signedUp.data.accessToken)) {
+        if (signedUp.status === 409) {
+          const session = await StellarCloud.login(email, password);
+          if (!(session.data && session.data.accessToken)) {
+            adminLoginError(session.data && session.data.requireEmailVerification ? '请先填写邮箱验证码' : explainAdminAuth(session.data, '登录失败'));
+            return;
+          }
+          await StellarCloud.applySessionToken(session.data);
+        } else if (signedUp.data && signedUp.data.requireEmailVerification) {
+          adminLoginError('请先获取并填写邮箱验证码');
+          return;
+        } else {
+          adminLoginError(explainAdminAuth(signedUp.data, '登录失败'));
+          return;
+        }
+      } else {
+        await StellarCloud.applySessionToken(signedUp.data);
+      }
+    }
+    const gate = await fetch('/api/park/admin/session', { headers: { Authorization: 'Bearer ' + StellarCloud.getToken() } });
+    const body = await gate.json().catch(() => ({}));
+    if (!gate.ok) {
+      StellarCloud.logout();
+      adminLoginError(body.message || '没有后台权限');
+      return;
+    }
+    unlockAdmin(body.email || email);
+  } catch (err) {
+    adminLoginError(err.message || '网络异常');
+  }
+}
+
+function unlockAdmin(email) {
+  adminReady = true;
+  document.getElementById('admin-gate').classList.add('hidden');
+  document.getElementById('admin-shell').classList.remove('hidden');
+  const emailEl = document.getElementById('admin-user-email');
+  if (emailEl) emailEl.textContent = email || '';
+  document.title = '后台 · 数据仪表盘';
+  bootAdminCloud();
+}
+
 async function bootAdminCloud() {
+  if (!adminReady) return;
   if (window.StellarCloud) {
     try {
       await StellarCloud.fetchAdminOrders();
@@ -2203,7 +2382,7 @@ async function bootAdminCloud() {
 ensureProductsSeed();
 loadRidesStatus();
 updateClock();
-bootAdminCloud();
+lucide.createIcons();
 </script>
 </main>
 </body>
