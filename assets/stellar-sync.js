@@ -155,8 +155,39 @@
     return false;
   }
 
+  function parkVisitorCount(date) {
+    const when = date || new Date();
+    const parts = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Shanghai',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(when);
+    let hash = 0;
+    for (let i = 0; i < parts.length; i++) hash = (hash * 33 + parts.charCodeAt(i)) >>> 0;
+    return 8200 + (hash % 400);
+  }
+
+  function rideIconSvg(rideId, sizeClass, colorStyle, dimClass) {
+    const cls = (sizeClass || 'w-6 h-6') + ' ride-icon-svg' + (dimClass || '');
+    const style = colorStyle || 'color: currentColor';
+    const open = '<svg viewBox="0 0 24 24" fill="none" class="' + cls + '" style="' + style + '">';
+    const icons = {
+      neon: '<path d="M4 16 L9 8 H13 L10 13 H14 L8 20 L11 14 H7 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/><circle cx="17" cy="7" r="2" stroke="currentColor" stroke-width="1.3"/>',
+      dream: '<path d="M3 15 C6 12, 8 18, 12 15 C16 12, 18 18, 21 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/><path d="M4 9 C7 7, 9 11, 12 9" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity="0.7"/>',
+      matrix: '<rect x="4" y="4" width="6" height="6" stroke="currentColor" stroke-width="1.3"/><rect x="14" y="4" width="6" height="6" stroke="currentColor" stroke-width="1.3"/><rect x="4" y="14" width="6" height="6" stroke="currentColor" stroke-width="1.3"/><path d="M14 17 H20 M17 14 V20" stroke="currentColor" stroke-width="1.3"/>',
+      thunder: '<path d="M13 3 L6 13 H11 L9 21 L18 10 H13 Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" fill="none"/>',
+      shadow: '<path d="M8 10 a4 4 0 1 1 8 0 v2 h1 a2 2 0 0 1 2 2 v1 H5 v-1 a2 2 0 0 1 2-2 h1 z" stroke="currentColor" stroke-width="1.3" fill="none"/><circle cx="10" cy="10" r="0.8" fill="currentColor"/><circle cx="14" cy="10" r="0.8" fill="currentColor"/>',
+      aurora: '<circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.3"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/><path d="M12 5 V8 M12 16 V19 M5 12 H8 M16 12 H19" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>'
+    };
+    if (!icons[rideId]) return '';
+    return open + icons[rideId] + '</svg>';
+  }
+
   global.StellarSync = {
     KEYS: KEYS,
+    parkVisitorCount: parkVisitorCount,
+    rideIconSvg: rideIconSvg,
     ORDERS_RESET_VERSION: ORDERS_RESET_VERSION,
     notifyDataChange: notifyDataChange,
     onDataChange: onDataChange,
