@@ -211,38 +211,38 @@
         <i data-lucide="sparkles" class="w-10 h-10 text-[var(--stellar-primary-bright)]"></i>
       </div>
       <h1 class="text-2xl font-bold gold-text">星屿乐园</h1>
-      <p class="text-xs text-[var(--stellar-muted-foreground)] mt-1.5">登录后即可购票和查看订单</p>
     </div>
 
     <!-- 登录表单 -->
     <div class="glass-card rounded-2xl p-5 space-y-4">
-      <!-- 手机号 -->
       <div>
-        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">手机号</label>
+        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">邮箱</label>
         <div class="relative">
-          <i data-lucide="phone" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
-          <input type="tel" id="login-phone" maxlength="11" inputmode="numeric" placeholder="请输入11位手机号" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+          <i data-lucide="mail" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="email" id="login-email" autocomplete="username" placeholder="you@example.com" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
         </div>
       </div>
-
-      <!-- 验证码 -->
       <div>
-        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">短信验证码</label>
+        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">密码</label>
+        <div class="relative">
+          <i data-lucide="lock" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="password" id="login-password" autocomplete="current-password" minlength="6" placeholder="至少 6 位" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">邮箱验证码</label>
         <div class="flex gap-2">
           <div class="relative flex-1">
             <i data-lucide="shield-check" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="tel" id="login-code" maxlength="6" inputmode="numeric" placeholder="6位验证码" oninput="clearLoginError()" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
+            <input type="text" id="login-code" maxlength="8" inputmode="numeric" placeholder="8位验证码" oninput="clearLoginError()" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
           </div>
-          <button id="sms-btn" onclick="sendSmsCode()" class="px-3.5 py-3 rounded-xl text-xs font-medium whitespace-nowrap glow-border transition-opacity" style="background: var(--stellar-primary-soft); color: var(--stellar-primary-bright);">获取验证码</button>
+          <button id="sms-btn" onclick="sendEmailCode()" class="px-3.5 py-3 rounded-xl text-xs font-medium whitespace-nowrap glow-border transition-opacity" style="background: var(--stellar-primary-soft); color: var(--stellar-primary-bright);">重发验证码</button>
         </div>
         <p id="sms-hint" class="text-[10px] text-[var(--stellar-primary-bright)] mt-1.5 hidden"></p>
         <p id="login-error" class="text-[11px] mt-1.5 hidden font-medium" style="color: var(--stellar-error);"></p>
       </div>
-
-      <!-- 登录按钮 -->
-      <button onclick="handleLogin()" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">登录</button>
-
-      <p class="text-center text-[11px] text-[var(--stellar-ink-3)]">未注册手机号将自动注册</p>
+      <button id="login-submit" onclick="handleLogin()" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">登录 / 注册</button>
+      <p class="text-center text-[11px] text-[var(--stellar-ink-3)]">新邮箱会自动注册。验证码发到邮箱，不会显示在页面上。</p>
       <button onclick="dismissLoginOverlay()" class="w-full py-2 text-xs text-[var(--stellar-muted-foreground)]">暂不登录</button>
     </div>
   </div>
@@ -255,7 +255,7 @@
 <div id="logout-confirm" class="fixed inset-0 z-[70] hidden items-center justify-center px-8" style="background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);">
   <div class="w-full max-w-[280px] rounded-2xl glass-card p-6 text-center" style="box-shadow: var(--stellar-shadow-2);">
     <p class="text-base font-semibold mb-1" style="color: var(--stellar-foreground);">确认退出吗？</p>
-    <p class="text-xs mb-5" style="color: var(--stellar-muted-foreground);">退出后需重新验证手机号登录</p>
+    <p class="text-xs mb-5" style="color: var(--stellar-muted-foreground);">退出后需重新用邮箱登录</p>
     <div class="flex gap-3">
       <button onclick="cancelLogout()" class="flex-1 py-2.5 rounded-xl text-sm font-medium glass-card" style="color: var(--stellar-foreground);">否</button>
       <button onclick="confirmLogout()" class="flex-1 py-2.5 rounded-xl text-sm font-medium glass-card" style="color: var(--stellar-foreground);">是</button>
@@ -862,6 +862,7 @@
 
     <script src="../assets/vendor/qrcode.min.js"></script>
     <script src="../assets/stellar-sync.js"></script>
+    <script src="../assets/stellar-cloud.js"></script>
 <script>
 // ==================== 数据定义 ====================
 const DEFAULT_TICKET_TYPES = {
@@ -1049,10 +1050,34 @@ function isExpressPassRecord(record) {
   return window.StellarSync ? StellarSync.isExpressPass(record) : !!(record && record.ticketId === 'express');
 }
 
+function cloudOn() {
+  return !!(window.StellarCloud);
+}
+function persistCloudList(list) {
+  if (!cloudOn()) return;
+  const session = StellarCloud.cache.session;
+  list.forEach(function (item) {
+    if (session) {
+      item.userId = item.userId || session.id;
+      item.email = item.email || session.email;
+      if (!item.phone) item.phone = session.email;
+    }
+    StellarCloud.upsert(item).catch(function (err) {
+      showLoginToast(err.message || '订单保存失败');
+    });
+  });
+}
 function getExpressPasses() {
+  if (cloudOn()) return StellarCloud.cache.express.slice();
   try { return JSON.parse(localStorage.getItem(EXPRESS_STORAGE_KEY) || '[]'); } catch(e) { return []; }
 }
 function saveExpressPasses(list) {
+  if (cloudOn()) {
+    StellarCloud.cache.express = list.slice();
+    persistCloudList(list);
+    if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.expressPasses);
+    return;
+  }
   localStorage.setItem(EXPRESS_STORAGE_KEY, JSON.stringify(list));
   if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.expressPasses);
 }
@@ -1063,12 +1088,19 @@ function getExpressPassesForCurrentUser() {
 }
 
 function getOrders() {
+  if (cloudOn()) return StellarCloud.cache.orders.slice();
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
 }
 function getTicketOrders() {
   return getOrders().filter(o => !isExpressPassRecord(o));
 }
 function saveOrders(orders) {
+  if (cloudOn()) {
+    StellarCloud.cache.orders = orders.slice();
+    persistCloudList(orders);
+    if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.orders);
+    return;
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
   if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.orders);
 }
@@ -1120,6 +1152,9 @@ function saveUsers(users) {
   if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.users);
 }
 function getCurrentUserPhone() {
+  if (cloudOn() && StellarCloud.cache.session && StellarCloud.cache.session.email) {
+    return StellarCloud.cache.session.email;
+  }
   try { return localStorage.getItem(CURRENT_USER_KEY) || null; } catch(e) { return null; }
 }
 function setCurrentUserPhone(phone) {
@@ -1127,32 +1162,44 @@ function setCurrentUserPhone(phone) {
 }
 function clearCurrentUser() {
   localStorage.removeItem(CURRENT_USER_KEY);
+  if (cloudOn()) StellarCloud.logout();
 }
 function getUserByPhone(phone) {
-  return getUsers().find(u => u.phone === phone) || null;
+  return getUsers().find(u => u.phone === phone || u.email === phone) || null;
 }
 function maskPhone(phone) {
-  if (!phone || phone.length < 7) return phone || '';
+  if (!phone) return '';
+  if (String(phone).includes('@')) return phone;
+  if (phone.length < 7) return phone;
   return phone.slice(0,3) + '****' + phone.slice(-4);
 }
 function getNicknameForPhone(phone) {
+  if (phone && String(phone).includes('@')) return String(phone).split('@')[0];
   const last4 = phone && phone.length >= 4 ? phone.slice(-4) : '8888';
   return '星际探索者' + last4;
 }
 
-function sendSmsCode() {
+function authMessage(data, fallback) {
+  if (!data) return fallback;
+  const code = data.error || '';
+  if (code === 'EMAIL_SMTP_SEND_FAILED') return '验证码邮件没发出去。请换一个真实邮箱，example.com 这类地址收不到。';
+  return data.message || data.error || fallback;
+}
+
+async function sendEmailCode() {
   clearLoginError();
-  const phoneInput = document.getElementById('login-phone');
-  const phone = phoneInput.value.trim();
-  if (!/^1\d{10}$/.test(phone)) {
-    showLoginToast('请输入正确的11位手机号');
-    phoneInput.focus();
+  const email = document.getElementById('login-email').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showLoginError('请输入正确的邮箱');
     return;
   }
-  // 生成 6 位演示验证码
-  lastSmsCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const result = await StellarCloud.resend(email);
+  if (!result.ok && result.status !== 200) {
+    showLoginError(authMessage(result.data, '验证码发送失败'));
+    return;
+  }
   const hint = document.getElementById('sms-hint');
-  hint.textContent = '演示验证码: ' + lastSmsCode;
+  hint.textContent = '验证码已发到邮箱，请填写 8 位数字';
   hint.classList.remove('hidden');
   showLoginToast('验证码已发送');
   startSmsCountdown();
@@ -1172,7 +1219,7 @@ function startSmsCountdown() {
       clearInterval(smsCountdownTimer);
       smsCountdownTimer = null;
       btn.disabled = false;
-      btn.textContent = '获取验证码';
+      btn.textContent = '重发验证码';
       btn.style.opacity = '1';
       btn.style.cursor = 'pointer';
     } else {
@@ -1222,47 +1269,14 @@ function clearLoginError() {
   }
 }
 
-function handleLogin() {
-  clearLoginError();
-  const phone = document.getElementById('login-phone').value.trim();
-  const code = document.getElementById('login-code').value.trim();
-  if (!/^1\d{10}$/.test(phone)) {
-    showLoginError('请输入正确的11位手机号');
-    return;
-  }
-  if (!/^\d{6}$/.test(code)) {
-    showLoginError('请输入6位验证码');
-    return;
-  }
-  if (!lastSmsCode) {
-    showLoginError('请先获取验证码');
-    return;
-  }
-  if (code !== lastSmsCode) {
-    showLoginError('验证码错误，请输入正确的演示验证码');
-    document.getElementById('login-code').value = '';
-    return;
-  }
-  // 登录 / 自动注册
-  let users = getUsers();
-  let user = users.find(u => u.phone === phone);
-  let isRegister = false;
-  if (!user) {
-    user = {
-      phone: phone,
-      registeredAt: new Date().toISOString(),
-      nickname: getNicknameForPhone(phone)
-    };
-    users.push(user);
-    saveUsers(users);
-    isRegister = true;
-  }
-  setCurrentUserPhone(phone);
+async function finishCloudLogin(isRegister) {
   hideLoginOverlay();
+  if (cloudOn() && StellarCloud.getToken()) {
+    try { await StellarCloud.fetchMyOrders(); } catch (e) {}
+  }
   updateProfileUserInfo();
   updateProfileNav();
   showLoginToast(isRegister ? '注册成功，欢迎加入星屿乐园' : '登录成功');
-  // 处理登录后待执行的操作
   const pendingAction = pendingLoginAction;
   pendingLoginAction = null;
   if (pendingAction === 'purchase' && lastAttemptedTicketId) {
@@ -1271,6 +1285,73 @@ function handleLogin() {
     openPurchase(ticketId);
   } else if (pendingAction === 'profile' || pendingAction === 'orders') {
     switchTab('profile');
+  }
+}
+
+async function handleLogin() {
+  clearLoginError();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const code = document.getElementById('login-code').value.trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showLoginError('请输入正确的邮箱');
+    return;
+  }
+  if (!password || password.length < 6) {
+    showLoginError('密码至少 6 位');
+    return;
+  }
+  const btn = document.getElementById('login-submit');
+  if (btn) btn.disabled = true;
+  try {
+    if (code) {
+      if (!/^\d{8}$/.test(code)) {
+        showLoginError('请输入 8 位验证码');
+        return;
+      }
+      const verified = await StellarCloud.verify(email, code);
+      if (!verified.ok || !verified.data.accessToken) {
+        showLoginError(authMessage(verified.data, '验证码不正确'));
+        return;
+      }
+      await finishCloudLogin(false);
+      return;
+    }
+    const signedUp = await StellarCloud.register(email, password);
+    if (signedUp.data && signedUp.data.accessToken) {
+      await StellarCloud.applySessionToken(signedUp.data);
+      await finishCloudLogin(true);
+      return;
+    }
+    if (signedUp.data && signedUp.data.requireEmailVerification) {
+      const hint = document.getElementById('sms-hint');
+      hint.textContent = '验证码已发到邮箱，填好后再点登录';
+      hint.classList.remove('hidden');
+      showLoginToast('请查收邮箱里的 8 位验证码');
+      return;
+    }
+    if (signedUp.status === 409) {
+      const session = await StellarCloud.login(email, password);
+      if (session.data && session.data.accessToken) {
+        await StellarCloud.applySessionToken(session.data);
+        await finishCloudLogin(false);
+        return;
+      }
+      if ((session.data && session.data.requireEmailVerification) || session.status === 403) {
+        const hint = document.getElementById('sms-hint');
+        hint.textContent = '这个邮箱还没验证，请填写邮箱里的 8 位验证码';
+        hint.classList.remove('hidden');
+        showLoginToast('请先完成邮箱验证');
+        return;
+      }
+      showLoginError(authMessage(session.data, '登录失败'));
+      return;
+    }
+    showLoginError(authMessage(signedUp.data, '注册失败'));
+  } catch (err) {
+    showLoginError(err.message || '网络异常');
+  } finally {
+    if (btn) btn.disabled = false;
   }
 }
 
@@ -1283,7 +1364,8 @@ function showLoginOverlay() {
   document.getElementById('login-overlay').classList.remove('hidden');
   lockPageScroll();
   // 重置表单
-  document.getElementById('login-phone').value = '';
+  document.getElementById('login-email').value = '';
+  document.getElementById('login-password').value = '';
   document.getElementById('login-code').value = '';
   document.getElementById('sms-hint').classList.add('hidden');
   clearLoginError();
@@ -1291,7 +1373,7 @@ function showLoginOverlay() {
   const btn = document.getElementById('sms-btn');
   if (btn) {
     btn.disabled = false;
-    btn.textContent = '获取验证码';
+    btn.textContent = '重发验证码';
     btn.style.opacity = '1';
     btn.style.cursor = 'pointer';
   }
@@ -1442,12 +1524,21 @@ function onAvatarSelected(event) {
 }
 
 function initLogin() {
-  const phone = getCurrentUserPhone();
-  if (phone) {
-    updateProfileUserInfo();
-  }
-  // 未登录时不弹出登录层，允许游客自由浏览
+  updateProfileUserInfo();
   updateProfileNav();
+}
+
+async function bootCloud() {
+  if (cloudOn()) {
+    try {
+      await StellarCloud.restoreSession();
+      if (StellarCloud.getToken()) await StellarCloud.fetchMyOrders();
+    } catch (e) {}
+  }
+  initLogin();
+  renderOrders('all');
+  renderExpressPasses('all');
+  if (typeof updateProfileCounts === 'function') updateProfileCounts();
 }
 
 // ==================== 星空粒子生成 ====================
@@ -2883,7 +2974,7 @@ lucide.createIcons();
 
 // ==================== 登录系统初始化 ====================
 initCrossPageSync();
-initLogin();
+bootCloud();
 ['purchase-overlay', 'ride-detail-overlay', 'wechat-pay-overlay', 'login-overlay'].forEach(function(id) {
   bindOverlayScrollGuard(document.getElementById(id));
 });

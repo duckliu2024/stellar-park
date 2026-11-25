@@ -1,6 +1,6 @@
 {
-  "version": 2,
-  "name": "stellar-park",
-  "buildCommand": "",
-  "outputDirectory": "."
+  "rewrites": [
+    { "source": "/app", "destination": "/pages/app-v2.html" },
+    { "source": "/admin", "destination": "/pages/admin-v2.html" }
+  ]
 }

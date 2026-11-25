@@ -778,6 +778,7 @@
 
     <script src="../assets/vendor/qrcode.min.js"></script>
     <script src="../assets/stellar-sync.js"></script>
+    <script src="../assets/stellar-cloud.js"></script>
 <script>
 // ==================== 数据定义（与 App 端一致） ====================
 const TICKET_TYPES = {
@@ -835,9 +836,18 @@ function isExpressPassRecord(record) {
 }
 
 function getExpressPasses() {
+  if (window.StellarCloud) return StellarCloud.cache.express.slice();
   try { return JSON.parse(localStorage.getItem(EXPRESS_STORAGE_KEY) || '[]'); } catch(e) { return []; }
 }
 function saveExpressPasses(list) {
+  if (window.StellarCloud) {
+    StellarCloud.cache.express = list.slice();
+    list.forEach(function (item) {
+      StellarCloud.upsertAdmin(item).catch(function (err) { console.error(err); });
+    });
+    if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.expressPasses);
+    return;
+  }
   localStorage.setItem(EXPRESS_STORAGE_KEY, JSON.stringify(list));
   if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.expressPasses);
 }
@@ -852,15 +862,24 @@ function getAllPaidRecords() {
 
 // ==================== localStorage 读取 ====================
 function getOrders() {
+  if (window.StellarCloud) return StellarCloud.cache.orders.slice();
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { return []; }
 }
 function saveOrders(orders) {
+  if (window.StellarCloud) {
+    StellarCloud.cache.orders = orders.slice();
+    orders.forEach(function (item) {
+      StellarCloud.upsertAdmin(item).catch(function (err) { console.error(err); });
+    });
+    if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.orders);
+    return;
+  }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
   if (window.StellarSync) StellarSync.notifyDataChange(StellarSync.KEYS.orders);
 }
 
-// 用户数据来自 localStorage（与 App 端共享）
 function getUsers() {
+  if (window.StellarCloud) return StellarCloud.cache.users.slice();
   try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch(e) { return []; }
 }
 function saveUsers(users) {
@@ -872,7 +891,7 @@ function saveUsers(users) {
 function maskPhone(phone) {
   if (!phone) return '—';
   const p = String(phone);
-  if (p.includes('****')) return p;
+  if (p.includes('@') || p.includes('****')) return p;
   if (p.length < 7) return p;
   return p.slice(0, 3) + '****' + p.slice(-4);
 }
@@ -1483,12 +1502,13 @@ function refreshOrders() {
   renderDashboard();
 }
 
-function adminClearAllOrders() {
+async function adminClearAllOrders() {
   if (!confirm('确认清空全部历史订单与快速通行证？此操作不可恢复。')) return;
-  if (window.StellarSync) {
+  if (window.StellarCloud) {
+    try { await StellarCloud.clearAll(); } catch (err) { alert(err.message || '清空失败'); return; }
+  } else if (window.StellarSync) {
     StellarSync.clearOrdersData();
     StellarSync.clearExpressPassesData();
-    localStorage.setItem(StellarSync.KEYS.ordersResetVersion, StellarSync.ORDERS_RESET_VERSION);
   } else {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(EXPRESS_STORAGE_KEY);
@@ -2165,13 +2185,25 @@ function updateClock() {
 setInterval(updateClock, 1000);
 
 // ==================== 初始化 ====================
+async function bootAdminCloud() {
+  if (window.StellarCloud) {
+    try {
+      await StellarCloud.fetchAdminOrders();
+      await StellarCloud.fetchAdminUsers();
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  lastOrderCount = getTicketOrders().length;
+  lastExpressCount = getExpressPasses().length;
+  renderDashboard();
+  lucide.createIcons();
+}
+
 ensureProductsSeed();
-lastOrderCount = getTicketOrders().length;
-lastExpressCount = getExpressPasses().length;
 loadRidesStatus();
-renderDashboard();
 updateClock();
-lucide.createIcons();
+bootAdminCloud();
 </script>
 </main>
 </body>

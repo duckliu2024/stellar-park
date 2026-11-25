@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>穿戴甲详情</title>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 1080px;
+    background: #F6F1ED;
+  }
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Heiti SC", sans-serif;
+    color: #3F2E32;
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    width: 1080px;
+    padding: 68px 56px 60px;
+    background-color: #F6F1ED;
+    background-image:
+      radial-gradient(820px 380px at 0% 0%, rgba(226, 176, 186, 0.32), transparent 62%),
+      radial-gradient(640px 340px at 100% 100%, rgba(214, 186, 150, 0.2), transparent 58%);
+  }
+  .head { text-align: center; }
+  h1 {
+    margin: 14px 0 0;
+    font-family: "Songti SC", "STSong", serif;
+    font-weight: 600;
+    font-size: 60px;
+    letter-spacing: 3px;
+    color: #6B3B48;
+    line-height: 1.15;
+  }
+  .sub {
+    margin: 12px 0 0;
+    font-family: "Songti SC", "STSong", serif;
+    font-size: 34px;
+    letter-spacing: 4px;
+    color: #A56E7C;
+    line-height: 1.3;
+  }
+  .ornament { display: flex; justify-content: center; }
+  .ornament.gap { margin-top: 22px; }
+  .ornament.foot { margin-top: 36px; }
+  .notes {
+    display: grid;
+    grid-template-columns: 1.45fr 0.9fr;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .note {
+    border-radius: 24px;
+    padding: 22px 26px 24px;
+    background: rgba(255,255,255,0.78);
+    border: 1px solid rgba(255,255,255,0.9);
+  }
+  .note.good { background: #F4F7F3; }
+  .note.bad { background: #FBF6F1; }
+  .k {
+    font-size: 22px;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+  .note.good .k { color: #5E7A63; }
+  .note.bad .k { color: #8C6848; }
+  .v {
+    font-size: 28px;
+    line-height: 1.5;
+    color: #3F2E32;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 22px;
+  }
+  .grid.top { margin-top: 28px; }
+  .card {
+    background: rgba(255,252,250,0.92);
+    border: 1px solid #F0E3DD;
+    border-radius: 28px;
+    padding: 18px 18px 22px;
+  }
+  .num {
+    font-family: "Songti SC", "STSong", serif;
+    font-size: 22px;
+    color: #C47B8A;
+    letter-spacing: 1px;
+    padding-left: 6px;
+  }
+  .stage {
+    height: 176px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .stage svg { width: 250px; height: 168px; display: block; }
+  .cap {
+    margin: 2px 8px 0;
+    text-align: center;
+    font-size: 30px;
+    line-height: 1.45;
+    color: #3F2E32;
+  }
+  .sec {
+    margin: 8px 0 0;
+    text-align: center;
+    font-family: "Songti SC", "STSong", serif;
+    font-size: 46px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: #6B3B48;
+  }
+  .sec.second { margin-top: 42px; }
+  .measures {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-top: 34px;
+  }
+  .mcard {
+    background: rgba(255,252,250,0.92);
+    border: 1px solid #F0E3DD;
+    border-radius: 28px;
+    padding: 8px 6px 4px;
+  }
+  .mcard svg { width: 100%; height: 210px; display: block; }
+  .explain {
+    margin: 26px 18px 0;
+    text-align: center;
+    font-size: 28px;
+    line-height: 1.75;
+    color: #3F2E32;
+  }
+  .table-wrap {
+    margin-top: 28px;
+    background: #fff;
+    border-radius: 28px;
+    overflow: hidden;
+    border: 1px solid #F0E3DD;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #F8EEEF;
+    color: #8E4E5C;
+    font-weight: 500;
+    font-size: 26px;
+    padding: 26px 4px;
+    font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+  }
+  td {
+    font-family: "Songti SC", "STSong", serif;
+    font-size: 32px;
+    color: #3F2E32;
+    text-align: center;
+    padding: 26px 4px;
+    border-top: 1px solid #F3E8E4;
+    white-space: nowrap;
+  }
+  td.size {
+    font-family: "PingFang SC", "Hiragino Sans GB", sans-serif;
+    color: #C47B8A;
+    font-size: 30px;
+  }
+</style>
+</head>
+<body>
+
+<section class="page" id="p1">
+  <div class="head">
+    <div class="ornament" id="bow"></div>
+    <h1>佩戴方法 1</h1>
+    <p class="sub">果冻胶佩戴法</p>
+    <div class="ornament gap"></div>
+  </div>
+  <div class="notes">
+    <div class="note good">
+      <div class="k">推荐理由</div>
+      <div class="v">可重复使用，不伤指甲，孕妈妈也可佩戴</div>
+    </div>
+    <div class="note bad">
+      <div class="k">劣势</div>
+      <div class="v">佩戴时间短，大约1-2天</div>
+    </div>
+  </div>
+  <div class="grid top">
+    <article class="card">
+      <div class="num">01</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="86" width="52" height="92" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="52" width="40" height="56" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <path d="M136 64c4 6 5 14 4 26" stroke="#fff" stroke-width="2.4" fill="none" opacity=".6" stroke-linecap="round"/>
+          <g transform="rotate(-38 146 78)">
+            <rect x="78" y="64" width="132" height="26" rx="8" fill="#6FA0D2" stroke="#4E84B8" stroke-width="1.6"/>
+            <path d="M92 72h104M92 78h104M92 84h104" stroke="#F3F8FD" stroke-width="1.3"/>
+          </g>
+        </svg>
+      </div>
+      <p class="cap">用搓条打磨甲面</p>
+    </article>
+    <article class="card">
+      <div class="num">02</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="86" width="52" height="92" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="52" width="40" height="56" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <g transform="rotate(-16 150 70)">
+            <rect x="96" y="36" width="92" height="58" rx="10" fill="#fff" stroke="#E4D4D6" stroke-width="1.6"/>
+            <rect x="108" y="48" width="68" height="10" rx="3" fill="#D5E6F6"/>
+            <rect x="108" y="64" width="48" height="8" rx="3" fill="#E7F0F8"/>
+          </g>
+          <circle cx="198" cy="58" r="3" fill="#9EC4E6"/>
+          <circle cx="208" cy="70" r="2" fill="#9EC4E6"/>
+        </svg>
+      </div>
+      <p class="cap">用酒精棉清洁甲面</p>
+    </article>
+    <article class="card">
+      <div class="num">03</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="58" y="48" width="164" height="112" rx="14" fill="#FFFBFA" stroke="#E7D5DA" stroke-width="1.8"/>
+          <ellipse cx="98" cy="84" rx="24" ry="16" fill="#F6D7E0" stroke="#E3B4C2" stroke-width="1.4"/>
+          <ellipse cx="150" cy="84" rx="24" ry="16" fill="#F6D7E0" stroke="#E3B4C2" stroke-width="1.4"/>
+          <ellipse cx="98" cy="124" rx="24" ry="16" fill="#F6D7E0" stroke="#E3B4C2" stroke-width="1.4"/>
+          <ellipse cx="150" cy="124" rx="24" ry="16" fill="#F6D7E0" stroke="#E3B4C2" stroke-width="1.4"/>
+          <g transform="translate(8,-16)">
+            <ellipse cx="176" cy="100" rx="24" ry="16" fill="#E4899A" stroke="#C45E74" stroke-width="1.8"/>
+            <path d="M164 92h24" stroke="#fff" stroke-width="1.4" opacity=".7"/>
+          </g>
+        </svg>
+      </div>
+      <p class="cap">选择合适的双面果冻胶</p>
+    </article>
+    <article class="card">
+      <div class="num">04</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="92" width="52" height="86" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="58" width="40" height="56" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <g transform="rotate(-45 168 78)">
+            <rect x="148" y="62" width="46" height="28" rx="12" fill="#F8E3E8" stroke="#E3B4C2" stroke-width="1.5" opacity=".95"/>
+            <path d="M186 62l16-14v28z" fill="#fff" stroke="#E3B4C2" stroke-width="1.2"/>
+          </g>
+          <path d="M168 108c10-10 22-14 34-12" fill="none" stroke="#C47B8A" stroke-width="1.6" stroke-linecap="round"/>
+          <text x="196" y="128" font-family="Songti SC, STSong, serif" font-size="16" fill="#C47B8A">45°</text>
+        </svg>
+      </div>
+      <p class="cap">撕下薄膜45°从根部贴</p>
+    </article>
+    <article class="card">
+      <div class="num">05</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="96" width="52" height="82" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="70" width="40" height="50" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <ellipse cx="144" cy="62" rx="34" ry="22" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <path d="M126 58c8 6 28 6 36 0" fill="none" stroke="#E7B7A8" stroke-width="1.5"/>
+          <path d="M92 48c-8 10-8 22 0 30" fill="none" stroke="#C47B8A" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M80 44c-10 12-10 28 0 38" fill="none" stroke="#E3B4C2" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="cap">按压40秒左右</p>
+    </article>
+    <article class="card">
+      <div class="num">06</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="112" y="78" width="56" height="96" rx="28" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="118" y="40" width="44" height="64" rx="22" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <path d="M132 54c5 8 6 18 5 32" stroke="#fff" stroke-width="3" fill="none" opacity=".65" stroke-linecap="round"/>
+          <path d="M196 46l2.2 7 7 2.2-7 2.2-2.2 7-2.2-7-7-2.2 7-2.2z" fill="#E4C57A"/>
+          <circle cx="214" cy="78" r="11" fill="#F3F7F3" stroke="#7E9A82" stroke-width="1.6"/>
+          <path d="M208 78l4 4 8-9" fill="none" stroke="#5E7A63" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="cap">成功搞定</p>
+    </article>
+  </div>
+  <div class="ornament foot"></div>
+</section>
+
+<section class="page" id="p2">
+  <div class="head">
+    <div class="ornament"></div>
+    <h1>测量尺寸</h1>
+    <p class="sub">根据测量尺寸选择对应尺码</p>
+    <div class="ornament gap"></div>
+  </div>
+  <div class="measures">
+    <div class="mcard">
+      <svg viewBox="0 0 300 230">
+        <rect x="124" y="118" width="52" height="90" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+        <rect x="130" y="78" width="40" height="62" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+        <path d="M68 146 C68 146, 98 58, 150 50 C202 58, 232 146, 232 146" fill="none" stroke="#F4E7CC" stroke-width="22" stroke-linecap="round"/>
+        <path d="M86 132 C104 78, 126 66, 150 62" fill="none" stroke="#D9C08A" stroke-width="1.2"/>
+        <path d="M150 62 C174 66, 196 78, 214 132" fill="none" stroke="#D9C08A" stroke-width="1.2"/>
+        <path d="M102 86 v16 M198 86 v16" stroke="#8C6848" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="102" cy="74" r="13" fill="#fff"/>
+        <circle cx="198" cy="74" r="13" fill="#fff"/>
+        <text x="102" y="80" text-anchor="middle" font-family="Songti SC, STSong, serif" font-size="20" fill="#7A5A3A">2</text>
+        <text x="198" y="80" text-anchor="middle" font-family="Songti SC, STSong, serif" font-size="20" fill="#7A5A3A">3</text>
+      </svg>
+    </div>
+    <div class="mcard">
+      <svg viewBox="0 0 300 230">
+        <rect x="116" y="120" width="68" height="90" rx="32" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+        <rect x="122" y="70" width="56" height="70" rx="26" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+        <path d="M58 150 C58 150, 92 46, 150 38 C208 46, 242 150, 242 150" fill="none" stroke="#F4E7CC" stroke-width="22" stroke-linecap="round"/>
+        <path d="M78 134 C100 72, 124 56, 150 50" fill="none" stroke="#D9C08A" stroke-width="1.2"/>
+        <path d="M150 50 C176 56, 200 72, 222 134" fill="none" stroke="#D9C08A" stroke-width="1.2"/>
+        <path d="M96 78 v16 M204 78 v16" stroke="#8C6848" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="96" cy="64" r="13" fill="#fff"/>
+        <circle cx="204" cy="64" r="13" fill="#fff"/>
+        <text x="96" y="70" text-anchor="middle" font-family="Songti SC, STSong, serif" font-size="20" fill="#7A5A3A">3</text>
+        <text x="204" y="70" text-anchor="middle" font-family="Songti SC, STSong, serif" font-size="20" fill="#7A5A3A">4</text>
+      </svg>
+    </div>
+    <div class="mcard">
+      <svg viewBox="0 0 300 230">
+        <rect x="124" y="108" width="52" height="96" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+        <rect x="118" y="52" width="64" height="72" rx="28" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+        <path d="M132 74c6 10 8 24 6 38" stroke="#fff" stroke-width="3" fill="none" opacity=".55" stroke-linecap="round"/>
+        <line x1="104" y1="86" x2="196" y2="86" stroke="#C47B8A" stroke-width="2.2" stroke-linecap="round"/>
+        <polyline points="116,76 104,86 116,96" fill="none" stroke="#C47B8A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="184,76 196,86 184,96" fill="none" stroke="#C47B8A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+  <p class="explain">用软尺包裹甲片，弧度测量最宽的位置 /<br>没有软尺可以用纸围住指甲做好记号后在直尺上测量。</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>型号</th>
+          <th>大拇指</th>
+          <th>食指</th>
+          <th>中指</th>
+          <th>无名指</th>
+          <th>小拇指</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="size">XS</td><td>14mm</td><td>10mm</td><td>11mm</td><td>10mm</td><td>7mm</td></tr>
+        <tr><td class="size">S</td><td>15mm</td><td>11mm</td><td>12mm</td><td>11mm</td><td>8mm</td></tr>
+        <tr><td class="size">M</td><td>16mm</td><td>12mm</td><td>13mm</td><td>12mm</td><td>9mm</td></tr>
+        <tr><td class="size">L</td><td>17mm</td><td>13mm</td><td>14mm</td><td>13mm</td><td>10mm</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ornament foot"></div>
+</section>
+
+<section class="page" id="p3">
+  <div class="head">
+    <div class="ornament"></div>
+    <h1 class="sec">果冻胶的拆卸方法</h1>
+    <div class="ornament gap"></div>
+  </div>
+  <div class="grid top">
+    <article class="card">
+      <div class="num">01</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="122" y="88" width="52" height="90" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="128" y="56" width="40" height="54" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <path d="M118 78c-16-20-8-36 6-30 6 2 4 12-2 18" fill="#F8E3E8" stroke="#E3B4C2" stroke-width="1.4"/>
+          <rect x="62" y="96" width="12" height="72" rx="6" fill="#E6C79A" stroke="#D2AE78" stroke-width="1.3" transform="rotate(-28 68 132)"/>
+        </svg>
+      </div>
+      <p class="cap">用木棒从侧面<br>轻轻剥下</p>
+    </article>
+    <article class="card">
+      <div class="num">02</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <g transform="rotate(-18 140 104)">
+            <rect x="112" y="48" width="56" height="96" rx="26" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+            <path d="M128 66c6 10 8 24 6 40" stroke="#fff" stroke-width="2.6" fill="none" opacity=".55" stroke-linecap="round"/>
+            <ellipse cx="140" cy="118" rx="20" ry="13" fill="#F6D7E0" stroke="#E3B4C2" stroke-width="1.4"/>
+          </g>
+          <path d="M176 70c18 4 28 16 26 28-2 8-14 8-22 2" fill="#fff" stroke="#E4D4D6" stroke-width="1.4"/>
+          <path d="M188 86c8 2 14 8 12 14" fill="none" stroke="#D5E6F6" stroke-width="3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="cap">用甲片上的果冻胶<br>清理干净，方便下次佩戴</p>
+    </article>
+  </div>
+
+  <h2 class="sec second">美甲胶水的拆卸方法</h2>
+  <div class="ornament gap"></div>
+  <div class="grid">
+    <article class="card">
+      <div class="num">01</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="108" y="78" width="34" height="58" rx="8" fill="#F7FBFE" stroke="#C5D4E2" stroke-width="1.6"/>
+          <rect x="114" y="62" width="22" height="18" rx="4" fill="#E7A8B6"/>
+          <rect x="114" y="92" width="22" height="24" rx="3" fill="#F8E4E8"/>
+          <rect x="168" y="64" width="12" height="86" rx="6" fill="#E6C79A" stroke="#D2AE78" stroke-width="1.3" transform="rotate(16 174 108)"/>
+        </svg>
+      </div>
+      <p class="cap">准备好解胶剂和木棒</p>
+    </article>
+    <article class="card">
+      <div class="num">02</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <path d="M104 58h72a24 24 0 0 1 24 24v46c0 22-28 40-60 40s-60-18-60-40V82a24 24 0 0 1 24-24z" fill="#F8E4E8" stroke="#E3B4C2" stroke-width="1.8"/>
+          <path d="M112 78h56" stroke="#E4899A" stroke-width="2" opacity=".4" stroke-linecap="round"/>
+          <ellipse cx="140" cy="108" rx="9" ry="12" fill="#C45E74"/>
+          <ellipse cx="137" cy="104" rx="3" ry="4" fill="#fff" opacity=".65"/>
+        </svg>
+      </div>
+      <p class="cap">在甲片内侧涂上<br>少量解胶剂</p>
+    </article>
+    <article class="card">
+      <div class="num">03</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="124" y="90" width="52" height="86" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="130" y="58" width="40" height="52" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <rect x="70" y="108" width="11" height="70" rx="5.5" fill="#E6C79A" stroke="#D2AE78" stroke-width="1.3" transform="rotate(-36 76 140)"/>
+          <circle cx="196" cy="64" r="3" fill="#C47B8A"/>
+          <circle cx="208" cy="64" r="3" fill="#C47B8A" opacity=".7"/>
+          <circle cx="220" cy="64" r="3" fill="#C47B8A" opacity=".4"/>
+        </svg>
+      </div>
+      <p class="cap">等待一会后<br>用木棒从边缘慢慢撬开</p>
+    </article>
+    <article class="card">
+      <div class="num">04</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="126" y="96" width="52" height="80" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <g transform="rotate(-14 146 80)">
+            <rect x="122" y="52" width="42" height="52" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          </g>
+          <ellipse cx="112" cy="78" rx="7" ry="9" fill="#C45E74"/>
+          <ellipse cx="110" cy="75" rx="2.4" ry="3" fill="#fff" opacity=".6"/>
+          <path d="M104 58c0 8-2 12-6 14" fill="none" stroke="#C45E74" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="cap">从撬开的边缘<br>在此滴入少量解胶剂</p>
+    </article>
+    <article class="card">
+      <div class="num">05</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="128" y="108" width="50" height="70" rx="25" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <g transform="rotate(-28 150 78)">
+            <rect x="128" y="48" width="40" height="50" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          </g>
+          <rect x="78" y="100" width="11" height="64" rx="5.5" fill="#E6C79A" stroke="#D2AE78" stroke-width="1.3" transform="rotate(-50 84 132)"/>
+          <path d="M196 70c10 6 14 16 8 24" fill="none" stroke="#C47B8A" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M206 64c12 8 16 20 8 30" fill="none" stroke="#E3B4C2" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="cap">重复用木棒慢慢撬开<br>少量多次</p>
+    </article>
+    <article class="card">
+      <div class="num">06</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="112" width="52" height="66" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <g transform="rotate(-8 170 70)">
+            <rect x="150" y="40" width="40" height="58" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+            <path d="M162 54c4 6 5 14 4 22" stroke="#fff" stroke-width="2.2" fill="none" opacity=".6" stroke-linecap="round"/>
+          </g>
+          <path d="M96 86c8-16 20-24 34-22" fill="none" stroke="#C47B8A" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="cap">慢慢揭下甲片<br>即可完成卸载</p>
+    </article>
+  </div>
+  <div class="ornament foot"></div>
+</section>
+
+<section class="page" id="p4">
+  <div class="head">
+    <div class="ornament"></div>
+    <h1>佩戴方法 2</h1>
+    <p class="sub">美甲胶水佩戴法</p>
+    <div class="ornament gap"></div>
+  </div>
+  <div class="notes">
+    <div class="note good">
+      <div class="k">推荐理由</div>
+      <div class="v">更加服帖，佩戴时间长，可保持1-2周时间</div>
+    </div>
+    <div class="note bad">
+      <div class="k">劣势</div>
+      <div class="v">不可重复利用</div>
+    </div>
+  </div>
+  <div class="grid top">
+    <article class="card">
+      <div class="num">01</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="86" width="52" height="92" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="52" width="40" height="56" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <path d="M136 64c4 6 5 14 4 26" stroke="#fff" stroke-width="2.4" fill="none" opacity=".6" stroke-linecap="round"/>
+          <g transform="rotate(-38 146 78)">
+            <rect x="78" y="64" width="132" height="26" rx="8" fill="#6FA0D2" stroke="#4E84B8" stroke-width="1.6"/>
+            <path d="M92 72h104M92 78h104M92 84h104" stroke="#F3F8FD" stroke-width="1.3"/>
+          </g>
+        </svg>
+      </div>
+      <p class="cap">用搓条打磨甲面</p>
+    </article>
+    <article class="card">
+      <div class="num">02</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="86" width="52" height="92" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="52" width="40" height="56" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <g transform="rotate(-16 150 70)">
+            <rect x="96" y="36" width="92" height="58" rx="10" fill="#fff" stroke="#E4D4D6" stroke-width="1.6"/>
+            <rect x="108" y="48" width="68" height="10" rx="3" fill="#D5E6F6"/>
+            <rect x="108" y="64" width="48" height="8" rx="3" fill="#E7F0F8"/>
+          </g>
+          <circle cx="198" cy="58" r="3" fill="#9EC4E6"/>
+          <circle cx="208" cy="70" r="2" fill="#9EC4E6"/>
+        </svg>
+      </div>
+      <p class="cap">用酒精棉清洁甲面</p>
+    </article>
+    <article class="card">
+      <div class="num">03</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <g transform="rotate(-8 130 110)">
+            <rect x="62" y="96" width="118" height="30" rx="10" fill="#F4C9D4" stroke="#E0A3B3" stroke-width="1.6"/>
+            <rect x="176" y="102" width="30" height="18" rx="4" fill="#F7FBFE" stroke="#C5D4E2" stroke-width="1.4"/>
+            <path d="M196 102v18" stroke="#C47B8A" stroke-width="1.4" stroke-dasharray="2 2"/>
+          </g>
+          <g transform="translate(188,46) rotate(20)">
+            <circle cx="0" cy="0" r="9" fill="none" stroke="#8E9AAB" stroke-width="1.8"/>
+            <circle cx="0" cy="20" r="9" fill="none" stroke="#8E9AAB" stroke-width="1.8"/>
+            <path d="M7 4 L36 -8 M7 16 L36 30" stroke="#8E9AAB" stroke-width="1.8" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+      <p class="cap">将胶水剪开适当大小</p>
+    </article>
+    <article class="card">
+      <div class="num">04</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="112" y="46" width="56" height="100" rx="28" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <path d="M130 64c6 10 7 24 6 40" stroke="#fff" stroke-width="3" fill="none" opacity=".55" stroke-linecap="round"/>
+          <ellipse cx="140" cy="108" rx="10" ry="13" fill="#C45E74"/>
+          <ellipse cx="136" cy="103" rx="3" ry="4" fill="#fff" opacity=".7"/>
+        </svg>
+      </div>
+      <p class="cap">把胶水滴到甲片上一滴</p>
+    </article>
+    <article class="card">
+      <div class="num">05</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="108" y="86" width="52" height="92" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="114" y="48" width="40" height="58" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <line x1="176" y1="128" x2="176" y2="46" stroke="#C47B8A" stroke-width="2.4" stroke-linecap="round"/>
+          <polyline points="166,60 176,44 186,60" fill="none" stroke="#C47B8A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <p class="cap">快速从指跟推到指尖</p>
+    </article>
+    <article class="card">
+      <div class="num">06</div>
+      <div class="stage">
+        <svg viewBox="0 0 280 200">
+          <circle cx="140" cy="104" r="72" fill="#F8EEEF"/>
+          <rect x="118" y="96" width="52" height="82" rx="26" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <rect x="124" y="70" width="40" height="50" rx="20" fill="#E4899A" stroke="#CC5E74" stroke-width="1.8"/>
+          <ellipse cx="144" cy="62" rx="34" ry="22" fill="#F6D5CB" stroke="#E3B5A8" stroke-width="2"/>
+          <path d="M126 58c8 6 28 6 36 0" fill="none" stroke="#E7B7A8" stroke-width="1.5"/>
+          <path d="M92 48c-8 10-8 22 0 30" fill="none" stroke="#C47B8A" stroke-width="1.7" stroke-linecap="round"/>
+          <path d="M80 44c-10 12-10 28 0 38" fill="none" stroke="#E3B4C2" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <p class="cap">按压30秒左右，完成</p>
+    </article>
+  </div>
+  <div class="ornament foot"></div>
+</section>
+
+<script>
+  const bow = `<svg width="132" height="28" viewBox="0 0 132 28" aria-hidden="true">
+    <line x1="0" y1="14" x2="46" y2="14" stroke="#E0C2A8" stroke-width="1"/>
+    <path d="M66 15c0 0-9-11-18-6-5 2.4 2 9 18 6z" fill="none" stroke="#C47B8A" stroke-width="1.5"/>
+    <path d="M66 15c0 0 9-11 18-6 5 2.4-2 9-18 6z" fill="none" stroke="#C47B8A" stroke-width="1.5"/>
+    <circle cx="66" cy="15" r="2.1" fill="#C4A36A"/>
+    <path d="M62 17l-5 8M70 17l5 8" stroke="#C47B8A" stroke-width="1.2" stroke-linecap="round"/>
+    <line x1="86" y1="14" x2="132" y2="14" stroke="#E0C2A8" stroke-width="1"/>
+  </svg>`;
+  document.querySelectorAll(".ornament").forEach((el) => { el.innerHTML = bow; });
+</script>
+</body>
+</html>

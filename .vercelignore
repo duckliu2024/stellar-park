@@ -1,0 +1,5 @@
+*.docx
+.vectoree
+.DS_Store
+server.mjs
+ios-homescreen-*.jpg

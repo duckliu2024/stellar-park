@@ -2,3 +2,6 @@
 .vercel
 .netlify
 *.log
+.vectoree/
+*.docx
+ios-homescreen-*.jpg
