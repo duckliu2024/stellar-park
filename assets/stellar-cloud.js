@@ -83,17 +83,6 @@
   async function login(email, password) {
     return json('POST', '/api/app-auth', { action: 'login', email: email, password: password });
   }
-  async function verify(email, otp) {
-    const result = await json('POST', '/api/app-auth', { action: 'verify', email: email, otp: otp });
-    if (result.ok && result.data.accessToken) {
-      setToken(result.data.accessToken);
-      await restoreSession();
-    }
-    return result;
-  }
-  async function resend(email) {
-    return json('POST', '/api/app-auth', { action: 'send-verification', email: email });
-  }
   function applySessionToken(data) {
     if (data && data.accessToken) {
       setToken(data.accessToken);
@@ -173,8 +162,6 @@
     restoreSession: restoreSession,
     register: register,
     login: login,
-    verify: verify,
-    resend: resend,
     applySessionToken: applySessionToken,
     fetchMyOrders: fetchMyOrders,
     fetchAdminOrders: fetchAdminOrders,

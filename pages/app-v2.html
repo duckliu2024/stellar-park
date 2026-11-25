@@ -72,7 +72,7 @@
   --stellar-error-foreground: #ffffff;
 }
 
-/* 登录验证码错误抖动动画 */
+/* 登录字段错误抖动 */
 @keyframes login-shake {
   0%, 100% { transform: translateX(0); }
   15% { transform: translateX(-8px); }
@@ -85,7 +85,7 @@
 .login-shake {
   animation: login-shake 0.5s ease-in-out;
 }
-.login-code-error {
+.login-input-invalid {
   border-color: var(--stellar-error) !important;
   box-shadow: 0 0 0 3px var(--stellar-error-soft) !important;
 }
@@ -231,21 +231,9 @@
         </div>
         <p id="login-error-password" class="login-field-error text-[11px] mt-1.5 hidden font-medium" style="color: var(--stellar-error);"></p>
       </div>
-      <div>
-        <label class="text-xs font-medium text-[var(--stellar-muted-foreground)] mb-1.5 block">邮箱验证码</label>
-        <div class="flex gap-2">
-          <div class="relative flex-1">
-            <i data-lucide="shield-check" class="w-4 h-4 text-[var(--stellar-muted-foreground)] absolute left-3 top-1/2 -translate-y-1/2"></i>
-            <input type="text" id="login-code" maxlength="8" inputmode="numeric" placeholder="8位验证码" oninput="clearLoginField('code')" class="w-full pl-9 pr-3 py-3 rounded-xl border border-[var(--stellar-input)] text-sm focus:outline-none focus:border-[var(--stellar-primary)] transition-colors" style="background: var(--stellar-card);">
-          </div>
-          <button id="sms-btn" onclick="sendEmailCode()" class="px-3.5 py-3 rounded-xl text-xs font-medium whitespace-nowrap glow-border transition-opacity" style="background: var(--stellar-primary-soft); color: var(--stellar-primary-bright);">获取验证码</button>
-        </div>
-        <p id="sms-hint" class="text-[10px] text-[var(--stellar-primary-bright)] mt-1.5 hidden"></p>
-        <p id="login-error-code" class="login-field-error text-[11px] mt-1.5 hidden font-medium" style="color: var(--stellar-error);"></p>
-      </div>
       <button id="login-submit" onclick="handleLogin()" class="w-full py-3 rounded-xl bg-[var(--stellar-primary)] text-[var(--stellar-primary-foreground)] text-sm font-semibold btn-glow">登录 / 注册</button>
       <p id="login-error-form" class="login-field-error text-[11px] hidden font-medium" style="color: var(--stellar-error);"></p>
-      <p class="text-center text-[11px] text-[var(--stellar-ink-3)]">新邮箱会自动注册。验证码发到邮箱，不会显示在页面上。</p>
+      <p class="text-center text-[11px] text-[var(--stellar-ink-3)]">新邮箱会自动注册，填写邮箱和密码即可。</p>
       <button onclick="dismissLoginOverlay()" class="w-full py-2 text-xs text-[var(--stellar-muted-foreground)]">暂不登录</button>
     </div>
   </div>
@@ -1150,14 +1138,10 @@ function updateOrderStatus(orderId, status) {
 // ==================== 用户登录/注册系统 ====================
 const USERS_KEY = 'stellar_park_users';
 const CURRENT_USER_KEY = 'stellar_park_current_user';
-let smsCountdownTimer = null;
-let smsCountdownSec = 0;
-let lastSmsCode = '';
 let pendingLoginAction = null;  // 'purchase' | 'profile' | 'orders'
 let lastAttemptedTicketId = null;
 let lastAttemptedPurchaseContext = null;
 let lastRideDetailId = null;
-let verificationSent = false;
 
 function getUsers() {
   try { return JSON.parse(localStorage.getItem(USERS_KEY) || '[]'); } catch(e) { return []; }
@@ -1205,56 +1189,17 @@ function authMessage(data, fallback) {
   if (data.userMessage) return data.userMessage;
   const code = data.error || '';
   const message = data.message || '';
+  if (code === 'AUTH_NEED_VERIFICATION' || data.requireEmailVerification === true) {
+    return '账号暂时无法登录，请稍后再试。';
+  }
+  if (/too many new accounts|too many requests|rate limit/i.test(message)) {
+    return '操作太频繁，请稍后再试。';
+  }
   if (code === 'EMAIL_SMTP_SEND_FAILED' || /reply_to|reply-to/i.test(message)) {
-    if (recipientAddressRejected(message)) return '验证码邮件没发出去。请换一个真实邮箱，example.com 这类地址收不到。';
-    return '验证码暂时发不出去，请稍后再试。';
+    if (recipientAddressRejected(message)) return '这个邮箱发不出去。请换一个真实邮箱，example.com 这类地址收不到。';
+    return '暂时无法完成注册或登录，请稍后再试。';
   }
   return message || data.error || fallback;
-}
-
-async function sendEmailCode() {
-  clearLoginError();
-  const email = document.getElementById('login-email').value.trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    showLoginError('请输入正确的邮箱', 'email');
-    return;
-  }
-  const result = await StellarCloud.resend(email);
-  if (!result.ok && result.status !== 200) {
-    const message = authMessage(result.data, '验证码发送失败');
-    const aboutAddress = recipientAddressRejected(result.data && result.data.message);
-    showLoginError(message, aboutAddress ? 'email' : 'form');
-    return;
-  }
-  const hint = document.getElementById('sms-hint');
-  hint.textContent = '验证码已发到邮箱，请填写 8 位数字';
-  hint.classList.remove('hidden');
-  verificationSent = true;
-  showLoginToast('验证码已发送');
-  startSmsCountdown();
-}
-
-function startSmsCountdown() {
-  smsCountdownSec = 60;
-  const btn = document.getElementById('sms-btn');
-  btn.disabled = true;
-  btn.textContent = '重新获取(60s)';
-  btn.style.opacity = '0.55';
-  btn.style.cursor = 'not-allowed';
-  if (smsCountdownTimer) clearInterval(smsCountdownTimer);
-  smsCountdownTimer = setInterval(() => {
-    smsCountdownSec--;
-    if (smsCountdownSec <= 0) {
-      clearInterval(smsCountdownTimer);
-      smsCountdownTimer = null;
-      btn.disabled = false;
-      btn.textContent = verificationSent ? '重发验证码' : '获取验证码';
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
-    } else {
-      btn.textContent = '重新获取(' + smsCountdownSec + 's)';
-    }
-  }, 1000);
 }
 
 let loginToastTimer = null;
@@ -1291,7 +1236,7 @@ function showLoginError(msg, field) {
     errEl.classList.remove('hidden');
   }
   const input = document.getElementById('login-' + key);
-  if (input) input.classList.add('login-shake', 'login-code-error');
+  if (input) input.classList.add('login-shake', 'login-input-invalid');
   setTimeout(() => { if (input) input.classList.remove('login-shake'); }, 500);
 }
 
@@ -1302,11 +1247,11 @@ function clearLoginField(field) {
     errEl.textContent = '';
   }
   const input = document.getElementById('login-' + field);
-  if (input) input.classList.remove('login-code-error');
+  if (input) input.classList.remove('login-input-invalid');
 }
 
 function clearLoginError() {
-  ['email', 'password', 'code', 'form'].forEach(clearLoginField);
+  ['email', 'password', 'form'].forEach(clearLoginField);
 }
 
 async function finishCloudLogin(isRegister) {
@@ -1336,7 +1281,6 @@ async function handleLogin() {
   clearLoginError();
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
-  const code = document.getElementById('login-code').value.trim();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     showLoginError('请输入正确的邮箱', 'email');
     return;
@@ -1348,17 +1292,14 @@ async function handleLogin() {
   const btn = document.getElementById('login-submit');
   if (btn) btn.disabled = true;
   try {
-    if (code) {
-      if (!/^\d{8}$/.test(code)) {
-        showLoginError('请输入 8 位验证码', 'code');
-        return;
-      }
-      const verified = await StellarCloud.verify(email, code);
-      if (!verified.ok || !verified.data.accessToken) {
-        showLoginError(authMessage(verified.data, '验证码不正确'), 'code');
-        return;
-      }
+    const session = await StellarCloud.login(email, password);
+    if (session.data && session.data.accessToken) {
+      await StellarCloud.applySessionToken(session.data);
       await finishCloudLogin(false);
+      return;
+    }
+    if (session.status !== 401) {
+      showLoginError(authMessage(session.data, '登录失败'), 'form');
       return;
     }
     const signedUp = await StellarCloud.register(email, password);
@@ -1367,28 +1308,8 @@ async function handleLogin() {
       await finishCloudLogin(true);
       return;
     }
-    if (signedUp.data && signedUp.data.requireEmailVerification) {
-      const hint = document.getElementById('sms-hint');
-      hint.textContent = '验证码已发到邮箱，填好后再点登录';
-      hint.classList.remove('hidden');
-      showLoginToast('请查收邮箱里的 8 位验证码');
-      return;
-    }
     if (signedUp.status === 409) {
-      const session = await StellarCloud.login(email, password);
-      if (session.data && session.data.accessToken) {
-        await StellarCloud.applySessionToken(session.data);
-        await finishCloudLogin(false);
-        return;
-      }
-      if ((session.data && session.data.requireEmailVerification) || session.status === 403) {
-        const hint = document.getElementById('sms-hint');
-        hint.textContent = '这个邮箱还没验证，请填写邮箱里的 8 位验证码';
-        hint.classList.remove('hidden');
-        showLoginToast('请先完成邮箱验证');
-        return;
-      }
-      showLoginError(authMessage(session.data, '登录失败'), 'form');
+      showLoginError('邮箱或密码不正确', 'form');
       return;
     }
     showLoginError(authMessage(signedUp.data, '注册失败'), 'form');
@@ -1410,18 +1331,7 @@ function showLoginOverlay() {
   // 重置表单
   document.getElementById('login-email').value = '';
   document.getElementById('login-password').value = '';
-  document.getElementById('login-code').value = '';
-  document.getElementById('sms-hint').classList.add('hidden');
   clearLoginError();
-  verificationSent = false;
-  if (smsCountdownTimer) { clearInterval(smsCountdownTimer); smsCountdownTimer = null; }
-  const btn = document.getElementById('sms-btn');
-  if (btn) {
-    btn.disabled = false;
-    btn.textContent = '获取验证码';
-    btn.style.opacity = '1';
-    btn.style.cursor = 'pointer';
-  }
   generateStars('login-stars', 30);
   lucide.createIcons();
 }
