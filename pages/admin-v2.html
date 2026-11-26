@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>后台 · 登录</title>
+    <title>后台 · 数据仪表盘</title>
     <style id="theme-vars">
 /* 星屿乐园 Stellar Park — 后台浅色主题
    单一品牌色：琥珀金 (#E3A63B)，浅灰白背景，清爽数据工作台 */
@@ -213,7 +213,7 @@
 <!-- Toast 提示 -->
 <div id="admin-toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-[90] hidden px-5 py-3 rounded-xl text-sm text-center pointer-events-none" style="background: var(--stellar-card); border: 1px solid var(--stellar-border-glow); box-shadow: var(--stellar-shadow-2); color: var(--stellar-foreground); transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0;"></div>
 
-<div id="admin-gate" class="fixed inset-0 z-[100] flex items-center justify-center px-4" style="background: var(--stellar-background);">
+<div id="admin-gate" class="fixed inset-0 z-[100] items-center justify-center px-4" style="display: none; background: var(--stellar-background);">
   <div class="w-full max-w-sm rounded-2xl p-6" style="background: var(--stellar-card); border: 1px solid var(--stellar-border); box-shadow: var(--stellar-shadow-2);">
     <h1 class="text-lg font-bold mb-1">星屿乐园后台</h1>
     <p class="text-xs mb-4" style="color: var(--stellar-muted-foreground);">请用已开通权限的邮箱登录。未登录不能查看订单、用户或修改项目。</p>
@@ -226,7 +226,7 @@
   </div>
 </div>
 
-<div id="admin-shell" class="hidden min-h-screen relative z-10 flex">
+<div id="admin-shell" class="min-h-screen relative z-10 flex">
 
   <!-- ==================== 侧边栏 ==================== -->
   <aside class="w-[232px] shrink-0 border-r-[1px] border-[var(--stellar-glass-border)] flex flex-col" style="background: var(--stellar-glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);">
@@ -2351,6 +2351,8 @@ async function bootAdminCloud() {
   lucide.createIcons();
 }
 
+adminReady = true;
+bootAdminCloud();
 ensureProductsSeed();
 loadRidesStatus();
 updateClock();
